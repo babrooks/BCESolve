@@ -1,4 +1,4 @@
-// Superclass for solving BCE
+// Includes for all BCE files.
 // BAB 11-3-2012
 
 #ifndef BCECOMMON_HPP

@@ -1,50 +1,85 @@
-#ifndef DISTRIBUTIONS_HPP
-#define DISTRIBUTIONS_HPP
+#ifndef BCEDISTR_HPP
+#define BCEDISTR_HPP
 
 #include <cmath>
 #include <vector>
 
 using namespace std;
 
-// Base class from which distributions are derived.
-class distribution
+//! Utility class for probability distributions
+/*! This is a pure virtual base class for describing bivariate joint
+    distributions. You can inherit from this class and reimplement the
+    CDF method. The CDF method should return the joint CDF. */
+class BCEDistr
 {
 public:
-  virtual double operator()(double v0, double v1) const = 0;
-  virtual distribution* clone() const = 0;
+  //! The joint CDF of the distribution.
+  virtual double CDF(double v0, double v1) const = 0;
+
+  //! Discretized PDF for the BCEDistr
+  /*! Calculates the mass in the rectangle [v0-incr0,v0] x
+    [v1-incr1,v1]. */
+  double PDF(double v0, double incr0,
+	     double v1, double incr1) const
+  {
+    return (CDF(v0,v1) + CDF(v0-incr0,v1-incr1)
+	    - CDF(v0-incr0,v1) - CDF(v0,v1-incr1));
+  }
+
+  //! Discretized PDF for the BCEDistr
+  /*! Calculates the mass in the rectangle [v0-incr,v0] x
+    [v1-incr,v1]. */
+  double PDF(double v0, double v1, double incr) const
+  {
+    return PDF(v0,incr,v1,incr);
+  }
 };
 
-// Class for convex combinations of multiple distributions.
-class distributionArray
+//! Weighted sum of distributions
+/*! This class creates a new distribution out of a convex combination
+    of distributions. It can be used recursively, i.e., to create
+    convex combinations of convex combinations. */
+class BCEDistrArray : public BCEDistr
 {
 public:
-  vector<distribution*> distributions;
+  vector<BCEDistr*> distributions;
   vector<double> weights;
 
-  distributionArray() {}
-
-  // Deallocate all of the space allocated for distributions.
-  ~distributionArray()
+  //! Default constructor
+  /*! Creates an empty BCEDistrArray. */
+  BCEDistrArray() {}
+  
+  //! Destructor
+  /*! Deletes all of the member distributions. */
+  ~BCEDistrArray()
   {
-    vector<distribution*>::iterator distr;
+    vector<BCEDistr*>::iterator distr;
     for (distr = distributions.begin();
 	 distr != distributions.end();
 	 distr++)
       delete *distr;
   }
 
-  // Add a new distribution to the array. Allocate space and then copy
-  // the new distribution.
-  template <class Distr>
-  void push_back(const Distr& newDistr, double newWeight)
+  //! Add a new distribution to the array
+  /*! This method appends a new distribution to the array with the
+      corresponding weight. */
+  bool push_back(BCEDistr* newDistr, double newWeight)
   {
-    distributions.push_back(newDistr.clone());
-    weights.push_back(newWeight);
+    // Avoid recursive catastrophes!
+    if (this != newDistr)
+      {
+	distributions.push_back(newDistr);
+	weights.push_back(newWeight);
+	
+	return false;
+      }
+    return true;
   }
 
+  //! Deletes all of the distributions in the array.
   void clear()
   {
-    vector<distribution*>::iterator distr;
+    vector<BCEDistr*>::iterator distr;
     for (distr = distributions.begin();
 	 distr != distributions.end();
 	 distr++)
@@ -53,9 +88,10 @@ public:
     weights.clear();
   }
 
-  double operator()(double v0, double v1) const
+  //! Implements BCEDistr::CDF to calculate the weighted sum of CDFs.
+  double CDF(double v0, double v1) const
   {
-    vector<distribution*>::const_iterator distr;
+    vector<BCEDistr*>::const_iterator distr;
     vector<double>::const_iterator weight;
 
     double p = 0;
@@ -63,14 +99,15 @@ public:
 	    weight = weights.begin();
 	 distr != distributions.end();
 	 distr++, weight++)
-      p += *weight * (**distr)(v0,v1);
+      p += *weight * (*distr)->CDF(v0,v1);
     return p;
   }
 };
 
-// Distribution that has a single mode. CDF is of the form
-// F(v)=c(dv-(v-m)^k+e), so that PDF is f(v)=c(d-k(v-m)^(k-1)). 
-class unimodal: public distribution
+//! Unimodal distribution
+/*! Distribution that has a single mode. CDF is of the form
+  F(v)=c(dv-(v-m)^k+e), so that PDF is f(v)=c(d-k(v-m)^(k-1)). */
+class unimodal: public BCEDistr
 {
   double m0;
   double c0;
@@ -105,7 +142,7 @@ public:
     e1 = e0; d1 = d0;
   }
 
-  double operator() (double v0, double v1) const
+  double CDF (double v0, double v1) const
   {
     double p = 1.0;
     if (v0<0)
@@ -121,14 +158,13 @@ public:
     return p;
   }
 
-  virtual unimodal* clone() const { return new unimodal(*this); }
 }; // unimodal
 
-// Uniform distribution
-class uniform: public distribution
+//! Uniform distribution
+class uniform: public BCEDistr
 {
 public:
-  double operator()(double v0, double v1) const
+  double CDF(double v0, double v1) const
   {
     double p = 1.0;
     if (v0<0)
@@ -144,11 +180,10 @@ public:
     return p;
   }
 
-  virtual uniform* clone() const { return new uniform(*this); }
 }; // uniform
 
-// Uniform w/ mass at zero
-class uniformWithMassPnt: public distribution
+//! Uniform w/ mass at zero
+class uniformWithMassPnt: public BCEDistr
 {
   double alpha;
 
@@ -156,7 +191,7 @@ public:
   uniformWithMassPnt() {}
   uniformWithMassPnt(double _alpha): alpha(_alpha) {}
 
-  double operator()(double v0, double v1) const
+  double CDF(double v0, double v1) const
   {
     double p = 1.0;
     if (v0<-1e-10)
@@ -176,11 +211,10 @@ public:
     return p;
   }
 
-  virtual uniformWithMassPnt* clone() const { return new uniformWithMassPnt(*this); }
 }; // uniform
 
-// Uniform distribution with no ties
-class uniformNoTie: public distribution
+//! Uniform distribution with no ties
+class uniformNoTie: public BCEDistr
 {
   int k;
   
@@ -188,7 +222,7 @@ public:
   uniformNoTie() {}
   uniformNoTie(int _k): k(_k) {}
 
-  double operator()(double v0, double v1) const
+  double CDF(double v0, double v1) const
   {
     double p = 1.0;
     if (v0<0)
@@ -207,11 +241,10 @@ public:
     return p;
   }
 
-  virtual uniformNoTie* clone() const { return new uniformNoTie(*this); }
 }; // uniformNoTie
 
-// f(v0,v1) = v0^alpha0*v1^alpha1
-class vToTheAlpha: public distribution
+//! CDF is of the form \f$F(v0,v1)=v_0^{\alpha_0}v_1^{\alpha_1}\f$
+class vToTheAlpha: public BCEDistr
 {
   double alpha0;
   double alpha1;
@@ -229,7 +262,7 @@ public:
     alpha1(a)
   {}
 
-  double operator()(double v0, double v1) const
+  double CDF(double v0, double v1) const
   {
     double p = 1.0;
     if (v0<0)
@@ -245,11 +278,10 @@ public:
     return p;
   } // CDF
 
-  virtual vToTheAlpha* clone() const { return new vToTheAlpha(*this); }
 }; // vToTheAlpha
 
 
-class independent: public distribution
+class independent: public BCEDistr
 {
   double probLow0;
   double probLow1;
@@ -267,7 +299,7 @@ public:
     probLow1(p)
   {}
 
-  double operator()(double v0, double v1) const
+  double CDF(double v0, double v1) const
   {
     double p = 1;
     if (v0 < 0)
@@ -287,20 +319,18 @@ public:
     return p;
   } // CDF
 
-  virtual independent* clone() const { return new independent(*this); }
 }; // independent
 
-template<class Distr>
-class truncated: public distribution
+class truncated: public BCEDistr
 {
 public:
-  Distr dist;
+  BCEDistr * dist;
   double min0;
   double min1;
   double max0;
   double max1;
 
-  truncated(Distr _dist):
+  truncated(BCEDistr * _dist):
     dist(_dist),
     min0(0),
     min1(0),
@@ -308,7 +338,7 @@ public:
     max1(1)
   {}
 
-  truncated(Distr _dist, 
+  truncated(BCEDistr * _dist, 
 	    double _min, double _max): 
     dist(_dist),
     min0(_min),
@@ -318,7 +348,7 @@ public:
   {
     assert(max0 >= min0);
   }
-  truncated(Distr _dist, 
+  truncated(BCEDistr * _dist, 
 	    double _min0, double _min1,
 	    double _max0, double _max1): 
     dist(_dist),
@@ -331,7 +361,7 @@ public:
     assert(max1 >= min1);
   }
 
-  double operator()(double v0, double v1) const
+  double CDF(double v0, double v1) const
   {
     // if (v0 < min0)
     //   v0 = min0;
@@ -346,26 +376,8 @@ public:
     if (v0 < min0-1e-13 || v1 < min1-1e-13)
       return 0;
 
-    return dist(v0,v1)-dist(min0,min1);
+    return dist->CDF(v0,v1)-dist->CDF(min0,min1);
   } // CDF
-
-  virtual truncated* clone() const { return new truncated(*this); }
 };
 
-// Calculates the mass in the area [v0-incr0,v0] x [v1-incr1,v1].
-template <class CDF>
-double PDF(const CDF & cdf,
-	   double v0, double incr0,
-	   double v1, double incr1)
-{
-  return (cdf(v0,v1) + cdf(v0-incr0,v1-incr1)
-	  - cdf(v0-incr0,v1) - cdf(v0,v1-incr1));
-}
-
-template <class CDF>
-double PDF(const CDF & cdf,
-	   double v0, double v1, double incr)
-{
-  return PDF(cdf,v0,incr,v1,incr);
-}
 #endif

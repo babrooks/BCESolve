@@ -3,6 +3,7 @@
 
 #include "bcecommon.hpp"
 #include "bceexception.hpp"
+#include "bcequilibrium.hpp"
 #include <boost/serialization/list.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/map.hpp>
@@ -11,194 +12,6 @@
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/serialization/utility.hpp>
-
-// Class for storing bndry points with PSM routine.
-class BCEPoint
-{
-public: 
-  vector<double> data;
-  
-  BCEPoint():data(2,0.0) {};
-  BCEPoint(vector<double> newData):data(newData) {};
-  BCEPoint(double p1, double p2):data(2,0.0) {data[0]=p1; data[1]=p2;};
-  ~BCEPoint() {};
-  
-  BCEPoint &operator=(const BCEPoint &rhs) 
-  {
-    if (this!=&rhs)
-      this->data = rhs.data;
-
-    return *this;
-  }
-
-  int operator==(const BCEPoint &rhs)
-  {
-    if ( this->data != rhs.data ) return 0;
-    return 1;
-  }
-
-  int operator<(const BCEPoint & rhs)
-  {
-    return 0;
-  }
-
-  friend ostream& operator<<(ostream& output, const BCEPoint &rhs)
-  {
-    output << rhs.data[0] << " " << rhs.data[1] << endl;
-
-    return output;
-  }
-};
-
-// Class for storing equilibria from PSM. The only reason we don't
-// just treat this as a vector<double> is that we might want to add
-// functionality later, e.g. for sorting.
-class BCEEquilibrium
-{
-public:
-  map<int,double> distribution;
-  double key;
-
-public:
-  BCEEquilibrium () {}
-  BCEEquilibrium (const map<int,double> & data):
-    distribution(data), key(0.0) 
-  {}
-
-  ~BCEEquilibrium() {}
-
-  BCEEquilibrium& operator=(const BCEEquilibrium & rhs)
-  {
-    if (this!=&rhs)
-      {
-	this->distribution=rhs.distribution;
-	this->key=rhs.key;
-      }
-    return *this;
-  }
-
-  template <class Archive>
-  void serialize(Archive& ar, const unsigned int version)
-  {
-    ar & distribution & key;
-  }
-
-  friend class boost::serialization::access;
-  friend class BCEData;
-}; // BCEEquilibrium
-
-// This class is a function operator for sorting equilibria in a
-// BCEData object.
-class BCEComparator
-{
-public:
-  enum Mode
-    {
-      ANGLE, EQUALITY
-    };
-private:
-  vector<int> obj;
-  vector<double> origin;
-  Mode currentMode;
-
-public:
-  BCEComparator(): obj(2,0) {};
-  bool operator() (const vector<double> &, 
-		   const vector<double> &);
-  double operator() (const vector<double> &, 
-		     const vector<double> &, 
-		     const vector<double> &);
-  void setObjectives(const vector<int> &);
-  void setOrigin(const vector<double> &);
-  void setMode(Mode);
-  
-  double cosine(const vector<double> &);
-  double norm(const vector<double> &);
-}; // BCEComparator
-
-// Class for iterating through arrays.
-class BCECounter
-{
-public:
-  int variable;
-  int marginal;
-  int stateType;
-
-  int numPlayers;
-  int state;
-  vector<int> actions;
-  vector<int> types;
-
-  BCECounter() {}
-
-  BCECounter(int _numStates,const vector<int> & _numActions, const vector<int> & _numTypes,
-	     const vector<int> &_stateConditions, 
-	     const vector< vector<int> > & _actionConditions, 
-	     const vector< vector<int> > & _typeConditions,
-	     bool _stateMarginal,
-	     const vector<bool> & _actionMarginal,
-	     const vector<bool> & _typeMarginal):
-    numPlayers(2),
-    numStates(_numStates), numActions(_numActions),
-    numTypes(_numTypes), stateConditions(_stateConditions),
-    actionConditions(_actionConditions), 
-    typeConditions(_typeConditions),
-    stateMarginal(_stateMarginal),
-    actionMarginal(_actionMarginal),
-    typeMarginal(_typeMarginal),
-    actions(2,0), types(2,0),
-    actionIncrements(2,0), typeIncrements(2,0),
-    actionDecrements(2,0), typeDecrements(2,0),
-    stateIncrementMarginal(0),
-    actionIncrementsMarginal(2,0), typeIncrementsMarginal(2,0),
-    actionDecrementsMarginal(2,0), typeDecrementsMarginal(2,0),
-    actionIncrementsStateType(2,0), typeIncrementsStateType(2,0),
-    typeDecrementsStateType(2,0)
-  {
-    initialize();
-  }
-  
-  void initialize();
-
-  bool operator++(); 
-
-  int getNumMarginal() {return numMarginalVariables;}
-  
-private:
-  int stateIndex;
-  vector<int> actionIndices;
-  vector<int> typeIndices;
-
-  int numMarginalVariables;
-  int numVariables;
-
-  vector<int> stateConditions;
-  vector< vector<int> > actionConditions;
-  vector< vector<int> > typeConditions;
-
-  bool stateMarginal;
-  vector<bool> actionMarginal;
-  vector<bool> typeMarginal;
-  
-  int numStates;
-  vector<int> numActions;
-  vector<int> numTypes;
-
-  vector<int> actionIncrements;
-  vector<int> typeIncrements;
-  vector<int> actionDecrements;
-  vector<int> typeDecrements;
-
-  int stateIncrementMarginal;
-  vector<int> actionIncrementsMarginal;
-  vector<int> typeIncrementsMarginal;
-  vector<int> actionDecrementsMarginal;
-  vector<int> typeDecrementsMarginal;
-
-  vector<int> actionIncrementsStateType;
-  vector<int> typeIncrementsStateType;
-  vector<int> typeDecrementsStateType;
-};
 
 // This class handles all of the data generated by the BCEBase. It
 // also contains statistical routines for analyzing the list of
@@ -222,8 +35,8 @@ public:
   int numActionsTypesPerPlayer_total;
   int numActionsTypes_total;
 
-  list<BCEEquilibrium> newEquilibria;
-  vector<BCEEquilibrium> equilibria;
+  list<BCEquilibrium> newEquilibria;
+  vector<BCEquilibrium> equilibria;
 
   int currentEquilibrium;
 
@@ -315,7 +128,7 @@ public:
 		  vector<int> &obj);
   // Gets the equilibrium corresponding to equilibriumIndex and puts
   // it in distr.
-  void getEquilibrium(int equilibriumIndex, BCEEquilibrium &equilibrium) const;
+  void getEquilibrium(int equilibriumIndex, BCEquilibrium &equilibrium) const;
   // Sets the current equilibrium to the equilibrium with index
   // i. That vector must be an element of the vector equilibria. 
   void setCurrentEquilibrium(int equilibriumIndex);

@@ -33,7 +33,7 @@ BCEGame::BCEGame (int numPlayersArg,
 {} 
 
 // Overloaded version of prior that finds the marginal.
-double BCEGame::prior(int state, int type, int player)
+double BCEGame::prior(int state, int type, int player) const
 {
   int stateTypeIndex, currentIndex, playerIndex;
   double probability=0.0;
@@ -79,7 +79,7 @@ double BCEGame::prior(int state, int type, int player)
 } // prior
 
 // Checks if any player has a dominated action/type.
-bool BCEGame::dominated(const vector<int> &actions, const vector<int> &types)
+bool BCEGame::dominated(const vector<int> &actions, const vector<int> &types) const
 {
   assert(actions.size()==numPlayers);
   assert(types.size()==numPlayers);

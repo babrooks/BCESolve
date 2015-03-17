@@ -118,27 +118,6 @@ void BCESolver::setParameter(BCESolver::BoolParameter param, bool arg)
 {
   switch (param)
     {
-    case OnlyICUp:
-      onlyICUp = arg;
-      break;
-    case OnlyICDown:
-      onlyICDown = arg;
-      break;
-    case OnlyICDownToZero:
-      onlyICDownToZero = arg;
-      break;
-    case OnlyPlayer1Down:
-      onlyPlayer1Down = arg;
-      break;
-    case OnlyPlayer0Up:
-      onlyPlayer0Up = arg;
-      break;
-    case OnlyLocalICDown:
-      onlyLocalICDown = arg;
-      break;
-    case OnlyLocalICUp:
-      onlyLocalICUp = arg;
-      break;
     default:
       throw(BCEException(BCEException::InvalidParameterName));
     } // switch
@@ -176,20 +155,6 @@ bool BCESolver::getParameter(BCESolver::BoolParameter param)
 {
   switch (param)
     {
-    case OnlyICUp:
-      return onlyICUp;
-    case OnlyICDown:
-      return onlyICDown;
-    case OnlyICDownToZero:
-      return onlyICDownToZero;
-    case OnlyPlayer1Down:
-      return onlyPlayer1Down;
-    case OnlyPlayer0Up:
-      return onlyPlayer0Up;
-    case OnlyLocalICDown:
-      return onlyLocalICDown;
-    case OnlyLocalICUp:
-      return onlyLocalICUp;
     default:
       throw(BCEException(BCEException::InvalidParameterName));
     } // switch
@@ -283,13 +248,7 @@ void BCESolver::populate ()
 	  // are not dominated, and if the deviating action is distinct.
 	  if (!(game->dominated(action,type,player) 
 		|| game->dominated(deviation,type,player) )
-	      && (!onlyICUp || deviation>action)
-	      && (!onlyICDown || deviation<action)
-	      && (!onlyICDownToZero || deviation>action || deviation==0 || deviation==1)
-	      && (!onlyPlayer1Down || deviation<action || player==0)
-	      && (!onlyPlayer0Up || deviation>action || player==1)
-	      && (!onlyLocalICDown || deviation>action || ((deviation==(action-1) || deviation==0)))
-	      && (!onlyLocalICUp || deviation<action || deviation==(action+1)))
+	      && game->feasibleDeviation(action,deviation,type,player) )
 	    {
 	      numICConstraints[player]++; 
 	    } // ! dominated
@@ -388,13 +347,7 @@ void BCESolver::populate ()
   		  // are dominated.
   		  if (!(game->dominated(action,type,player) 
   			|| game->dominated(deviations[player],type,player))
-  		      && (!onlyICUp || deviations[player]>action)
-  		      && (!onlyICDown || deviations[player]<action)
-  		      && (!onlyICDownToZero || deviations[player]>action || deviations[player]==0)
-  		      && (!onlyPlayer1Down || deviations[player]<action || player==0)
-  		      && (!onlyPlayer0Up || deviations[player]>action || player==1)
-  		      && (!onlyLocalICDown  || deviations[player]>action || ((deviations[player]==(action-1) || deviations[player]==0)))
-  		      && (!onlyLocalICUp || deviations[player]<action || deviations[player]==(action+1)))
+  		      && game->feasibleDeviation(action,deviation,type,player) )
   		    {
   		      IloNumExpr lhs(env,0);
 
@@ -562,58 +515,6 @@ void BCESolver::populate ()
 	    } // action
 	} // type
     } // player
-
-  // for (player=0; player<numPlayers; player++)
-  //   {
-  //     typeConditions[1-player] = vector<int>(0);
-  //     actionConditions[1-player] = vector<int>(0);
-
-  //     // Reset the rows counter.
-  //     for (type = 0; type < numTypes[player]; type++)
-  // 	{
-  // 	  typeConditions[player] = vector<int>(1,type);
-  // 	  for (action=0; action<numActions[player]; action++)
-  // 	    {
-  // 	      actionConditions[player] = vector<int>(1,action);
-	      
-  // 	      for (deviations[player] = 0; deviations[player] < numActions[player]; 
-  // 		   deviations[player]++)
-  // 		{
-  // 		  if (deviations[player] == action)
-  // 		    continue;
-		  
-  // 		  // Make sure neither the action nor the deviation
-  // 		  // are dominated.
-  // 		  if (!(game->dominated(action,type,player) 
-  // 			|| game->dominated(deviations[player],type,player))
-  // 		      && (!onlyICUp || deviations[player]>action)
-  // 		      && (!onlyICDown || deviations[player]<action)
-  // 		      && (!onlyICDownToZero || deviations[player]>action || deviations[player]==0)
-  // 		      && (!onlyPlayer1Down || deviations[player]<action || player==0)
-  // 		      && (!onlyPlayer0Up || deviations[player]>action || player==1)
-  // 		      && (!onlyLocalICDown  || deviations[player]>action || ((deviations[player]==(action-1) || deviations[player]==0)))
-  // 		      && (!onlyLocalICUp || deviations[player]<action || deviations[player]==(action+1)))
-  // 		    {
-
-  // 		      counter = BCECounter(numStates,numActions,numTypes,
-  // 					   stateConditions,actionConditions,typeConditions,
-  // 					   stateMarginal,actionMarginal,typeMarginal);
-		      
-  // 		      assert(counter.actions[player]==action);
-  // 		      assert(counter.types[player]==type);
-  // 		      assert(objectivesVector[player][counter.marginal]==
-  // 			     game->objective(counter.state,counter.actions,player));
-  // 		      row++;
-
-  // 		      if (!(row % (numICConstraints_total/20>0? numICConstraints_total/20:1)) && displayLevel)
-  // 			cout << "player = " << player << ", row=" << row << endl;
-
-  // 		    } // if not dominated, etc
-  // 		} // deviations
-  // 	    } // action
-  // 	} // type
-  //   } // player
-
 
   data.setObjectivesPriorDominated(objectivesVector,priorVector,dominatedVector);
 } // populate

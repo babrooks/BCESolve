@@ -5,6 +5,6 @@
 #define BCE_HPP
 
 #include "bcesolver.hpp"
-#include "distributions.hpp"
+#include "bcedistr.hpp"
 
 #endif
