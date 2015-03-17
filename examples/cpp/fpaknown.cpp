@@ -10,8 +10,8 @@ int main(int argc, char ** argv)
 {
   double entryCost=0.0;
   double reservePrice=0.0;
-  int nvals=10;
-  int nbids=10;
+  int nvals=2;
+  int nbids=50;
   double lowbid = 0.0;
 
   solveFPA(nvals,nbids,entryCost,reservePrice);
@@ -44,22 +44,12 @@ void solveFPA(int nvals, int nbids,
       FPAKnown fpa(nbids,nvals,entryCost,reservePrice,highbid);
       fpa.distribution.clear();
       // fpa.distribution.push_back(uniformWithMassPnt(0.3),1.0); // uniform with mass 
-      fpa.distribution.push_back(vToTheAlpha(1.0),1.0); // uniform
-      // fpa.distribution.push_back(independent(1.0/3.0),1.0);
-      // fpa.distribution.push_back(uniformNoTie(nvals),1.0);
-      // fpa.distribution.push_back(independent(1.0/3.0),1.0);
+      fpa.distribution.push_back(new vToTheAlpha(1.0),1.0); // uniform
 
 
       BCESolver solver(fpa);
 
       solver.setParameter(BCESolver::MinAngleIncrement,minAngleIncrement);
-      solver.setParameter(BCESolver::OnlyICDown,false);
-      if (solver.getParameter(BCESolver::OnlyICDown))
-	filename << "_onlydown";
-      solver.setParameter(BCESolver::OnlyICUp,false);
-      if (solver.getParameter(BCESolver::OnlyICUp))
-	filename << "_onlyup";
-
       solver.setParameter(BCESolver::DisplayLevel,1);
 
       if (verbose)

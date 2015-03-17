@@ -42,7 +42,9 @@ public:
 class BCEDistrArray : public BCEDistr
 {
 public:
+  //! Vector of pointers to distributions
   vector<BCEDistr*> distributions;
+  //! Weights corresponding to distributions
   vector<double> weights;
 
   //! Default constructor
@@ -105,8 +107,9 @@ public:
 };
 
 //! Unimodal distribution
-/*! Distribution that has a single mode. CDF is of the form
-  F(v)=c(dv-(v-m)^k+e), so that PDF is f(v)=c(d-k(v-m)^(k-1)). */
+/*! Independent draws from distributions that have a single mode. CDF
+  for each element is of the form \f$F(v)=c(dv-(v-m)^k+e)\f$, so that
+  PDF is \f$f(v)=c(d-k(v-m)^{k-1})\f$. */
 class unimodal: public BCEDistr
 {
   double m0;
@@ -280,74 +283,39 @@ public:
 
 }; // vToTheAlpha
 
-
-class independent: public BCEDistr
-{
-  double probLow0;
-  double probLow1;
-
-public:
-  independent() {}
-
-  independent (double p0, double p1):
-    probLow0(p0),
-    probLow1(p1)
-  {}
-
-  independent (double p):
-    probLow0(p),
-    probLow1(p)
-  {}
-
-  double CDF(double v0, double v1) const
-  {
-    double p = 1;
-    if (v0 < 0)
-      return 0.0;
-    else if (v0 < 0.5)
-      p *= probLow0*v0/0.5;
-    else if (v0<1.0)
-      p *= probLow0 + (1-probLow0)*(v0-0.5)/0.5;
-
-    if (v1 < 0)
-      return 0.0;
-    else if (v1 <0.5)
-      p *= probLow1*v1/0.5;
-    else if (v1 < 1.0)
-      p *= probLow1 + (1-probLow1)*(v1-0.5)/0.5;
-
-    return p;
-  } // CDF
-
-}; // independent
-
+//! Truncated version of a distribution
 class truncated: public BCEDistr
 {
 public:
+  //! The distribution being truncated
   BCEDistr * dist;
+  //! Minimum 0 coordinate
   double min0;
+  //! Minimum 1 coordinate
   double min1;
+  //! Maximum 0 coordinate
   double max0;
+  //! Maximum 1 coordinate
   double max1;
 
+  //! Constructor
+  /*! Truncates the given BCEDistr at _distr to the range
+      \f$[0,1]^2\f$. */
   truncated(BCEDistr * _dist):
-    dist(_dist),
-    min0(0),
-    min1(0),
-    max0(1),
-    max1(1)
+    truncated(_dist,0,1)
   {}
 
+  //! Constructor
+  /*! Truncates the distribution at _dist to the range
+      \f$[min,max]^2\f$. */
   truncated(BCEDistr * _dist, 
 	    double _min, double _max): 
-    dist(_dist),
-    min0(_min),
-    min1(_min),
-    max0(_max),
-    max1(_max)
-  {
-    assert(max0 >= min0);
-  }
+    truncated(_dist,_min,_min,_max,_max)
+  {}
+
+  //! Constructor. 
+  /*! Truncates the distribution at _dist to the range
+      \f$[min_0,max_0]\times[min_1,max_1]\f$. */
   truncated(BCEDistr * _dist, 
 	    double _min0, double _min1,
 	    double _max0, double _max1): 
@@ -361,6 +329,7 @@ public:
     assert(max1 >= min1);
   }
 
+  //! Implements BCEDistr::CDF
   double CDF(double v0, double v1) const
   {
     // if (v0 < min0)

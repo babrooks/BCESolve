@@ -8,8 +8,8 @@ int main(int argc, char ** argv)
   double entryCost=0.0;
   double reservePrice=0;
   double minAngleIncrement = 0.025;
-  int nb = 25;
-  int nv = 4;
+  int nb = 50;
+  int nv = 2;
 
   double highbid = 1.0;
 
@@ -86,10 +86,6 @@ int main(int argc, char ** argv)
       // solver.mapBoundary("fpaunknownbndry_bidder.dat");
       // cout << "Mapped boundary" << endl;
 
-      // cout << "Sorting data." << endl;
-      // vector<int> sortObj(2,0);
-      // sortObj[1]=1;
-      // data.sortEquilibria(sortObj);
 
     }
   catch (IloException & e)

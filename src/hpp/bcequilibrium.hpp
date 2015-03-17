@@ -12,23 +12,33 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/serialization/utility.hpp>
 
-// Class for storing equilibria from PSM. The only reason we don't
-// just treat this as a vector<double> is that we might want to add
-// functionality later, e.g. for sorting.
+//! Class for storing a BCE
+/*! Class for storing equilibria from BCESolver. The class performs
+    very few functions, except for serialization and copying. */
 class BCEquilibrium
 {
 public:
+  //! The BCE
+  /*! BCE are represented as maps from linear indices to doubles. The
+      linear index corresponding to a particular state/type/action
+      tuple can be easily calculated using BCECounter. */
   map<int,double> distribution;
+  //! Unused key for sorting BCE
   double key;
 
 public:
+  //! Default constructor
   BCEquilibrium () {}
+  //! Constructor
+  /*! Initializes the equilibrium with the given map and a key of
+      0.0. */
   BCEquilibrium (const map<int,double> & data):
     distribution(data), key(0.0) 
   {}
-
+  //! Destructor
   ~BCEquilibrium() {}
 
+  //! Assignment operator
   BCEquilibrium& operator=(const BCEquilibrium & rhs)
   {
     if (this!=&rhs)
@@ -39,6 +49,7 @@ public:
     return *this;
   }
 
+  //! Serialization routine.
   template <class Archive>
   void serialize(Archive& ar, const unsigned int version)
   {

@@ -11,8 +11,8 @@ int main(int argc, char ** argv)
 {
   double entryCost=0.0;
   double reservePrice=-0.0001;
-  int nvals=10;
   int nbids=10;
+  int nvals=10;
   double lowbid = 0.0;
 
   solveFPA(nvals,nbids,entryCost,reservePrice);
@@ -43,24 +43,15 @@ void solveFPA(int nvals, int nbids,
   try
     {
       FPAKnown fpa(nbids,nvals,entryCost,reservePrice,highbid);
-      fpa.exAnteFee = 0.1;
+      fpa.exAnteFee = 1.0;
       fpa.distribution.clear();
-      // fpa.distribution.push_back(uniformWithMassPnt(0.3),1.0); // uniform with mass 
-      fpa.distribution.push_back(vToTheAlpha(1.0),1.0); // uniform
-      // fpa.distribution.push_back(independent(1.0/3.0),1.0);
-      // fpa.distribution.push_back(uniformNoTie(nvals),1.0);
-      // fpa.distribution.push_back(independent(1.0/3.0),1.0);
+      fpa.distribution.push_back(new vToTheAlpha(1.0),1.0); // uniform
 
+      // FPASolver solver(fpa);
 
-      FPASolver solver(fpa);
+      BCESolver solver(fpa);
 
       solver.setParameter(BCESolver::MinAngleIncrement,minAngleIncrement);
-      solver.setParameter(BCESolver::OnlyICDown,false);
-      if (solver.getParameter(BCESolver::OnlyICDown))
-	filename << "_onlydown";
-      solver.setParameter(BCESolver::OnlyICUp,false);
-      if (solver.getParameter(BCESolver::OnlyICUp))
-	filename << "_onlyup";
 
       solver.setParameter(BCESolver::DisplayLevel,1);
 
@@ -85,6 +76,15 @@ void solveFPA(int nvals, int nbids,
 
       IloCplex cplex = solver.getCplex();
 
+      for (int player = 0; player < 2; player++)
+	{
+	  for (int val = 0; val < nvals; val++)
+	    {
+	      cplex.getModel()
+		.add(solver.getObjectiveFunction(5+val+player*nvals)>=0.0);
+	    } // val
+	}
+
       cplex.setParam(IloCplex::RootAlg,IloCplex::Barrier);
       cplex.setParam(IloCplex::SimDisplay,0);
       solver.setParameter(BCESolver::DisplayLevel,1);
@@ -107,10 +107,6 @@ void solveFPA(int nvals, int nbids,
       	   << cplex.getValue(solver.getObjectiveFunction(0)) << endl;
       cout << "Bidder 2's surplus: "
       	   << cplex.getValue(solver.getObjectiveFunction(1)) << endl;
-      cout << "Bidder 1's ex-ante surplus: " 
-      	   << cplex.getValue(solver.getObjectiveFunction(5+2*nvals)) << endl;
-      cout << "Bidder 2's ex-ante surplus: "
-      	   << cplex.getValue(solver.getObjectiveFunction(5+2*nvals+1)) << endl;
       cout << "Revenue: " 
       	   << cplex.getValue(solver.getObjectiveFunction(2)) << endl;
       cout << "Total surplus: " 

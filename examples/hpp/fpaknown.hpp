@@ -18,7 +18,7 @@ public:
     numTypes = vector<int>(2,nv);
   };
 
-  double prior (int state, const vector<int> &types)
+  double prior (int state, const vector<int> &types) const
   {
     // Use a uniform prior
     vector<int> values(2,0);
@@ -32,15 +32,15 @@ public:
       return 0.0;
   }
 
-  bool dominated(int a, int t, int player)
+  bool dominated(int a, int t, int player) const
   {
-    if (a>0 && (lowbid + (highbid-lowbid)*(a-1.0)/(numActions[player]-2.0) 
-		> (1.0*t)/(numValues-1.0)))
-      return (true);
-    else
-      return (false);
+    return (lowbid + (highbid-lowbid)*(a-1.0)/(numActions[player]-2.0)
+	    > (1.0*t)/(numValues-1.0));
+
+
     // return (false);
   }
+
 };
 
 #endif

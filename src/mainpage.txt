@@ -1,0 +1,69 @@
+/*! \mainpage BCESolve Documentation
+    \section introsec Introduction
+
+    BCESolve is a library of routines for representing, solving, and
+    analyzing Bayes correlated equilibria (BCE), a solution concept
+    that generalized correlated equilibrium to games of incomplete
+    information. BCE, like correlated equilibria, are joint
+    distributions that satisfy a series of linear constraints. The
+    library utilizes IBM's CPLEX linear programming package to solve
+    for BCE that maximize a given linear objective, such as expected
+    payoffs of the players.
+
+    \section installsec Installation
+
+    To use the library, you must first install CPLEX and have the
+    CPLEX libraries locatable on the path. The program also uses Boost
+    libraries for serialization, which the user must install. The src
+    and examples directories have makefiles for building the source
+    code using GNU's make. The makefile may have to be edited to
+    reflect the correct path to CPLEX and Boost. The program has most
+    recently been compiled with gcc 4.8.2 and run using CPLEX 12.51
+    and Boost 1.57 on Centos 7. To build the program, simple open a
+    terminal, change to the examples directory, and run "make".
+
+    \section overviewsec Overview of the program
+
+    The BCESolve library contains a series of classes for
+    representing, solving, and analyzing BCE. The BCEGame class is a
+    base class for representing games of incomplete information. One
+    must derive from this class, and reimplement its
+    BCEGame::objective and BCEGame::prior methods to reflect the
+    payoff functions and the distribution of the state for the
+    particular game of interest.
+
+    The BCESolver class uses CPLEX to solve a game represented by an
+    object derived from the BCEGame class, by maximizing a particular
+    linear objective over all BCE for that game.
+
+    The output from the BCESolver class is stored in a BCEData
+    object. BCEData objects can be serialized and de-serialized, and
+    the class also contains routines for analyzing the BCE contained
+    within.
+
+    \section examplesec Examples
+    
+    A number of examples have been provided to illustrate how to use
+    the program. Please see fpaknown.cpp, which uses the class files
+    fpaknown.hpp and fpagame.hpp, for an example that solves a private
+    first price auction. The file fpaunknown.cpp uses fpagame.hpp to
+    solve an "unknown" private value auction. Both of these programs
+    show how to derive from the BCEGame class to create a
+    representation of your own game.
+
+    \section finalsec Final thoughts
+
+    The library also contains two utilities for studying games in
+    MATLAB. The first is a mex file interface called "bcemex" that can
+    be used to read BCEData objects, and translate various data from
+    the BCEData class into the MATLAB workspace. Second, the MATLAB
+    program bcegui.m is a graphical user interface that, together with
+    bcemex, provides various visualizations of a BCE.
+
+    Enjoy!
+
+    Ben Brooks,
+    Chicago, Il
+
+
+*/

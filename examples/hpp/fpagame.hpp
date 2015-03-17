@@ -20,13 +20,14 @@ public:
   double exAnteFee;
   BCEDistrArray distribution;
 
-  FPAGame() {distribution.push_back(new independent(),1.0);}
+  FPAGame() {distribution.push_back(new vToTheAlpha(1.0),1.0);}
   
   FPAGame(int na, int nv, double _exPostFee, 
 	  double _reservePrice,double _highbid)
     : BCEGame(2,nv*nv,na+1,1,5+2*nv+2), numValues(nv), 
       exPostFee(_exPostFee), highbid(_highbid),
-      lowbid(0.0), reservePrice(_reservePrice)
+      lowbid(0.0), reservePrice(_reservePrice),
+      exAnteFee(0.0)
   {
     distribution.push_back(new vToTheAlpha(1.0),1.0);
     // distribution.push_back(new uniform(),1.0);
@@ -64,7 +65,8 @@ public:
     return distribution.PDF(v0,v1,incr);
   }
 
-  double objective(int state, const vector<int> &actions, int objectiveIndex) const
+  double objective(int state, const vector<int> &actions, 
+		   int objectiveIndex) const
   {
     // Convert the state into a pair of valuations
     vector<int> values(2,0);
@@ -72,8 +74,8 @@ public:
 
     double obj = 0; 
 
-    double winbid = ((actions[0]>actions[1]? actions[0]: actions[1])-1.0)
-      * (highbid-lowbid) / (numActions[0]-2.0) + lowbid;
+    double winbid = lowbid + ((actions[0]>actions[1]? actions[0]: actions[1])-1.0)
+      * (highbid-lowbid) / (numActions[0]-2.0);
     // If winning bid is less than reserve price, all objectives are
     // zero.
     if (winbid < reservePrice)
@@ -87,12 +89,12 @@ public:
 	if (actions[player]>actions[1-player]
 	    || (actions[player]==actions[1-player] 
 		&& values[player]>values[1-player]))
-	  obj = (1.0*values[player]/(numValues-1.0)-winbid);
+	  obj = ((1.0*values[player])/(numValues-1.0)-winbid);
 	else if (actions[player]==actions[1-player] 
 		 && values[player]==values[1-player])
-	  obj = (1.0*values[player]/(numValues-1.0)-winbid)/2.0;
+	  obj = ((1.0*values[player])/(numValues-1.0)-winbid)/2.0;
 	
-	obj -= (actions[player]>0? exPostFee : 0.0);
+	obj -= (actions[player]>0? exPostFee + exAnteFee : 0.0);
       }
     else if (objectiveIndex==2)
       {
@@ -108,7 +110,9 @@ public:
 	    || (actions[0]==actions[1] && values[0]>values[1]))
 	  obj = (1.0*values[0]/(numValues-1.0)); // Player 1 won
 	else
-	  obj = (1.0*values[1]/(numValues-1.0)); // Either player 2 won or they tied with same val.
+	  obj = (1.0*values[1]/(numValues-1.0)); // Either player 2
+						 // won or they tied
+						 // with same val.
       }
     else if (objectiveIndex==4)
       {
@@ -125,18 +129,25 @@ public:
 	value -= player*numValues;
 	
 	if (actions[player]>0 && values[player]==value)
-	  return objective(state,actions,player)-exAnteFee;
+	  return objective(state,actions,player);
       }
     else if (objectiveIndex >= 5+2*numValues
 	     && objectiveIndex < 5+2*numValues + 2)
       {
 	int player = (objectiveIndex-2 - 5)/numValues;
 	if (actions[player]>0)
-	  return objective(state,actions,player)-exAnteFee;
+	  return objective(state,actions,player);
       }
     
     return obj;
   } // objective
+
+  bool feasibleDeviation(int action, int dev, 
+			 int type, int player) const
+  {
+    return !(action>0 && dev == 0); // Just exclude deviations from
+				    // positive to zero actions.
+  }
 
   friend class FPASolver;
 };

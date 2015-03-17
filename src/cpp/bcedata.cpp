@@ -97,14 +97,13 @@ void BCEData::consolidateEquilibria()
   newEquilibria.clear();
 } // Consolidate equilibria
 
-void BCEData::getEquilibrium(int equilibriumIndex, 
-			     BCEquilibrium &equilibrium) const
+const BCEquilibrium & BCEData::getEquilibrium(int equilibriumIndex) const
 {
   if (!equilibria.size())
     throw(BCEException(BCEException::NoEquilibria));
 
   if (equilibriumIndex<equilibria.size())
-    equilibrium=equilibria[equilibriumIndex];
+    return equilibria[equilibriumIndex];
   else
     throw(BCEException(BCEException::OutOfBounds));
 } // getEquilibrium
@@ -375,105 +374,6 @@ double BCEData::getConditionalMarginal(const vector<int> &stateConditions,
   return probSum;
 } // getConditionalMarginal
 
-void BCEData::indexToStateTypes(int index, int &state, vector<int> & types) const
-{
-  int playerCounter;
-
-  // Make sure arguments are right size
-  types.resize(numPlayers);
- 
-  assert(index>=0);
-  assert(index<numStates*numTypes_total);
-
-  state=index%numStates;
-  index-=state; index/=numStates;
-  assert(state>=0);
-  assert(state<numStates);
-
-  for (playerCounter=0; playerCounter<numPlayers; playerCounter++)
-    {
-      types[playerCounter]=index%numTypes[playerCounter];
-      index-=types[playerCounter]; index/=numTypes[playerCounter];
-
-      assert(types[playerCounter]<numTypes[playerCounter]);
-      assert(types[playerCounter]>=0);
-    }
-} // indexToStateTypes
-
-void BCEData::indexToStateActions(int index, int &state, vector<int> &actions) const
-{
-  int playerCounter;
-
-  assert(index>=0);
-  assert(index<numStates*numActions_total);
-
-  state=index%numStates;
-  index-=state; index/=numStates;
-  assert(state>=0);
-  assert(state<numStates);
-
-  for (playerCounter=0; playerCounter<numPlayers; playerCounter++)
-    {
-      actions[playerCounter]=index%numActions[playerCounter];
-      index-=actions[playerCounter]; index/=numActions[playerCounter];
-
-      assert(actions[playerCounter]<numActions[playerCounter]);
-      assert(actions[playerCounter]>=0);
-    }
-} // indexToStateActions
-
-void BCEData::indexToTypeAction(int index, int player, int &type, int &action) const
-{
-  assert(index>=0);
-  assert(index<numTypes[player]*numActions[player]);
-
-  action=index%numActions[player];
-  index-=action; index/=numActions[player];
-  type=index;
-
-  assert(type>=0);
-  assert(action>=0);
-  assert(type<numTypes[player]);
-  assert(action<numActions[player]);
-} // indexToTypeAction
-
-void BCEData::indexToStateTypesActions(int index,
-				      int &state, 
-				      vector<int> &types,
-				      vector<int> &actions) const
-{
-  int playerCounter;
-
-  // Resize arguments
-  types.resize(numPlayers);
-  actions.resize(numPlayers);
-
-  assert(index>=0);
-  assert(index<numStates*numActionsTypes_total);
-
-  state=index%numStates;
-  index-=state; index/=numStates;
-  assert(state>=0);
-  assert(state<numStates);
-
-  for (playerCounter=0; playerCounter<numPlayers; playerCounter++)
-    {
-      actions[playerCounter]=index%numActions[playerCounter];
-      index-=actions[playerCounter]; index/=numActions[playerCounter];
-      
-      assert(actions[playerCounter]>=0);
-      assert(actions[playerCounter]<numActions[playerCounter]);
-    }
-  for (playerCounter=0; playerCounter<numPlayers; playerCounter++)
-    {
-      types[playerCounter]=index%numTypes[playerCounter];
-      index-=types[playerCounter]; index/=numTypes[playerCounter];
-
-      assert(types[playerCounter]>=0);
-      assert(types[playerCounter]<numTypes[playerCounter]);
-    }
-
-} // indexToStateTypesActions
 
 int BCEData::stateTypesActionsToMarginalIndex(int state, 
 					      const vector<int> &types, 
