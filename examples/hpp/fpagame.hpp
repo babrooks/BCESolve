@@ -1,5 +1,7 @@
 // Header file for fpaunknown example.
 // BAB 11-3-2012
+//! @example
+
 #ifndef FPAGAME_HPP
 #define FPAGAME_HPP
 
@@ -16,9 +18,9 @@ protected:
 
 public:
   double exAnteFee;
-  distributionArray distribution;
+  BCEDistrArray distribution;
 
-  FPAGame() {distribution.push_back(independent(),1.0);}
+  FPAGame() {distribution.push_back(new independent(),1.0);}
   
   FPAGame(int na, int nv, double _exPostFee, 
 	  double _reservePrice,double _highbid)
@@ -26,13 +28,13 @@ public:
       exPostFee(_exPostFee), highbid(_highbid),
       lowbid(0.0), reservePrice(_reservePrice)
   {
-    distribution.push_back(vToTheAlpha(1.0),1.0);
-    // distribution.push_back(uniform(),1.0);
+    distribution.push_back(new vToTheAlpha(1.0),1.0);
+    // distribution.push_back(new uniform(),1.0);
   }
 
-  int getNumValues(){return numValues;}
+  int getNumValues() const {return numValues;}
 
-  int stateToPrivateValues(int state, vector<int> &values)
+  int stateToPrivateValues(int state, vector<int> &values) const
   {
     values.resize(2);
 
@@ -41,7 +43,7 @@ public:
     values[1]=state/numValues;
   }
 
-  double prior (int state, const vector<int> &types)
+  double prior (int state, const vector<int> &types) const
   {
     vector<int> values;
     stateToPrivateValues(state,values);
@@ -59,10 +61,10 @@ public:
       }
 
     // return PDF(distribution,v0,v1,incr);
-    return PDF(distribution,v0,v1,incr);
+    return distribution.PDF(v0,v1,incr);
   }
 
-  double objective(int state, const vector<int> &actions, int objectiveIndex)
+  double objective(int state, const vector<int> &actions, int objectiveIndex) const
   {
     // Convert the state into a pair of valuations
     vector<int> values(2,0);
@@ -135,11 +137,6 @@ public:
     
     return obj;
   } // objective
-
-  bool dominated(int a, int t, int player)
-  {
-    return false;
-  }
 
   friend class FPASolver;
 };

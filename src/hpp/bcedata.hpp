@@ -4,6 +4,8 @@
 #include "bcecommon.hpp"
 #include "bceexception.hpp"
 #include "bcequilibrium.hpp"
+#include "bcecounter.hpp"
+
 #include <boost/serialization/list.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/map.hpp>
@@ -120,12 +122,6 @@ public:
   // Appends the list of newEquilibria to the vector
   // equilibria. Clears newEquilibria.
   void consolidateEquilibria();
-  // Sorts equilibria according to the two objective functions. Throws
-  // out redundant equilibria.
-  void sortEquilibria(vector<int>& obj);
-  // Helper to sortEquilibria
-  void grahamScan(vector< vector<double> > & points,
-		  vector<int> &obj);
   // Gets the equilibrium corresponding to equilibriumIndex and puts
   // it in distr.
   void getEquilibrium(int equilibriumIndex, BCEquilibrium &equilibrium) const;

@@ -58,7 +58,7 @@ public:
       }
 
     // return PDF(distribution,v0,v1,incr);
-    return PDF(distribution,v0,v1,incr);
+    return distribution::PDF(distribution,v0,v1,incr);
   }
 
   double objective(int state, const vector<int> &actions, int objectiveIndex)

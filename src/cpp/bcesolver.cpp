@@ -586,12 +586,13 @@ void BCESolver::mapBoundary(const char * fname)
 
   // Print the bndry points.
   ofstream vertexData;
-  list<BCEPoint>::iterator pointIterator;
+  list<double>::iterator XIterator;
+  list<double>::iterator YIterator;
   vertexData.open(fname);
-  for (pointIterator=boundaryPoints.begin(); 
-       pointIterator!=boundaryPoints.end(); 
-       pointIterator++)
-    vertexData << *pointIterator;
+  for (XIterator=boundaryXs.begin(), YIterator=boundaryYs.begin(); 
+       XIterator!=boundaryXs.end() && YIterator!=boundaryYs.end(); 
+       XIterator++, YIterator++)
+    vertexData << *XIterator << " " << *YIterator << endl;
   vertexData.close();
   
   data.consolidateEquilibria();
@@ -678,11 +679,15 @@ void BCESolver::mapFrontier(int plusOrMinus1, int plusOrMinus2, bool reversePrin
 
       // Add new element to the list.
       if (reversePrint)
-	boundaryPoints.push_back(BCEPoint(plusOrMinus2*objectiveValue2,
-					  plusOrMinus1*objectiveValue1));
+	{
+	  boundaryXs.push_back(plusOrMinus2*objectiveValue2);
+	  boundaryYs.push_back(plusOrMinus1*objectiveValue1);
+	}
       else
-	boundaryPoints.push_back(BCEPoint(plusOrMinus1*objectiveValue1,
-					  plusOrMinus2*objectiveValue2));
+	{
+	  boundaryXs.push_back(plusOrMinus1*objectiveValue1);
+	  boundaryYs.push_back(plusOrMinus2*objectiveValue2);
+	}
 
       basisStatuses.clear();
       reducedCosts1.clear();
@@ -717,7 +722,7 @@ void BCESolver::mapFrontier(int plusOrMinus1, int plusOrMinus2, bool reversePrin
   reducedCosts2.end();
 
   cout << "Final weight = " << objectiveWeight << ", total iterations = " << iterationCounter << endl;
-  // cout << "# of elements of list: " << boundaryPoints.size() << endl;
+  // cout << "# of elements of list: " << boundaryXs.size() << endl;
 
   cplex.setParam(IloCplex::ItLim,ItLimDefault);
 } // mapFrontier

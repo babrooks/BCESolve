@@ -80,7 +80,7 @@ void BCEData::clearEquilibria()
 void BCEData::addEquilibrium(const map<int,double> & distr)
 {
 
-  newEquilibria.push_back(BCEEquilibrium(distr));
+  newEquilibria.push_back(BCEquilibrium(distr));
 } // addEquilibrium
 
 void BCEData::consolidateEquilibria()
@@ -89,7 +89,7 @@ void BCEData::consolidateEquilibria()
 
   equilibria.reserve(equilibria.size()+newEquilibria.size());
 
-  for (list<BCEEquilibrium>::const_iterator it=newEquilibria.begin();
+  for (list<BCEquilibrium>::const_iterator it=newEquilibria.begin();
        it!=newEquilibria.end();
        it++)
     equilibria.push_back(*it);
@@ -97,38 +97,8 @@ void BCEData::consolidateEquilibria()
   newEquilibria.clear();
 } // Consolidate equilibria
 
-void BCEData::sortEquilibria(vector<int> &obj)
-{
-  // Get expected objectives, and append a key.
-  int equilibriumCounter;
-  vector< vector<double> > expectedObjectives;
-
-  cout << "Getting expected objectives" << endl;
-  getExpectedObjectives(expectedObjectives);
-  for (equilibriumCounter=0;
-       equilibriumCounter<expectedObjectives.size();
-       equilibriumCounter++)
-    expectedObjectives[equilibriumCounter].push_back(static_cast<double>(equilibriumCounter));
-  
-  cout << "Starting convex hull routine." << endl;
-
-  // Use the sorting list to reconstruct the equilibria array.
-  grahamScan(expectedObjectives,obj);
-
-  cout << "Done finding convex hull." << endl;
-  vector<BCEEquilibrium> sortedEq;
-  sortedEq.reserve(expectedObjectives.size());
-  for (equilibriumCounter=0;
-       equilibriumCounter<expectedObjectives.size();
-       equilibriumCounter++)
-    sortedEq.push_back(equilibria[static_cast<int>(expectedObjectives[equilibriumCounter].back())]);
-
-  // Replace equilibria with sortedEq
-  equilibria = sortedEq;
-}
-
 void BCEData::getEquilibrium(int equilibriumIndex, 
-			     BCEEquilibrium &equilibrium) const
+			     BCEquilibrium &equilibrium) const
 {
   if (!equilibria.size())
     throw(BCEException(BCEException::NoEquilibria));
@@ -533,76 +503,4 @@ int BCEData::stateTypesActionsToMarginalIndex(int state,
 
   return index;
 }
-
-void BCEData::grahamScan(vector< vector<double> > & points,
-			 vector<int> & obj)
-{
-  BCEComparator comparator;
-  vector<double> origin(2,0), temp;
-
-  double absoluteZero = 1e-12;
-
-  int pointCounter, extremeCounter;
-
-  assert(obj.size()==2);
-  assert(obj[0]>=0);
-  assert(obj[0]<numObjectives);
-  assert(obj[1]>=0);
-  assert(obj[1]<numObjectives);
-  assert(obj[0]!=obj[1]);
-
-  comparator.setObjectives(obj);
-  comparator.setMode(BCEComparator::ANGLE);
-
-  // Push first vector to the back. 
-  points.push_back(points.front());
-
-  // Find the vector with the lowest y coordinate
-  origin[0]=points[1][obj[0]];
-  origin[1]=points[1][obj[1]];
-  for (pointCounter=2; pointCounter<points.size(); pointCounter++)
-    {
-      if (points[pointCounter][obj[1]]<origin[1])
-  	{
-  	  origin[0]=points[pointCounter][obj[0]];
-  	  origin[1]=points[pointCounter][obj[1]];
-  	}
-    }
-  comparator.setOrigin(origin);
-
-  // Sort the points in area order. Move the last point to the front.
-  sort(points.begin()+1,points.end(),comparator);
-  points[0]=points.back();
-
-  // Now do the Graham scan
-  extremeCounter=1;
-  for (pointCounter=2; pointCounter<points.size(); pointCounter++)
-    {
-      while (comparator(points[extremeCounter-1],
-			points[extremeCounter],
-			points[pointCounter])<=absoluteZero)
-	{
-	  if (extremeCounter>1)
-	    extremeCounter--;
-	  else if (pointCounter==points.size()-1)
-	    break;
-	  else
-	    pointCounter++;
-	}
-
-      extremeCounter++;
-      temp=points[extremeCounter];
-      points[extremeCounter]=points[pointCounter];
-      points[pointCounter]=temp;
-    }
-
-  // Move the first point to the end and delete the first point.
-  points.erase(points.begin()+extremeCounter+1,points.end());
-  points.back()=points.front();
-  points.erase(points.begin());
-
-  comparator.setMode(BCEComparator::EQUALITY);
-  unique(points.begin()+1,points.end(),comparator);
-}
-
 

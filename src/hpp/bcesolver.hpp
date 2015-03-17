@@ -153,9 +153,12 @@ protected:
                        CPLEX output. */
 
   // Lists for storing equilibria and boundary points.
-  list<BCEPoint> boundaryPoints; /*!< List of boundary points traced
-                                    out by the BCESolver::mapBoundary
-                                    routine. */
+  list<double> boundaryXs; /*!< List of x-coordinates of boundary
+			     points traced out by the
+			     BCESolver::mapBoundary routine. */
+  list<double> boundaryYs; /*!< List of y-coordinates of boundary
+			     points traced out by the
+			     BCESolver::mapBoundary routine. */
   BCEData data; /*!< BCEData object for serializing output of the
                    algorithm. */
 

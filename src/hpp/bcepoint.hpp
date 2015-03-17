@@ -4,7 +4,7 @@
 #include "bcecommon.hpp"
 #include "bceexception.hpp"
 
-//! Class for two dimensional vectors.
+//! Simple class for two dimensional vectors.
 class BCEPoint
 {
 public: 
