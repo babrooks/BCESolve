@@ -4,27 +4,25 @@
 #include "fpaknown.hpp"
 
 void solveFPA(int nvals, int nbids, 
-	      double entryCost, double reservePrice);
+	      double entryCost, double reservePrice,
+	      bool exAnteFee);
 
 int main(int argc, char ** argv)
 {
-  double entryCost=0.0;
+  double entryCost=0.4;
   double reservePrice=0.0;
-  int nvals=2;
+  int nvals=4;
   int nbids=50;
   double lowbid = 0.0;
 
-  solveFPA(nvals,nbids,entryCost,reservePrice);
+  solveFPA(nvals,nbids,entryCost,reservePrice,false);
   return 0;
 
-  for (nvals=10; nvals < 11; nvals+=2)
-    solveFPA(nvals,nbids,entryCost,reservePrice);
-
-  return 0;
 }
 
 void solveFPA(int nvals, int nbids, 
-	      double entryCost, double reservePrice)
+	      double entryCost, double reservePrice,
+	      bool exAnteFee)
 {
   int t, a, ahat;
   double minAngleIncrement = 0.05;
@@ -41,7 +39,8 @@ void solveFPA(int nvals, int nbids,
 
   try
     {
-      FPAKnown fpa(nbids,nvals,entryCost,reservePrice,highbid);
+      FPAKnown fpa(nbids,nvals,entryCost,reservePrice,highbid,
+		   exAnteFee);
       fpa.distribution.clear();
       // fpa.distribution.push_back(uniformWithMassPnt(0.3),1.0); // uniform with mass 
       fpa.distribution.push_back(new vToTheAlpha(1.0),1.0); // uniform
@@ -73,6 +72,15 @@ void solveFPA(int nvals, int nbids,
       // 	      nvals,nbids);
 
       IloCplex cplex = solver.getCplex();
+
+      for (int player = 0; player < 2; player++)
+	{
+	  for (int val = 0; val < nvals; val++)
+	    {
+	      cplex.getModel()
+		.add(solver.getObjectiveFunction(5+val+player*nvals)>=0.0);
+	    } // val
+	}
 
       cplex.setParam(IloCplex::RootAlg,IloCplex::Barrier);
       cplex.setParam(IloCplex::SimDisplay,0);

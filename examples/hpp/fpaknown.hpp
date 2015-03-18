@@ -12,8 +12,8 @@ public:
   FPAKnown() {};
   
   FPAKnown(int na, int nv, double _entryCost, double _reservePrice, 
-	   double _highbid) 
-    : FPAGame(na,nv,_entryCost,_reservePrice,_highbid)
+	   double _highbid, bool exAnteFee) 
+    : FPAGame(na,nv,_entryCost,_reservePrice,_highbid, exAnteFee)
   { 
     numTypes = vector<int>(2,nv);
   };

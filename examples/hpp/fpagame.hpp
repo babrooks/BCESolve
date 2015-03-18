@@ -11,23 +11,23 @@ class FPAGame : public BCEGame
 {
 protected:
   int numValues;
-  double exPostFee;
+  double fee;
   double reservePrice;
   double highbid;
   double lowbid;
+  bool exAnteFee;
 
 public:
-  double exAnteFee;
   BCEDistrArray distribution;
 
   FPAGame() {distribution.push_back(new vToTheAlpha(1.0),1.0);}
   
-  FPAGame(int na, int nv, double _exPostFee, 
-	  double _reservePrice,double _highbid)
-    : BCEGame(2,nv*nv,na+1,1,5+2*nv+2), numValues(nv), 
-      exPostFee(_exPostFee), highbid(_highbid),
+  FPAGame(int na, int nv, double _fee, 
+	  double _reservePrice,double _highbid,bool _exAnteFee)
+    : BCEGame(2,nv*nv,na+1,1,5+2*nv), numValues(nv), 
+      fee(_fee), highbid(_highbid),
       lowbid(0.0), reservePrice(_reservePrice),
-      exAnteFee(0.0)
+      exAnteFee(_exAnteFee)
   {
     distribution.push_back(new vToTheAlpha(1.0),1.0);
     // distribution.push_back(new uniform(),1.0);
@@ -94,14 +94,14 @@ public:
 		 && values[player]==values[1-player])
 	  obj = ((1.0*values[player])/(numValues-1.0)-winbid)/2.0;
 	
-	obj -= (actions[player]>0? exPostFee + exAnteFee : 0.0);
+	obj -= (actions[player]>0? fee : 0.0);
       }
     else if (objectiveIndex==2)
       {
 	// Revenue
 	obj = winbid;
-	obj += (actions[0]>0? exPostFee + exAnteFee : 0.0);
-	obj += (actions[1]>0? exPostFee + exAnteFee : 0.0);
+	obj += (actions[0]>0? fee : 0.0);
+	obj += (actions[1]>0? fee : 0.0);
       }
     else if (objectiveIndex==3)
       {
@@ -131,22 +131,17 @@ public:
 	if (actions[player]>0 && values[player]==value)
 	  return objective(state,actions,player);
       }
-    else if (objectiveIndex >= 5+2*numValues
-	     && objectiveIndex < 5+2*numValues + 2)
-      {
-	int player = (objectiveIndex-2 - 5)/numValues;
-	if (actions[player]>0)
-	  return objective(state,actions,player);
-      }
     
     return obj;
   } // objective
 
   bool feasibleDeviation(int action, int dev, 
-			 int type, int player) const
+  			 int type, int player) const
   {
-    return !(action>0 && dev == 0); // Just exclude deviations from
-				    // positive to zero actions.
+    return !(exAnteFee
+  	     && action>0 
+  	     && dev == 0); // Just exclude deviations from positive to
+			   // zero actions.
   }
 
   friend class FPASolver;

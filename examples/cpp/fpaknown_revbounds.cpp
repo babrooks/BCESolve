@@ -3,13 +3,13 @@
 #include "fpaknown.hpp"
 
 void solveModel(int nb, int nv, double entryCost, double reservePrice,
-		ofstream & datafile);
+		bool exAnteFee, ofstream & datafile);
 
 int main(int argc, char ** argv)
 {
   double entryCost=0.0;
   double reservePrice=0.0;
-  int nb = 25;
+  int nb = 20;
   int nv = nb;
 
   stringstream ss; 
@@ -27,25 +27,30 @@ int main(int argc, char ** argv)
   for (int k = 0; k < nv; k++)
     {
       reservePrice = (1.0*k)/(nv-1.0)-1e-6;
-      solveModel(nb, nv, entryCost, reservePrice, datafile);
+      solveModel(nb, nv, entryCost, reservePrice,false, datafile);
     }
   reservePrice = 0.0;
   for (int k = 0; k < nv; k++)
     {
       entryCost = (1.0*k)/(nv-1.0)-1e-6;
-      solveModel(nb, nv, entryCost, reservePrice, datafile);
+      solveModel(nb, nv, entryCost, reservePrice,false, datafile);
+    }
+  for (int k = 0; k < nv; k++)
+    {
+      entryCost = (1.0*k)/(nv-1.0)-1e-6;
+      solveModel(nb, nv, entryCost, reservePrice,true, datafile);
     }
 
   return 0;
 }
 
 void solveModel(int nb, int nv, double entryCost, double reservePrice,
-		ofstream & datafile)
+		bool exAnteFee, ofstream & datafile)
 {
   double minAngleIncrement = 0.025;
   double highbid = 1.0;
 
-  FPAKnown fpa(nb,nv,entryCost,reservePrice,highbid);
+  FPAKnown fpa(nb,nv,entryCost,reservePrice,highbid,exAnteFee);
   
   BCESolver solver(fpa);
 
@@ -58,6 +63,16 @@ void solveModel(int nb, int nv, double entryCost, double reservePrice,
 
       IloCplex cplex=solver.getCplex();
       cplex.setParam(IloCplex::Threads,4);
+
+      // Add in ex-ante constraints
+      for (int player = 0; player < 2; player++)
+	{
+	  for (int val = 0; val < nv; val++)
+	    {
+	      cplex.getModel()
+		.add(solver.getObjectiveFunction(5+val+player*nv)>=0.0);
+	    } // val
+	}
 
 
       cplex.setParam(IloCplex::BarDisplay,0);
@@ -89,12 +104,14 @@ void solveModel(int nb, int nv, double entryCost, double reservePrice,
       double maxrev = cplex.getValue(solver.getObjectiveFunction(2));
       cout << "nb: " << nb << ", nv: " << nv 
 	   << ", entry cost: " << entryCost
+	   << ", ex-ante fee: " << exAnteFee
 	   << ", reserve price: " << reservePrice
 	   << ", minimum revenue: " << minrev
 	   << ", maximum revenue: " << maxrev << endl;
 
       datafile << nb << " " << nv
       	       << " " << entryCost
+	       << " " << exAnteFee
       	       << " " << reservePrice
       	       << " " << minrev << " " << maxrev << endl;
     }

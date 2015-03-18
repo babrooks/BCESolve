@@ -326,74 +326,67 @@ void BCESolver::populate ()
   // IC constraints
   for (player=0; player<numPlayers; player++)
     {
-      typeConditions[1-player] = vector<int>(0);
-      actionConditions[1-player] = vector<int>(0);
+      for (ICCounter=0; 
+	   ICCounter<numTypes[player]*numActions[player]*numActions[player]; 
+	   ICCounter++)
+	{
+	  indexToTypeActionDeviation(ICCounter,player,type,action,deviation);
 
-      // Reset the rows counter.
-      for (type = 0; type < numTypes[player]; type++)
-  	{
-  	  typeConditions[player] = vector<int>(1,type);
-  	  for (action=0; action<numActions[player]; action++)
-  	    {
-  	      actionConditions[player] = vector<int>(1,action);
-	      
-  	      for (deviations[player] = 0; deviations[player] < numActions[player]; 
-  		   deviations[player]++)
-  		{
-  		  if (deviations[player] == action)
-  		    continue;
-		  
-  		  // Make sure neither the action nor the deviation
-  		  // are dominated.
-  		  if (!(game->dominated(action,type,player) 
-  			|| game->dominated(deviations[player],type,player))
-  		      && game->feasibleDeviation(action,deviation,type,player) )
-  		    {
-  		      IloNumExpr lhs(env,0);
+	  if (deviation==action)
+	    continue;
+	  typeConditions[player] = vector<int>(1,type);
+	  typeConditions[1-player] = vector<int>(0);
+	  actionConditions[player] = vector<int>(1,action);
+	  actionConditions[1-player] = vector<int>(0);
+	  deviations[player] = deviation;
 
-  		      counter = BCECounter(numStates,numActions,numTypes,
-  					   stateConditions,actionConditions,typeConditions,
-  					   stateMarginal,actionMarginal,typeMarginal);
+	  if (!(game->dominated(action,type,player) 
+		|| game->dominated(deviations[player],type,player))
+	      && game->feasibleDeviation(action,deviation,type,player) )
+	    {
+	      IloNumExpr lhs(env,0);
+
+	      counter = BCECounter(numStates,numActions,numTypes,
+				   stateConditions,actionConditions,typeConditions,
+				   stateMarginal,actionMarginal,typeMarginal);
 		      
-		      assert(counter.actions[player]==action);
-		      assert(counter.types[player]==type);
+	      assert(counter.actions[player]==action);
+	      assert(counter.types[player]==type);
 
-  		      do
-  			{
-			  if (variableLocationsMap.count(counter.variable))
-			    {
-			      deviations[1-player] = counter.actions[1-player];
-			      types[1-player] = counter.types[1-player];
+	      do
+		{
+		  if (variableLocationsMap.count(counter.variable))
+		    {
+		      deviations[1-player] = counter.actions[1-player];
+		      types[1-player] = counter.types[1-player];
 
-			      lhs += variables[variableLocationsMap.at(counter.variable)]
-				*(game->objective(counter.state,deviations,player)
-				  -game->objective(counter.state,counter.actions,player))
-				*game->prior(counter.state,counter.types);
-			    }
-  			} while (++counter);
-		      lhs += variables[numProbabilityVariables + row];
+		      lhs += variables[variableLocationsMap.at(counter.variable)]
+			*(game->objective(counter.state,deviations,player)
+			  -game->objective(counter.state,counter.actions,player))
+			*game->prior(counter.state,counter.types);
+		    }
+		} while (++counter);
+	      lhs += variables[numProbabilityVariables + row];
 	      
-  		      constraints[row].setExpr(lhs);
+	      constraints[row].setExpr(lhs);
 
-		      row++;
+	      row++;
 
-		      if (!(row % (numICConstraints_total/20>0? numICConstraints_total/20:1)) && displayLevel)
-			{
-			  time(&nowIC);
-			  double secElapsed = difftime(startIC,nowIC);
-			  double remaining = secElapsed * (1-numICConstraints_total/(1.0*row));
-			  int minRemaining = remaining/60, 
-			    secRemaining = remaining - minRemaining*60;
-			  cout << "player = " << player << ", row=" << row << ", ";
-			  if (minRemaining>0)
-			    cout << minRemaining << " min ";
-			  cout << secRemaining << " sec remaining" << endl;
-			}
+	      if (!(row % (numICConstraints_total/20>0? numICConstraints_total/20:1)) && displayLevel)
+		{
+		  time(&nowIC);
+		  double secElapsed = difftime(startIC,nowIC);
+		  double remaining = secElapsed * (1-numICConstraints_total/(1.0*row));
+		  int minRemaining = remaining/60, 
+		    secRemaining = remaining - minRemaining*60;
+		  cout << "player = " << player << ", row=" << row << ", ";
+		  if (minRemaining>0)
+		    cout << minRemaining << " min ";
+		  cout << secRemaining << " sec remaining" << endl;
+		}
 
-  		    } // if not dominated, etc
-  		} // deviations
-  	    } // action
-  	} // type
+	    } // if not dominated, etc
+	} // ICCounter
     } // player
 
   if (displayLevel)
