@@ -20,6 +20,12 @@
     actions that a given type should never play. */
 class BCEGame 
 {
+
+  /**
+   *\example fpagame.hpp
+   *\example duopoly.hpp
+   */
+
 protected:
   //! The number of players, always 2.
   int numPlayers; 

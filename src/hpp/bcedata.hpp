@@ -218,9 +218,9 @@ public:
     element of stateConditions, action[i] must be an element of
     actionConditions[i], etc. If the given condition vector is empty,
     no restriction is imposed. The distribution is projected onto
-    variables with a logical true in <var>Marginal. Returns the
-    probability of the event we are conditioning on. See BCECounter
-    for a description of the conditioning and marginal arguments. */
+    variables with a logical true in Marginal. Returns the probability
+    of the event we are conditioning on. See BCECounter for a
+    description of the conditioning and marginal arguments. */
   double getConditionalMarginal(const vector<int> &stateConditions, 
 			      const vector< vector<int> > &actionConditions,
 			      const vector< vector<int> > &typeConditions,

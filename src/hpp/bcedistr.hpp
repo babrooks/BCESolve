@@ -64,18 +64,50 @@ public:
 
   //! Add a new distribution to the array
   /*! This method appends a new distribution to the array with the
-      corresponding weight. */
+      corresponding weight. Returns true in the event of a
+      failure. */
   bool push_back(BCEDistr* newDistr, double newWeight)
   {
     // Avoid recursive catastrophes!
-    if (this != newDistr)
+    if (!contains(newDistr))
       {
 	distributions.push_back(newDistr);
 	weights.push_back(newWeight);
-	
 	return false;
       }
     return true;
+  }
+
+  //! Recursive check if BCEDistr contains distr.
+  /*! Since BCEDistrArray derives from BCEDistr, it is possible to
+      have distribution arrays that are elements of distribution
+      arrays. We do not want recursive nightmares where a
+      BCEDistrArray contains itself. This function checks if the given
+      distr is an element, and if any of the elements are themselves
+      arrays, recursively checks whether or not the distr is contained
+      in any of the elements. */
+  bool contains(BCEDistr * distr) const
+  {
+    // First check if this object is itself distr.
+    if (this==distr)
+      return true;
+    
+    // Now check if any of the elements of distributions are distr. If
+    // any of the elements of distributions are themselves arrays,
+    // initiate a recursive check.
+    for (auto it = distributions.cbegin();
+	 it != distributions.cend();
+	 ++it)
+      {
+	BCEDistrArray * distrArray = dynamic_cast<BCEDistrArray *>(distr);
+	
+	if (distr == *it 
+	    || (distrArray != NULL
+		&& distrArray->contains(distr) ) )
+	  return true;
+      }
+
+    return false;
   }
 
   //! Deletes all of the distributions in the array.
