@@ -1,5 +1,9 @@
 %% BAB 5-20-2014
 
+%%
+% Calculate winning bid distributions for 
+
+
 %% Solve relaxed program
 H = @(b,u,v) min(v,u./(v-b));
 

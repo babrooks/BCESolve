@@ -8,8 +8,8 @@ int main(int argc, char ** argv)
   double entryCost=0.0;
   double reservePrice=0;
   double minAngleIncrement = 0.025;
-  int nb = 50;
-  int nv = 2;
+  int nb = 35;
+  int nv = 10;
 
   double highbid = 1.0;
 
@@ -21,7 +21,7 @@ int main(int argc, char ** argv)
 
   cout << "Starting main" << endl;
 
-  FPAGame fpa(nb,nv,entryCost,reservePrice,highbid);
+  FPAGame fpa(nb,nv,entryCost,reservePrice,highbid,entryCost);
   
   BCESolver solver(fpa);
 
@@ -68,19 +68,19 @@ int main(int argc, char ** argv)
       cout << "Total surplus: " 
       	   << cplex.getValue(solver.getObjectiveFunction(3)) << endl;
 
+      solver.setParameter(BCESolver::BoundaryObjective1,4);
+      solver.setParameter(BCESolver::BoundaryObjective2,2);
+      
+      solver.mapBoundary("fpaunknownbndry_correlated.dat");
+      cout << "Mapped boundary" << endl;
+
       // BCEData data;
       // solver.getData(data);
       // data.setNumValues(vector<int>(2,fpa.getNumValues()));
 
       // BCEData::save(data,filename);
 
-      // solver.setParameter(BCESolver::BoundaryObjective1,4);
-      // solver.setParameter(BCESolver::BoundaryObjective2,2);
-      
-      // solver.mapBoundary("fpaunknownbndry.dat");
-      // cout << "Mapped boundary" << endl;
-
-      // solver.setParameter(BCESolver::BoundaryObjective1,0);
+      // Solver.setParameter(BCESolver::BoundaryObjective1,0);
       // solver.setParameter(BCESolver::BoundaryObjective2,1);
       
       // solver.mapBoundary("fpaunknownbndry_bidder.dat");

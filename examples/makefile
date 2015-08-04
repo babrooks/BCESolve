@@ -18,7 +18,7 @@ DEBUG = -g
 # Directories
 CPLEXDIR=/opt/ibm/ILOG/CPLEX_Studio1251/cplex
 CONCERTDIR=/opt/ibm/ILOG/CPLEX_Studio1251/concert
-CPLEXNAME=cplex1251	
+CPLEXNAME=cplex1251
 
 # Directories
 GRBDIR=/opt/gurobi563/linux64
@@ -53,7 +53,8 @@ LDFLAGS = -L$(CPLEXDIR)/lib/$(SYSTEM)/$(LIBFORMAT) \
 
 
 # MAINS=fpaknown fpaunknown fangmorris spa spaknown survey
-MAINS=exantefee fpaunknown spaunknown \
+MAINS=exampleforrobbie \
+	exantefee fpaunknown spaunknown \
 	fpaunknown_revbounds fpaknown_revbounds \
 	stationary stationary2 fpaknown \
 	 fangmorris publicinfo commonfpa \
