@@ -154,6 +154,7 @@ BCEData& BCEData::operator=(const BCEData &rhs)
       this->numTypes_total=rhs.numTypes_total;
       this->numActionsTypesPerPlayer_total=rhs.numActionsTypesPerPlayer_total;
       this->numActionsTypes_total=rhs.numActionsTypes_total;
+      this->numValues=rhs.numValues;
     }
 
   return *this;

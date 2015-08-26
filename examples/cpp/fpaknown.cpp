@@ -9,9 +9,9 @@ void solveFPA(int nvals, int nbids,
 
 int main(int argc, char ** argv)
 {
-  double entryCost=0.4;
+  double entryCost=0;
   double reservePrice=0.0;
-  int nvals=4;
+  int nvals=2;
   int nbids=50;
   double lowbid = 0.0;
 
@@ -87,7 +87,7 @@ void solveFPA(int nvals, int nbids,
       solver.setParameter(BCESolver::DisplayLevel,1);
 
       cplex.getObjective().setSense(IloObjective::Maximize);
-      cplex.getObjective().setExpr(1.0*(solver.getObjectiveFunction(2)));
+      cplex.getObjective().setExpr(-1.0*(solver.getObjectiveFunction(2)));
       cplex.setParam(IloCplex::Threads,4);
       
       // filename << "_maxbidderssurplus";
@@ -137,16 +137,22 @@ void solveFPA(int nvals, int nbids,
       // sortObj[1]=1;
       // data.sortEquilibria(sortObj);
 
-      // solver.setBndryObjective(1,solver.getObjectiveFunction(0)
-      // 			       +solver.getObjectiveFunction(1));
-      // solver.setBndryObjective(2,solver.getObjectiveFunction(2));
+
+      // if (verbose)
+      // 	cout << "Saving data..." << endl;
+
+      solver.setParameter(BCESolver::BoundaryObjective1,0);
+      solver.setParameter(BCESolver::BoundaryObjective2,1);
+
+      solver.setBndryObjective(1,solver.getObjectiveFunction(0)
+      			       +solver.getObjectiveFunction(1));
+      solver.setBndryObjective(2,solver.getObjectiveFunction(2));
+
+      solver.mapBoundary("fpaknownbndry_bidder.dat");
 
       BCEData data;
       solver.getData(data);
       data.setNumValues(vector<int>(2,nvals));
-
-      // if (verbose)
-      // 	cout << "Saving data..." << endl;
 
       filename << ".bce";
       const string & filenamestring = filename.str();
@@ -158,10 +164,6 @@ void solveFPA(int nvals, int nbids,
 
       // solver.mapBoundary("fpaknownbndry.dat");
 
-      // solver.setParameter(BCESolver::BoundaryObjective1,0);
-      // solver.setParameter(BCESolver::BoundaryObjective2,1);
-
-      // solver.mapBoundary("fpaknownbndry_bidder.dat");
 
     }
   catch (IloException & e)
