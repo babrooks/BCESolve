@@ -1,0 +1,30 @@
+#ifndef BCEVALUESETPLOT_HPP
+#define BCEVALUESETPLOT_HPP
+
+#include <QtWidgets>
+#include "qcustomplot.h"
+
+class BCEValueSetPlot : public QCustomPlot {
+  Q_OBJECT;
+
+public:
+
+  BCEValueSetPlot() {
+  connect(this,SIGNAL(mouseMove(QMouseEvent*)),
+	  this,SLOT(showPointToolTip(QMouseEvent*)));
+  }
+
+public slots:
+
+  void showPointToolTip(QMouseEvent *event) {
+
+    double x = this->xAxis->pixelToCoord(event->pos().x());
+    double y = this->yAxis->pixelToCoord(event->pos().y());
+
+    setToolTip(QString("%1 , %2").arg(x).arg(y));
+  }
+
+
+};
+
+#endif

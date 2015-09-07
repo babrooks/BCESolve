@@ -1,0 +1,28 @@
+#ifndef BCELINEEDIT_HPP
+#define BCELINEEDIT_HPP
+
+#include <QtWidgets>
+#include "bcedatastate.hpp"
+
+class BCELineEdit : public QLineEdit
+{
+  Q_OBJECT;
+
+public:
+
+  BCEDataState::BCESliderType sliderType;
+  int player;
+
+  BCELineEdit(BCEDataState::BCESliderType _type, int _player):
+    sliderType(_type), player(_player)
+  {}
+
+public slots:
+
+  void changeDisplayValue(int newVal, BCEDataState::BCESliderType type, int player) {
+    setText(QString::number(newVal));
+  }
+
+};
+
+#endif

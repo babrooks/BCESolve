@@ -237,7 +237,7 @@ void BCEData::getExpectedObjectives(vector<double> &objectiveValues,
 } // getExpectedObjectives (for a particular distribution)
 
 double BCEData::getDeviationObjectives(int player, int action, int type,
-				     vector< vector<double> > &objectiveValues) const
+				       vector< vector<double> > &objectiveValues) const
 {
   if (!equilibria.size())
     throw(BCEException(BCEException::NoEquilibria));
@@ -289,7 +289,7 @@ double BCEData::getDeviationObjectives(int player, int action, int type,
 	    =stateTypesActionsToMarginalIndex(counter.state,counter.types,deviations,
 					      true,vector<bool>(2,true),
 					      vector<bool>(2,false));
-	  
+
 	  for (objectiveCounter=0; 
 	       objectiveCounter<numObjectives; 
 	       objectiveCounter++)

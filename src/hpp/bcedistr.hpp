@@ -195,6 +195,19 @@ public:
 
 }; // unimodal
 
+class additiveCorrelated: public BCEDistr
+{
+public:
+  additiveCorrelated() {}
+
+  double CDF(double v0, double v1) const
+  {
+    v0 = min(max(v0,0.0),1.0);
+    v1 = min(max(v1,0.0),1.0);
+    return (v0+v1)*(v0+v1)*v0*v1/4;
+  }
+}; // additiveCorrelated
+
 //! Uniform distribution
 class uniform: public BCEDistr
 {
