@@ -42,14 +42,15 @@ bceenumeration.hpp
 SOURCES += main.cpp \
 bcewindow.cpp \
 qcustomplot.cpp 
-LIBS += ../lib/libbce.a /usr/lib/x86_64-linux-gnu/libboost_serialization.a
+LIBS += ../lib/libbce.a
+
 
 LIBS += -L../lib/ -L/usr/local/lib/ -L/usr/lib/x86_64-linux-gnu/
 linux-g++ {
-LIBS +=  -Bstatic -L../lib -lsg -Wl,-Bstatic  -L/usr/lib/x86_64-linux-gnu/ -lboost_serialization -Wl,-Bdynamic
+LIBS +=  -Bstatic -L../lib -Wl,-Bstatic  -L/usr/lib/x86_64-linux-gnu/ -lboost_serialization -Wl,-Bdynamic
 }
 macx {
-LIBS += -lc++ -lsg /usr/local/lib/libboost_serialization.a 
+LIBS += -lc++ /usr/local/lib/libboost_serialization.a 
 }
 TEMPLATE = app
 TARGET = viewer
