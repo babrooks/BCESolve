@@ -4,7 +4,9 @@
 CXX=g++
 
 # CPLEX
-SYSTEM = x86-64_linux
+# SYSTEM = x86-64_linux
+SYSTEM=x86-64_sles10_4.1
+
 LIBFORMAT = static_pic
 CSYSFLAGS  = -fPIC -DIL_STD 
 LDSYSFLAGS = 
@@ -15,13 +17,15 @@ LDMTFLAGS = -lpthread
 #DEBUG = 
 # DEBUG = -O1 -DNDEBUG
 DEBUG = -g
+
 # Directories
-CPLEXDIR=/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex
-CONCERTDIR=/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/concert
-CPLEXNAME=cplex1262	
-# CPLEXDIR=/opt/ibm/ILOG/CPLEX_Studio1251/cplex
-# CONCERTDIR=/opt/ibm/ILOG/CPLEX_Studio1251/concert
-# CPLEXNAME=cplex1251
+# CPLEXDIR=/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex
+# CONCERTDIR=/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/concert
+# CPLEXNAME=cplex1262	
+
+CPLEXDIR=/opt/ibm/ILOG/CPLEX_Studio1251/cplex
+CONCERTDIR=/opt/ibm/ILOG/CPLEX_Studio1251/concert
+CPLEXNAME=cplex1251
 
 # Directories
 GRBDIR=/opt/gurobi563/linux64
@@ -58,7 +62,7 @@ LDFLAGS = -L$(CPLEXDIR)/lib/$(SYSTEM)/$(LIBFORMAT) \
 # MAINS=fpaknown fpaunknown fangmorris spa spaknown survey
 MAINS=exampleforrobbie \
 	exantefee fpaunknown spaunknown \
-	fpaunknown_revbounds fpaknown_revbounds \
+	fpaunknown_revbounds fpacommon fpaknown_revbounds \
 	stationary stationary2 fpaknown \
 	 fangmorris publicinfo commonfpa \
 	 multiplicative survey duopoly onesided \
