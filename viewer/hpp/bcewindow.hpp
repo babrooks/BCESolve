@@ -30,11 +30,19 @@ public slots:
 
 private:
 
+  QAction *linearScale;
+  QAction *colorfulDistn;
+
+  int resWidth;
+  int resHeight;
+
   QVector<BCESlider*> sliderGroup;
   QVector<BCELineEdit*> lineEditGroup;
   QVector<BCECheckBox*> checkBoxGroup;
+  QVector<QLabel*> sliderLabels;
 
   QString path;
+  QString screenShotPath;
 
   QCustomPlot *conditionalMarginalPlot;
   QCPColorMap *colorMap;
@@ -58,10 +66,9 @@ private:
 private slots:
 
   void loadSolution();
-  void setLinearScale();
-  void setLogScale();
-  void setColorfulTheme();
-  void setBlueTheme();
+  void toggleLinearScale(bool checked);
+  void toggleColorfulTheme(bool checked);
+  void screenShot();
 
 };
 

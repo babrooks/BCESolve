@@ -10,30 +10,40 @@
 BCEWindow::BCEWindow() 
 {
   path=QString("../examples/");
+  screenShotPath=QString("../examples/screenshots/");
+
+  // Resolution Settings
+
+  resWidth = 1920;
+  resHeight = 1080;
 
   // Menu Bar
   QMenu * fileMenu = menuBar()->addMenu(tr("&File"));
   QMenu * viewMenu = menuBar()->addMenu(tr("&View"));
   QAction * loadSolutionAction = new QAction(tr("&Load solution"),this);
-  QAction * linearScale = new QAction(tr("&Linear Color Scale (Default)"),this);
-  QAction * logScale = new QAction(tr("&Log Color Scale"),this);
-  QAction * colorfulDistn = new QAction(tr("&Colorful Theme"),this);
-  QAction * lightDistn = new QAction(tr("&Blue Theme (Default)"),this);
+  QAction * linearScale = new QAction(tr("&Linear/Log Color Scale Toggle)"),this);
+  QAction * colorfulDistn = new QAction(tr("&Blue/Colorful Theme Toggle"),this);
+  QAction * screenShotAction = new QAction(tr("&Save a screen shot"),this);
+  QAction * quitAction = new QAction(tr("&Quit GUI"),this);
   fileMenu->addAction(loadSolutionAction);
+  fileMenu->addAction(quitAction);
   viewMenu->addAction(linearScale);
   linearScale->setCheckable(true);
-  viewMenu->addAction(logScale);
+  linearScale->setChecked(true);
   viewMenu->addAction(colorfulDistn);
-  viewMenu->addAction(lightDistn);
-  loadSolutionAction->setShortcut(tr("Ctrl+O"));
-  // loadSolutionAction->setShortcutContext(Qt::ApplicationShortcut);
+  colorfulDistn->setCheckable(true);
+  colorfulDistn->setChecked(true);
+  viewMenu->addAction(screenShotAction);
+  loadSolutionAction->setShortcut(tr("Ctrl+L"));
+  screenShotAction->setShortcut(tr("Ctrl+P"));
+  quitAction->setShortcut(tr("Ctrl+W"));
 
   // Menu Connections
   connect(loadSolutionAction,SIGNAL(triggered()),this,SLOT(loadSolution()));
-  connect(linearScale,SIGNAL(triggered()),this,SLOT(setLinearScale()));
-  connect(logScale,SIGNAL(triggered()),this,SLOT(setLogScale()));
-  connect(colorfulDistn,SIGNAL(triggered()),this,SLOT(setColorfulTheme()));
-  connect(lightDistn,SIGNAL(triggered()),this,SLOT(setBlueTheme()));
+  connect(quitAction,SIGNAL(triggered()),this,SLOT(close()));
+  connect(linearScale,SIGNAL(toggled(bool)),this,SLOT(toggleLinearScale(bool)));
+  connect(colorfulDistn,SIGNAL(toggled(bool)),this,SLOT(toggleColorfulTheme(bool)));
+  connect(screenShotAction,SIGNAL(triggered()),this,SLOT(screenShot()));
 
   ////////////////////////////////////////////////////
   // Slider, LineEdit, and CheckBox Controls Creation
@@ -55,9 +65,10 @@ BCEWindow::BCEWindow()
 
   for (int widgetIndex = 0; widgetIndex < 6; widgetIndex++) {
     lineEditGroup[widgetIndex]->setReadOnly(true);
-    sliderGroup[widgetIndex]->setMaximumHeight(20);
+    sliderGroup[widgetIndex]->setMaximumHeight(resHeight/54);
+    sliderGroup[widgetIndex]->setMinimumWidth(resWidth/16);
     sliderGroup[widgetIndex]->setOrientation(Qt::Horizontal);
-    lineEditGroup[widgetIndex]->setMaximumSize(30,20);
+    lineEditGroup[widgetIndex]->setMaximumSize(resWidth/64,resHeight/54);
     connect(sliderGroup[widgetIndex],
 	    SIGNAL(valueChanged(int,BCESliderType,int)),
 	    this,SLOT(changeSliderValue(int,BCESliderType,int)));
@@ -117,7 +128,7 @@ BCEWindow::BCEWindow()
   payoffPlot = new BCEValueSetPlot();
   payoffPlot->xAxis->setLabel("Player 0");
   payoffPlot->yAxis->setLabel("Player 1");
-  payoffPlot->setMinimumSize(1920/4,1080/3.5);
+  payoffPlot->setMinimumSize(resWidth/4,resHeight/3.5);
   connect(payoffPlot,SIGNAL(newEqmCoordinates(double,double)),
 	  this,SLOT(setNewEqm(double,double)));
 
@@ -128,7 +139,7 @@ BCEWindow::BCEWindow()
   deviationBarGraphs[1]->xAxis->setLabel("Player 1's Actions");
   for (int player = 0; player < 2; player++) {
     deviationBarGraphs[player]->yAxis->setLabel("Expected Payoff");
-    deviationBarGraphs[player]->setMinimumHeight(1080/3.5);
+    deviationBarGraphs[player]->setMinimumHeight(resHeight/3.5);
   }
 
   // Payoff Plot and Sliders Horizontal Layout
@@ -153,7 +164,7 @@ BCEWindow::BCEWindow()
   conditionalMarginalPlot->addPlottable(colorMap);
   conditionalMarginalPlot->setInteractions(QCP::iRangeDrag|QCP::iRangeZoom);
   conditionalMarginalPlot->axisRect()->setupFullAxesBox(true);
-  conditionalMarginalPlot->setMinimumWidth(960); // 1080p resolution
+  conditionalMarginalPlot->setMinimumWidth(resWidth/2); // 1080p resolution
   conditionalMarginalPlot->xAxis->setLabel("Player 0");
   conditionalMarginalPlot->yAxis->setLabel("Player 1");
 
@@ -170,7 +181,7 @@ BCEWindow::BCEWindow()
   // Color Scale Color Choice
   QCPColorGradient *mGradient = new QCPColorGradient();
   // mGradient->gpSpectrum;
-  colorMap->setGradient(mGradient->inverted());
+  colorMap->setGradient(mGradient->gpSpectrum);
   colorMap->setInterpolate(false);
 
   // Line up Color Scale and Color Map
@@ -282,8 +293,8 @@ void BCEWindow::plotEqm(vector<vector<double>> bceEqm) {
   colorScale->setDataRange(QCPRange(0,maxEntry*1.3));
 
   conditionalMarginalPlot->rescaleAxes();
-  conditionalMarginalPlot->xAxis->scaleRange(1.1,conditionalMarginalPlot->xAxis->range().center());
-  conditionalMarginalPlot->yAxis->scaleRange(1.1,conditionalMarginalPlot->yAxis->range().center());
+  // conditionalMarginalPlot->xAxis->scaleRange(1.1,conditionalMarginalPlot->xAxis->range().center());
+  // conditionalMarginalPlot->yAxis->scaleRange(1.1,conditionalMarginalPlot->yAxis->range().center());
   conditionalMarginalPlot->replot();
 
 } // Plot Conditional-Marginal Distribution
@@ -506,26 +517,41 @@ void BCEWindow::setNewEqm(double x,double y) {
 /////////////////////////////////
 // View Slots
 
-void BCEWindow::setLinearScale() {
-  colorScale->setDataScaleType(QCPAxis::stLinear);
+void BCEWindow::toggleLinearScale(bool checked) {
+
+  if (checked)
+    colorScale->setDataScaleType(QCPAxis::stLinear);
+  else 
+    colorScale->setDataScaleType(QCPAxis::stLogarithmic);
+
   plotSelectGraphics(State,0);
+
 } // Slot to set a linear color scale for the distribution's heat map
 
-void BCEWindow::setLogScale() {
-  colorScale->setDataScaleType(QCPAxis::stLogarithmic);
-  plotSelectGraphics(State,0);
-} // Slot to set a linear color scale for the distribution's heat map
+void BCEWindow::toggleColorfulTheme(bool checked) {
 
-void BCEWindow::setColorfulTheme() {
   QCPColorGradient *newGradient = new QCPColorGradient();
-  colorMap->setGradient(newGradient->gpSpectrum);
+
+  if (checked)
+    colorMap->setGradient(newGradient->gpSpectrum);
+  else
+    colorMap->setGradient(newGradient->inverted());
+
   plotSelectGraphics(State,0);
+
 } // Slot to change color theme of heat map for conditional marginal distribution
 
-void BCEWindow::setBlueTheme() {
-  QCPColorGradient *newGradient = new QCPColorGradient();
-  colorMap->setGradient(newGradient->inverted());
-  plotSelectGraphics(State,0);
-} // Slot to change color theme of heat map for conditional marginal distribution
+void BCEWindow::screenShot() {
+
+  QString newPath = QFileDialog::getSaveFileName(this, tr("Save PNG"),
+						 screenShotPath, tr("PNG files (*.png)"));
+
+  if (newPath.isEmpty())
+    return;
+
+  QFileInfo fi(newPath);
+
+  grab().save(newPath);
+}
 
 

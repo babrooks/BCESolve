@@ -45,7 +45,7 @@ qcustomplot.cpp
 LIBS += ../lib/libbce.a
 
 
-LIBS += -L../lib/ -L/usr/local/lib/ -L/usr/lib/x86_64-linux-gnu/
+LIBS += -L../lib/ -L/usr/local/lib/ /usr/lib/x86_64-linux-gnu/libboost_serialization.a
 linux-g++ {
 LIBS +=  -Bstatic -L../lib -Wl,-Bstatic  -L/usr/lib/x86_64-linux-gnu/ -lboost_serialization -Wl,-Bdynamic
 }
@@ -53,5 +53,5 @@ macx {
 LIBS += -lc++ /usr/local/lib/libboost_serialization.a 
 }
 TEMPLATE = app
-TARGET = viewer
+TARGET = bceviewer
 

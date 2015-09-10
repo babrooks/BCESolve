@@ -5,7 +5,7 @@
 #include "bcedatastate.hpp"
 #include "bceenumeration.hpp"
 
-class BCESlider : public QSlider
+class BCESlider : public QScrollBar
 {
   Q_OBJECT;
 
