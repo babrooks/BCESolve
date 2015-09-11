@@ -18,12 +18,18 @@ private:
   vector<bool> margA, margT;
   int objective0 = 0,objective1 = 1;
   // player 0 and player 1 surplus, CAN BE CHANGED
-  int currentEqmIndex=0;
+  int currentEqmIndex;
   bool isPrivateVals;
+  vector<vector<double>> equilibriumMatrix;
 
 signals:
 
   void valueChanged(int val,BCESliderType st,int player);
+  void devPlotTitleChange(int player,
+			  int aciton,
+			  int type,
+			  double payoff,
+			  double probability);
 
 public:
 
@@ -40,6 +46,7 @@ public:
     margS1 = false;
     margA = {true,true};
     margT = {false,false};
+    currentEqmIndex = 0;
     isPrivateVals=false;
 
   } // Default Constructor
@@ -79,12 +86,13 @@ public:
 	isPrivateVals = !(data.isPrivateValues);
 	std::cout << isPrivateVals << std::endl;
 
+	currentEqmIndex = 0;
+
       }
     catch (std::exception & e)
       {
 	qDebug() << "Load solution didnt work :(" << endl;
       }
-
   }
 
   vector<vector<double>> getEqmMatrix() {
@@ -144,15 +152,15 @@ public:
 
     assert(data.numActions_total == distribution.size());
 
-    vector<vector<double>> equilibriumMatrix(data.numActions[1],
-					     vector<double>(data.numActions[0],0));
+    equilibriumMatrix = vector<vector<double>>(data.numActions[1],
+					       vector<double>(data.numActions[0],0));
 
     for (int a1 = 0; a1 < data.numActions[1]; a1++)
       {
 	for (int a0 = 0; a0 < data.numActions[0]; a0++)
 	  {
 	    int index = a1 * data.numActions[0] + a0;
-	    equilibriumMatrix[a1][a0] = distribution[index];
+	    equilibriumMatrix[a0][a1] = distribution[index];
 	  } // for a0
       } // for a1
 
@@ -164,10 +172,15 @@ public:
 
     vector<vector<double>> objectiveValues;
 
-    if (player==0)
+    if (player==0) {
       data.getDeviationObjectives(player,a0,t0,objectiveValues);
-    else if (player==1)
+      emit(devPlotTitleChange(player,a0,t0,objectiveValues[player][a0],equilibriumMatrix[a0][a1]));
+    }
+
+    else if (player==1) {
       data.getDeviationObjectives(player,a1,t1,objectiveValues);
+      emit(devPlotTitleChange(player,a1,t1,objectiveValues[player][a1],equilibriumMatrix[a0][a1]));
+    }
 
     return objectiveValues; 
 

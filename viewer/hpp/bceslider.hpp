@@ -1,5 +1,5 @@
-#ifndef BCESLIDER_H
-#define BCESLIDER_H
+#ifndef BCESLIDER_HPP
+#define BCESLIDER_HPP
 
 #include <QtWidgets>
 #include "bcedatastate.hpp"

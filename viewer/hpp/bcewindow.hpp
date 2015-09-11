@@ -10,6 +10,7 @@
 #include "bcecheckbox.hpp"
 #include "bcevaluesetplot.hpp"
 #include "bceenumeration.hpp"
+#include "bcedevplottitle.hpp"
 
 using namespace std;
 
@@ -40,11 +41,12 @@ private:
   QVector<BCELineEdit*> lineEditGroup;
   QVector<BCECheckBox*> checkBoxGroup;
   QVector<QLabel*> sliderLabels;
+  QVector<BCEDevPlotTitle*> devPlotTitles;
 
   QString path;
   QString screenShotPath;
 
-  QCustomPlot *conditionalMarginalPlot;
+  BCEValueSetPlot *conditionalMarginalPlot;
   QCPColorMap *colorMap;
   QCPColorScale *colorScale;
   QCPColorGradient *mGradient;

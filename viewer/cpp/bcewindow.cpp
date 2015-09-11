@@ -6,6 +6,7 @@
 #include "bceslider.hpp"
 #include "bcedata.hpp"
 #include "bceenumeration.hpp"
+#include "bcedevplottitle.hpp"
 
 BCEWindow::BCEWindow() 
 {
@@ -49,7 +50,7 @@ BCEWindow::BCEWindow()
   // Slider, LineEdit, and CheckBox Controls Creation
 
   for (int player = 0; player < 2; player++) {
-    // Note that player is irrelevant for private values
+
     sliderGroup.push_back(new BCESlider(Action,player));
     sliderGroup.push_back(new BCESlider(Type,player));
     sliderGroup.push_back(new BCESlider(State,player));
@@ -89,12 +90,12 @@ BCEWindow::BCEWindow()
 
   QVector<QLabel*> sliderLabels;
 
-  sliderLabels.push_back(new QLabel(QApplication::translate("viewer","Player 0's Action")));
-  sliderLabels.push_back(new QLabel(QApplication::translate("viewer","Player 0's Type")));
-  sliderLabels.push_back(new QLabel(QApplication::translate("viewer","Player 0's Value")));
-  sliderLabels.push_back(new QLabel(QApplication::translate("viewer","Player 1's Action")));
-  sliderLabels.push_back(new QLabel(QApplication::translate("viewer","Player 1's Type")));
-  sliderLabels.push_back(new QLabel(QApplication::translate("viewer","Player 1's Value")));
+  sliderLabels.push_back(new QLabel(QApplication::translate("bceviewer","Player 0's Action")));
+  sliderLabels.push_back(new QLabel(QApplication::translate("bceviewer","Player 0's Type")));
+  sliderLabels.push_back(new QLabel(QApplication::translate("bceviewer","Player 0's Value")));
+  sliderLabels.push_back(new QLabel(QApplication::translate("bceviewer","Player 1's Action")));
+  sliderLabels.push_back(new QLabel(QApplication::translate("bceviewer","Player 1's Type")));
+  sliderLabels.push_back(new QLabel(QApplication::translate("bceviewer","Player 1's Value")));
 
   for (int labelIt = 0; labelIt < 6; labelIt++)
     sliderLabels[labelIt]->setMaximumHeight(20);
@@ -140,6 +141,12 @@ BCEWindow::BCEWindow()
   for (int player = 0; player < 2; player++) {
     deviationBarGraphs[player]->yAxis->setLabel("Expected Payoff");
     deviationBarGraphs[player]->setMinimumHeight(resHeight/3.5);
+
+    devPlotTitles.push_back(new BCEDevPlotTitle(player));
+    connect(&gui,
+	    SIGNAL(devPlotTitleChange(int,int,int,double,double)),
+	    devPlotTitles[player],
+	    SLOT(changeText(int,int,int,double,double)));
   }
 
   // Payoff Plot and Sliders Horizontal Layout
@@ -150,12 +157,14 @@ BCEWindow::BCEWindow()
   // Left Viewer Panel, Bar Plots and Slider Box
   QVBoxLayout *leftSectorDivide = new QVBoxLayout();
   leftSectorDivide->addLayout(topLeftPanel);
-  for (int player = 0; player < 2; player++)
+  for (int player = 0; player < 2; player++) {
+    leftSectorDivide->addWidget(devPlotTitles[player]);
     leftSectorDivide->addWidget(deviationBarGraphs[player]);
+  }
 
   ////////////////////////////////////////////////
   // Right Viewer Panel, Conditional-Marginal Distribution
-  conditionalMarginalPlot = new QCustomPlot();
+  conditionalMarginalPlot = new BCEValueSetPlot();
 
   // Plot Layout and Interaction Settings
   colorMap = new QCPColorMap(conditionalMarginalPlot->xAxis,
@@ -176,7 +185,6 @@ BCEWindow::BCEWindow()
   colorScale->setType(QCPAxis::atRight); 
   colorScale->axis()->setLabel("Action Probability");
   colorScale->setRangeDrag(true);
-  colorMap->setTightBoundary(true);
 
   // Color Scale Color Choice
   QCPColorGradient *mGradient = new QCPColorGradient();
@@ -284,7 +292,7 @@ void BCEWindow::plotEqm(vector<vector<double>> bceEqm) {
       for (int yIndex=0; yIndex<ny; ++yIndex)
 	{
 	  double dataPoint = bceEqm[xIndex][yIndex];
-	  colorMap->data()->setCell(yIndex, xIndex, dataPoint);
+	  colorMap->data()->setCell(xIndex,yIndex,dataPoint);
 	  if (dataPoint > maxEntry)
 	    maxEntry = dataPoint;
 	}
@@ -293,8 +301,8 @@ void BCEWindow::plotEqm(vector<vector<double>> bceEqm) {
   colorScale->setDataRange(QCPRange(0,maxEntry*1.3));
 
   conditionalMarginalPlot->rescaleAxes();
-  // conditionalMarginalPlot->xAxis->scaleRange(1.1,conditionalMarginalPlot->xAxis->range().center());
-  // conditionalMarginalPlot->yAxis->scaleRange(1.1,conditionalMarginalPlot->yAxis->range().center());
+  conditionalMarginalPlot->xAxis->scaleRange(1.05,conditionalMarginalPlot->xAxis->range().center());
+  conditionalMarginalPlot->yAxis->scaleRange(1.05,conditionalMarginalPlot->yAxis->range().center());
   conditionalMarginalPlot->replot();
 
 } // Plot Conditional-Marginal Distribution
@@ -452,6 +460,7 @@ void BCEWindow::plotDeviationObjectives(int player, vector<vector<double>> devOb
 // Plot Graphics (Loading or Data Changed)
 
 void BCEWindow::plotAllGraphics() {
+    plotBCEValueSet();
     vector<vector<double>> conditionalMarginalDistn;
     conditionalMarginalDistn = gui.getEqmMatrix();
     vector<vector<double>> deviationObjectives0;
@@ -461,7 +470,6 @@ void BCEWindow::plotAllGraphics() {
     plotEqm(conditionalMarginalDistn);
     plotDeviationObjectives(0,deviationObjectives0);
     plotDeviationObjectives(1,deviationObjectives1);
-    plotBCEValueSet();
 }
 
 void BCEWindow::plotSelectGraphics(BCESliderType type,int player) {

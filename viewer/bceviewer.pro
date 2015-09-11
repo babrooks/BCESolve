@@ -37,7 +37,8 @@ bceslider.hpp \
 bcelineedit.hpp \
 bcecheckbox.hpp \
 bcevaluesetplot.hpp \
-bceenumeration.hpp
+bceenumeration.hpp \
+bcedevplottitle.hpp
 
 SOURCES += main.cpp \
 bcewindow.cpp \
