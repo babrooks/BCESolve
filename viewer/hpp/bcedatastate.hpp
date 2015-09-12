@@ -12,7 +12,10 @@ class BCEDataState : public QWidget
   friend class BCEWindow;
 
 private:
-  int a0, a1, t0, t1, v0, v1, s;
+  vector<int> actions;
+  vector<int> types;
+  vector<int> values;
+  int state;
   BCEData data;
   bool margS0, margS1;
   vector<bool> margA, margT;
@@ -21,6 +24,8 @@ private:
   int currentEqmIndex;
   bool isPrivateVals;
   vector<vector<double>> equilibriumMatrix;
+  vector<vector<double>> objectiveValues;
+  vector<vector<double>> allEqm;
 
 signals:
 
@@ -28,19 +33,22 @@ signals:
   void devPlotTitleChange(int player,
 			  int aciton,
 			  int type,
-			  double payoff,
-			  double probability);
+			  double payoff);
+  void devPlotPrChange(double probability);
+  void eqmCoordSignal(double xCoord,double yCoord);
+  void newStateSignal(int value0,
+		      int value1,
+		      int state,
+		      bool privateVals);
+  void loadDataSignal(bool privateVals,int player);
 
 public:
 
   BCEDataState() {
-    a0 = 0;
-    a1 = 0;
-    t0 = 0;
-    t1 = 0;
-    v0 = 0;
-    v1 = 0;
-    s = 0;
+    actions = vector<int>(2,0);
+    types = vector<int>(2,0);
+    values = vector<int>(2,0);
+    state = 0;
     BCEData data;
     margS0 = false;
     margS1 = false;
@@ -51,28 +59,17 @@ public:
 
   } // Default Constructor
 
-  int shareDataProperties(int index) {
-    switch(index) {
-    case 0: return data.numActions[0];
+  int shareDataProperties(BCESliderType st,int player) {
+    switch(st) {
+    case Action: return data.numActions[player];
       break;
-    case 1: return data.numTypes[0];
+    case Type: return data.numTypes[player];
       break;
-    case 2: {
+    case State: {
       if (isPrivateVals == true) 
 	return data.numStates;
       else
-	return data.numValues[0];
-    }
-      break;
-    case 3: return data.numActions[1];
-      break;
-    case 4: return data.numTypes[1];
-      break;
-    case 5: {
-      if (isPrivateVals == true)
-	return data.numStates;
-      else
-	return data.numValues[1];
+	return data.numValues[player];
     }
       break;
     }
@@ -84,9 +81,11 @@ public:
 	BCEData::load(data,pathToData);
 
 	isPrivateVals = !(data.isPrivateValues);
-	std::cout << isPrivateVals << std::endl;
 
 	currentEqmIndex = 0;
+
+	for (int player = 0; player < 2; player++)
+	  emit(loadDataSignal(isPrivateVals,player));
 
       }
     catch (std::exception & e)
@@ -95,15 +94,15 @@ public:
       }
   }
 
-  vector<vector<double>> getEqmMatrix() {
+  void getEqmMatrix() {
 
     vector<double> distribution;
 
     // State Conditions
 
-    vector<int> stateConditions(1,s);
+    vector<int> stateConditions(1,state);
     if (isPrivateVals == false)
-      stateConditions = vector<int>(1,v0+v1*data.numValues[0]); 
+      stateConditions = vector<int>(1,values[0]+values[1]*data.numValues[0]); 
 
     // Action Conditions
 
@@ -164,41 +163,39 @@ public:
 	  } // for a0
       } // for a1
 
-    return equilibriumMatrix;
+    emit(devPlotPrChange(equilibriumMatrix[actions[0]][actions[1]]));
 
   }
 
-  vector<vector<double>> getObjectiveVals(int player) {
+  void getObjectiveVals(int player) {
 
-    vector<vector<double>> objectiveValues;
+    data.getDeviationObjectives(player,actions[player],types[player],objectiveValues);
 
-    if (player==0) {
-      data.getDeviationObjectives(player,a0,t0,objectiveValues);
-      emit(devPlotTitleChange(player,a0,t0,objectiveValues[player][a0],equilibriumMatrix[a0][a1]));
-    }
+    emit(devPlotTitleChange(player,
+			    actions[player],
+			    types[player],
+			    objectiveValues[player][actions[player]]));
 
-    else if (player==1) {
-      data.getDeviationObjectives(player,a1,t1,objectiveValues);
-      emit(devPlotTitleChange(player,a1,t1,objectiveValues[player][a1],equilibriumMatrix[a0][a1]));
-    }
 
-    return objectiveValues; 
+    emit(devPlotPrChange(equilibriumMatrix[actions[0]][actions[1]]));
 
   }
 
-  vector<vector<double>> getObjectiveMatrix() {
+  void getObjectiveMatrix() {
 
-    vector<vector<double>> allEqmObjectives;
-    data.getExpectedObjectives(allEqmObjectives);
+    data.getExpectedObjectives(allEqm);
 
-    return allEqmObjectives;
+    double xClosest = 0;
+    double yClosest = 0;
+
+    xClosest = allEqm[currentEqmIndex][objective0];
+    yClosest = allEqm[currentEqmIndex][objective1]; 
+
+    emit(eqmCoordSignal(xClosest,yClosest));
 
   }
 
   void modifyEqmFocus(double x,double y) {
-
-    vector<vector<double>> allEqm;
-    data.getExpectedObjectives(allEqm);
 
     int newEqmIndex = 0;
     double smallestEuclidianDistance = 5000.0000; // This just needs to be large
@@ -209,12 +206,13 @@ public:
 
       if (currentEuclidianDistance < smallestEuclidianDistance) {
 	newEqmIndex = i;
-	smallestEuclidianDistance = currentEuclidianDistance; 
+	smallestEuclidianDistance = currentEuclidianDistance;
       }
     }
 
     currentEqmIndex = newEqmIndex;
     data.setCurrentEquilibrium(currentEqmIndex);
+
   }
 
   double euclidianDistance(double x1,double x2,double y1,double y2) {
@@ -225,32 +223,19 @@ public:
 		     BCESliderType st,
 		     int player) {
     switch(st) {
-    case Action: {
-      if (player==0)
-	a0 = value;
-      else 
-	a1 = value;
-    }
+    case Action: actions[player] = value;
       break;
-    case Type: {
-      if (player==0)
-	t0 = value;
-      else 
-	t1 = value;
-    }
+    case Type: types[player] = value;
       break;
     case State: {
       if (isPrivateVals == true) {
-	s = value;
-	v0 = value;
-	v1 = value;
+	state = value;
+	values[player] = value;
       }
       else {
-	if (player==0)
-	  v0 = value;
-	else 
-	  v1 = value;
+	values[player] = value;
       }
+      emit(newStateSignal(values[0],values[1],state,isPrivateVals));
     }
       break;
     }
@@ -259,6 +244,7 @@ public:
       for (int playerIt=0; playerIt < data.numPlayers; playerIt++)
 	emit(valueChanged(value,st,playerIt));
     }
+
     else 
       emit(valueChanged(value,st,player));
   }
@@ -279,6 +265,21 @@ public:
     }
       break;
     }
+  }
+
+  void resetManipulatedData(BCESliderType st,int player) {
+    switch(st) {
+    case Action: getObjectiveVals(player);
+      break;
+    case Type: getObjectiveVals(player);
+      break;
+    case State: getEqmMatrix();
+    }
+  }
+
+  void resetManipulatedData() {
+    getObjectiveMatrix();
+    getEqmMatrix();
   }
 
 };

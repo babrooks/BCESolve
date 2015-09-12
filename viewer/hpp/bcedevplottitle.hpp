@@ -2,7 +2,6 @@
 #define BCEDEVPLOTTITLE_HPP
 
 #include <QtWidgets>
-#include "bceenumeration.hpp"
 #include <sstream>
 
 class BCEDevPlotTitle : public QLabel
@@ -12,6 +11,7 @@ class BCEDevPlotTitle : public QLabel
 private:
 
   int player;
+  std::stringstream titleNameNoPr;
 
 public:
 
@@ -31,20 +31,28 @@ public slots:
   void changeText(int emittedPlayer,
 		  int action,
 		  int type,
-		  double objectiveValue,
-		  double probability) {
+		  double objectiveValue) {
+
+    if (player == emittedPlayer) {
+      titleNameNoPr.str(std::string());
+      titleNameNoPr << "Player " << emittedPlayer << "'s Deviation Objectives, "
+		    << "Action = " << action << ", "
+		    << "Type = " << type << ", "
+		    << "Payoff = " << objectiveValue << ", ";
+    }
+  }
+
+  void changeProbability(double probability) {
 
     std::stringstream titleName;
-    titleName << "Player " << emittedPlayer << "'s Deviation Objectives, "
-	      << "Action = " << action << ", "
-	      << "Type = " << type << ", "
-	      << "Payoff = " << objectiveValue << ", "
+    std::string titleNameNoPrStr = titleNameNoPr.str();
+    titleName << titleNameNoPrStr
 	      << "Probability = " << probability;
     std::string titleStr = titleName.str();
     QString title = QString::fromStdString(titleStr);
 
-    if (player == emittedPlayer)
-      setText(title);
+    setText(title);
+    setAlignment(Qt::AlignCenter);
 
   }
 

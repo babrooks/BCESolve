@@ -7,6 +7,9 @@
 #include "bcedata.hpp"
 #include "bceenumeration.hpp"
 #include "bcedevplottitle.hpp"
+#include "bcevaluesetplottitle.hpp"
+#include "bceheatmaptitle.hpp"
+#include "bcesliderlabel.hpp"
 
 BCEWindow::BCEWindow() 
 {
@@ -22,8 +25,8 @@ BCEWindow::BCEWindow()
   QMenu * fileMenu = menuBar()->addMenu(tr("&File"));
   QMenu * viewMenu = menuBar()->addMenu(tr("&View"));
   QAction * loadSolutionAction = new QAction(tr("&Load solution"),this);
-  QAction * linearScale = new QAction(tr("&Linear/Log Color Scale Toggle)"),this);
-  QAction * colorfulDistn = new QAction(tr("&Blue/Colorful Theme Toggle"),this);
+  QAction * linearScale = new QAction(tr("&Linear/Log Color Scale Toggle"),this);
+  QAction * colorfulDistn = new QAction(tr("&Colorful/Blue Theme Toggle"),this);
   QAction * screenShotAction = new QAction(tr("&Save a screen shot"),this);
   QAction * quitAction = new QAction(tr("&Quit GUI"),this);
   fileMenu->addAction(loadSolutionAction);
@@ -88,22 +91,24 @@ BCEWindow::BCEWindow()
 
   // Slider Labels
 
-  QVector<QLabel*> sliderLabels;
+  QVector<BCESliderLabel*> sliderLabels;
 
-  sliderLabels.push_back(new QLabel(QApplication::translate("bceviewer","Player 0's Action")));
-  sliderLabels.push_back(new QLabel(QApplication::translate("bceviewer","Player 0's Type")));
-  sliderLabels.push_back(new QLabel(QApplication::translate("bceviewer","Player 0's Value")));
-  sliderLabels.push_back(new QLabel(QApplication::translate("bceviewer","Player 1's Action")));
-  sliderLabels.push_back(new QLabel(QApplication::translate("bceviewer","Player 1's Type")));
-  sliderLabels.push_back(new QLabel(QApplication::translate("bceviewer","Player 1's Value")));
-
-  for (int labelIt = 0; labelIt < 6; labelIt++)
-    sliderLabels[labelIt]->setMaximumHeight(20);
+  for (int player = 0; player < 2; player++) {
+    sliderLabels.push_back(new BCESliderLabel(Action,player));
+    sliderLabels.push_back(new BCESliderLabel(Type,player));
+    sliderLabels.push_back(new BCESliderLabel(State,player));
+  }
+	 
+  for (int labelIt = 0; labelIt < 6; labelIt++) {
+    sliderLabels[labelIt]->setMaximumHeight(resHeight/54);
+    connect(&gui,SIGNAL(loadDataSignal(bool,int)),
+	    sliderLabels[labelIt],SLOT(displayStateOrValues(bool,int)));
+  }
 
   for (int i = 0; i < 2; i++)
     checkBoxGroup[3*i]->setChecked(true);
 
-  // Slider, LineEdit, and CheckBox Layout Creation (Non Private-values)
+  // Slider, LineEdit, and CheckBox Layout Creation
 
   QVector<QHBoxLayout*> gridSubLayouts;
   QVector<QVBoxLayout*> subLayoutWithLabels;
@@ -126,12 +131,15 @@ BCEWindow::BCEWindow()
   //////////////////////////////////////////
 
   // Payoff Plot Initialization
+  BCEValueSetPlotTitle *payoffPlotTitle = new BCEValueSetPlotTitle();
   payoffPlot = new BCEValueSetPlot();
   payoffPlot->xAxis->setLabel("Player 0");
   payoffPlot->yAxis->setLabel("Player 1");
   payoffPlot->setMinimumSize(resWidth/4,resHeight/3.5);
   connect(payoffPlot,SIGNAL(newEqmCoordinates(double,double)),
 	  this,SLOT(setNewEqm(double,double)));
+  connect(&gui,SIGNAL(eqmCoordSignal(double,double)),
+	  payoffPlotTitle,SLOT(changeDisplayedCoords(double,double)));
 
   // Bar Plot Initialization 
   deviationBarGraphs.push_back(new QCustomPlot());
@@ -144,14 +152,21 @@ BCEWindow::BCEWindow()
 
     devPlotTitles.push_back(new BCEDevPlotTitle(player));
     connect(&gui,
-	    SIGNAL(devPlotTitleChange(int,int,int,double,double)),
+	    SIGNAL(devPlotTitleChange(int,int,int,double)),
 	    devPlotTitles[player],
-	    SLOT(changeText(int,int,int,double,double)));
+	    SLOT(changeText(int,int,int,double)));
+    connect(&gui,
+	    SIGNAL(devPlotPrChange(double)),
+	    devPlotTitles[player],
+	    SLOT(changeProbability(double)));
   }
 
   // Payoff Plot and Sliders Horizontal Layout
+  QVBoxLayout *payoffPlotWithTitle = new QVBoxLayout();
+  payoffPlotWithTitle->addWidget(payoffPlotTitle);
+  payoffPlotWithTitle->addWidget(payoffPlot);
   QHBoxLayout *topLeftPanel = new QHBoxLayout();
-  topLeftPanel->addWidget(payoffPlot);
+  topLeftPanel->addLayout(payoffPlotWithTitle);
   topLeftPanel->addLayout(controlsGrid);
 
   // Left Viewer Panel, Bar Plots and Slider Box
@@ -165,11 +180,14 @@ BCEWindow::BCEWindow()
   ////////////////////////////////////////////////
   // Right Viewer Panel, Conditional-Marginal Distribution
   conditionalMarginalPlot = new BCEValueSetPlot();
+  BCEHeatMapTitle *colorMapTitle = new BCEHeatMapTitle();
+  colorMapTitle->setMaximumHeight(resHeight/54);
+  connect(&gui,SIGNAL(newStateSignal(int,int,int,bool)),
+	  colorMapTitle,SLOT(changeDisplayedState(int,int,int,bool)));
 
   // Plot Layout and Interaction Settings
   colorMap = new QCPColorMap(conditionalMarginalPlot->xAxis,
-					  conditionalMarginalPlot->yAxis);
-
+			     conditionalMarginalPlot->yAxis);
   conditionalMarginalPlot->addPlottable(colorMap);
   conditionalMarginalPlot->setInteractions(QCP::iRangeDrag|QCP::iRangeZoom);
   conditionalMarginalPlot->axisRect()->setupFullAxesBox(true);
@@ -201,9 +219,12 @@ BCEWindow::BCEWindow()
   /////////////////////////////////////////////// 
 
   // Layout of Left and Right Viewer Panels
+  QVBoxLayout *colorMapWithTitle = new QVBoxLayout();
+  colorMapWithTitle->addWidget(colorMapTitle);
+  colorMapWithTitle->addWidget(conditionalMarginalPlot);
   QHBoxLayout *mainTab = new QHBoxLayout();
   mainTab->addLayout(leftSectorDivide);
-  mainTab->addWidget(conditionalMarginalPlot);
+  mainTab->addLayout(colorMapWithTitle);
 
   // Graph Tab Setup and Main Panel Initialization
   QWidget * mainPanel = new QWidget();
@@ -226,7 +247,7 @@ BCEWindow::BCEWindow()
   setWindowState(Qt::WindowMaximized);
 
   // Window Title
-  setWindowTitle(QApplication::translate("viewer","BCESolve Work in Progress"));
+  setWindowTitle(QApplication::translate("bceviewer","BCE Solution Viewer"));
 
 
 } // constructor
@@ -252,8 +273,13 @@ void BCEWindow::loadSolution() {
       
       // Set Up Sliders for Data
 
+      for (int player = 0; player < 2; player++) {
+	sliderGroup[3*player]->setRange(0,gui.shareDataProperties(Action,player)-1);
+	sliderGroup[3*player+1]->setRange(0,gui.shareDataProperties(Type,player)-1);
+	sliderGroup[3*player+2]->setRange(0,gui.shareDataProperties(State,player)-1);
+      }
+
       for (int i = 0; i < 6; i++) {
-	sliderGroup[i]->setRange(0,gui.shareDataProperties(i)-1);
 	sliderGroup[i]->setSliderPosition(0);
 	sliderGroup[i]->setSingleStep(1);
 	lineEditGroup[i]->setText("0");
@@ -263,7 +289,7 @@ void BCEWindow::loadSolution() {
 	gui.setSliderData(0,Action,player);
 	gui.setSliderData(0,Type,player);
 	gui.setSliderData(0,State,player);
-      }     
+      }  
     
       // Default Load Plot
       plotAllGraphics();
@@ -278,11 +304,11 @@ void BCEWindow::loadSolution() {
 /////////////////////////////////////////////
 // Plot Conditional-Marginal Distribution
 
-void BCEWindow::plotEqm(vector<vector<double>> bceEqm) {
+void BCEWindow::plotEqm() {
 
   colorMap->clearData();
-  int nx = bceEqm[0].size();
-  int ny = bceEqm[1].size();
+  int nx = gui.equilibriumMatrix[0].size();
+  int ny = gui.equilibriumMatrix[1].size();
   colorMap->data()->setSize(nx, ny); 
   colorMap->data()->setRange(QCPRange(0,nx), QCPRange(0,ny)); 
   double x, y;
@@ -291,7 +317,7 @@ void BCEWindow::plotEqm(vector<vector<double>> bceEqm) {
     {
       for (int yIndex=0; yIndex<ny; ++yIndex)
 	{
-	  double dataPoint = bceEqm[xIndex][yIndex];
+	  double dataPoint = gui.equilibriumMatrix[xIndex][yIndex];
 	  colorMap->data()->setCell(xIndex,yIndex,dataPoint);
 	  if (dataPoint > maxEntry)
 	    maxEntry = dataPoint;
@@ -321,16 +347,12 @@ void BCEWindow::plotBCEValueSet() {
 
   // Getting Data
 
-  vector<vector<double>> objectives;
-  objectives = gui.getObjectiveMatrix();
-
   QVector<double> objective0Payoffs;
   QVector<double> objective1Payoffs;
 
-  for (int i = 0; i < objectives.size(); i++) {
-    objective0Payoffs.push_back(objectives[i][gui.objective0]);
-    objective1Payoffs.push_back(objectives[i][gui.objective1]);
-
+  for (int i = 0; i < gui.allEqm.size(); i++) {
+    objective0Payoffs.push_back(gui.allEqm[i][gui.objective0]);
+    objective1Payoffs.push_back(gui.allEqm[i][gui.objective1]);
   }
 
   // Graphing Curve
@@ -343,9 +365,9 @@ void BCEWindow::plotBCEValueSet() {
 
   payoffPlot->graph(1)->setData(objective0Payoffs,objective1Payoffs);
   payoffPlot->graph(1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc,
-						       QPen(Qt::blue),
-						       QBrush(Qt::blue),
-						       5));
+							QPen(Qt::blue),
+							QBrush(Qt::blue),
+							5));
   payoffPlot->rescaleAxes();
   payoffPlot->xAxis->scaleRange(1.1, payoffPlot->xAxis->range().center());
   payoffPlot->yAxis->scaleRange(1.1, payoffPlot->yAxis->range().center());
@@ -376,7 +398,7 @@ void BCEWindow::plotBCEValueSet() {
 ////////////////////////////////////
 // Plot Deviation Objectives
 
-void BCEWindow::plotDeviationObjectives(int player, vector<vector<double>> devObjs) {
+void BCEWindow::plotDeviationObjectives(int player) {
 
   // Erase Current Graphics
 
@@ -386,13 +408,13 @@ void BCEWindow::plotDeviationObjectives(int player, vector<vector<double>> devOb
   // Setup Main Bar Graph
 
   QCPBars *barGraph = new QCPBars(deviationBarGraphs[player]->xAxis,
-				   deviationBarGraphs[player]->yAxis);
+				  deviationBarGraphs[player]->yAxis);
   deviationBarGraphs[player]->addPlottable(barGraph);
   barGraph->setName("Expected Payoffs from Deviation");
 
   QVector<double> yData;
 
-  yData = QVector<double>::fromStdVector(devObjs[player]);
+  yData = QVector<double>::fromStdVector(gui.objectiveValues[player]);
 
   int sizeYData = yData.size();
   QVector<double> xData(sizeYData,0);
@@ -411,13 +433,7 @@ void BCEWindow::plotDeviationObjectives(int player, vector<vector<double>> devOb
 				   deviationBarGraphs[player]->yAxis);
   deviationBarGraphs[player]->addPlottable(recAction);
 
-  int action = 0;
-  switch(player) {
-  case 0: action = gui.a0;
-    break;
-  case 1: action = gui.a1;
-    break;
-  }
+  int action = gui.actions[player];
 
   recAction->setData(QVector<double>(1,action),
 		     QVector<double>(1,yData[action]));
@@ -460,38 +476,20 @@ void BCEWindow::plotDeviationObjectives(int player, vector<vector<double>> devOb
 // Plot Graphics (Loading or Data Changed)
 
 void BCEWindow::plotAllGraphics() {
-    plotBCEValueSet();
-    vector<vector<double>> conditionalMarginalDistn;
-    conditionalMarginalDistn = gui.getEqmMatrix();
-    vector<vector<double>> deviationObjectives0;
-    vector<vector<double>> deviationObjectives1;
-    deviationObjectives0 = gui.getObjectiveVals(0);
-    deviationObjectives1 = gui.getObjectiveVals(1);
-    plotEqm(conditionalMarginalDistn);
-    plotDeviationObjectives(0,deviationObjectives0);
-    plotDeviationObjectives(1,deviationObjectives1);
+  gui.resetManipulatedData();
+  plotBCEValueSet();
+  plotEqm();
+  for (int player = 0; player < 2; player++)
+    plotSelectGraphics(Action,player);
 }
 
 void BCEWindow::plotSelectGraphics(BCESliderType type,int player) {
-
+  gui.resetManipulatedData(type,player);
   if (type==State) {
-    vector<vector<double>> conditionalMarginalDistn;
-    conditionalMarginalDistn = gui.getEqmMatrix();
-    plotEqm(conditionalMarginalDistn);
+    plotEqm();
   }
-
-  else if (player==0) {
-    vector<vector<double>> deviationObjectives0;
-    deviationObjectives0 = gui.getObjectiveVals(0);
-    plotDeviationObjectives(0,deviationObjectives0);
-  }
-
-  else if (player==1) {
-    vector<vector<double>> deviationObjectives1;
-    deviationObjectives1 = gui.getObjectiveVals(1);
-    plotDeviationObjectives(1,deviationObjectives1);
-  }
-
+  else 
+    plotDeviationObjectives(player);
 } // Plot Graphics
 
 //////////////////////////////////
@@ -526,39 +524,28 @@ void BCEWindow::setNewEqm(double x,double y) {
 // View Slots
 
 void BCEWindow::toggleLinearScale(bool checked) {
-
   if (checked)
     colorScale->setDataScaleType(QCPAxis::stLinear);
   else 
     colorScale->setDataScaleType(QCPAxis::stLogarithmic);
-
   plotSelectGraphics(State,0);
-
 } // Slot to set a linear color scale for the distribution's heat map
 
 void BCEWindow::toggleColorfulTheme(bool checked) {
-
   QCPColorGradient *newGradient = new QCPColorGradient();
-
   if (checked)
     colorMap->setGradient(newGradient->gpSpectrum);
   else
     colorMap->setGradient(newGradient->inverted());
-
   plotSelectGraphics(State,0);
-
 } // Slot to change color theme of heat map for conditional marginal distribution
 
 void BCEWindow::screenShot() {
-
   QString newPath = QFileDialog::getSaveFileName(this, tr("Save PNG"),
 						 screenShotPath, tr("PNG files (*.png)"));
-
   if (newPath.isEmpty())
     return;
-
   QFileInfo fi(newPath);
-
   grab().save(newPath);
 }
 

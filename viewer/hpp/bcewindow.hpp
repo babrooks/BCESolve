@@ -11,6 +11,9 @@
 #include "bcevaluesetplot.hpp"
 #include "bceenumeration.hpp"
 #include "bcedevplottitle.hpp"
+#include "bcevaluesetplottitle.hpp"
+#include "bceheatmaptitle.hpp"
+#include "bcesliderlabel.hpp"
 
 using namespace std;
 
@@ -41,6 +44,7 @@ private:
   QVector<BCELineEdit*> lineEditGroup;
   QVector<BCECheckBox*> checkBoxGroup;
   QVector<QLabel*> sliderLabels;
+  QVector<QVBoxLayout*> subLayoutWithLabels;
   QVector<BCEDevPlotTitle*> devPlotTitles;
 
   QString path;
@@ -54,10 +58,9 @@ private:
   BCEValueSetPlot *payoffPlot;
 
   QVector<QCustomPlot*> deviationBarGraphs;
-
   BCEDataState gui;
-  void plotEqm(vector<vector<double>> bceEqm);
-  void plotDeviationObjectives(int index, vector<vector<double>> deviationObjectives);
+  void plotEqm();
+  void plotDeviationObjectives(int index);
   void plotBCEValueSet();
   void plotSelectGraphics(BCESliderType type,int player);
   void plotAllGraphics();
