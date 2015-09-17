@@ -5,14 +5,17 @@
 #include "bcedatastate.hpp"
 #include "bceenumeration.hpp"
 
+//! QCheckBox with added signal and slot.
 class BCECheckBox : public QCheckBox
 {
   Q_OBJECT;
 
-public:
+private:
 
   BCESliderType boxType;
   int player;  
+
+public:
 
   BCECheckBox(BCESliderType _type,int _player):
     boxType(_type), player(_player)

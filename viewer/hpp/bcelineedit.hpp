@@ -5,6 +5,7 @@
 #include "bcedatastate.hpp"
 #include "bceenumeration.hpp"
 
+//! Read-only QLineEdits displaying slider values.
 class BCELineEdit : public QLineEdit
 {
   Q_OBJECT;

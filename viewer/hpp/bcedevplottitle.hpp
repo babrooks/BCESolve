@@ -4,6 +4,7 @@
 #include <QtWidgets>
 #include <sstream>
 
+//! QLabel used for deviation plot titles.
 class BCEDevPlotTitle : public QLabel
 {
   Q_OBJECT;
@@ -24,6 +25,7 @@ public:
     QString title = QString::fromStdString(titleStr);
 
     setText(title);
+    setStyleSheet("background-color: white");
   } 
 
 public slots:

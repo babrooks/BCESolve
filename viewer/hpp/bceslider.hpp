@@ -5,14 +5,17 @@
 #include "bcedatastate.hpp"
 #include "bceenumeration.hpp"
 
+//! QScrollBar with added signal and slots.
 class BCESlider : public QScrollBar
 {
   Q_OBJECT;
 
-public:
+private:
 
   BCESliderType sliderType;
   int player;  
+
+public:
 
   BCESlider(BCESliderType _type,int _player):
     sliderType(_type), player(_player)

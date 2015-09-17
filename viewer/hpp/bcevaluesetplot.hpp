@@ -4,6 +4,7 @@
 #include <QtWidgets>
 #include "qcustomplot.h"
 
+//! QCustomPlot with Tool-tip and click functionality.
 class BCEValueSetPlot : public QCustomPlot {
   Q_OBJECT;
 

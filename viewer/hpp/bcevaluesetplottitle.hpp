@@ -5,6 +5,7 @@
 #include <sstream>
 #include <iomanip>
 
+//! QLabel for Set of BCE Plot title.
 class BCEValueSetPlotTitle : public QLabel {
   Q_OBJECT;
 
@@ -20,6 +21,7 @@ public:
   {
     QString title = QString::fromStdString(staticString);
     setText(title);
+    setStyleSheet("background-color: white");
   }
 
 public slots:

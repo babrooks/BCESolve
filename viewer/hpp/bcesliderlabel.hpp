@@ -5,6 +5,7 @@
 #include <sstream>
 #include "bceenumeration.hpp"
 
+//! QLabel with added slot. Used for slider labeling.
 class BCESliderLabel : public QLabel {
   Q_OBJECT;
 
