@@ -4,8 +4,8 @@
 CXX=g++
 
 # CPLEX
-# SYSTEM = x86-64_linux
-SYSTEM=x86-64_sles10_4.1
+SYSTEM = x86-64_linux
+# SYSTEM=x86-64_sles10_4.1
 
 LIBFORMAT = static_pic
 CSYSFLAGS  = -fPIC -DIL_STD 
@@ -19,13 +19,13 @@ LDMTFLAGS = -lpthread
 DEBUG = -g
 
 # Directories
-# CPLEXDIR=/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex
-# CONCERTDIR=/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/concert
-# CPLEXNAME=cplex1262	
+CPLEXDIR=/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex
+CONCERTDIR=/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/concert
+CPLEXNAME=cplex1262	
 
-CPLEXDIR=/opt/ibm/ILOG/CPLEX_Studio1251/cplex
-CONCERTDIR=/opt/ibm/ILOG/CPLEX_Studio1251/concert
-CPLEXNAME=cplex1251
+# CPLEXDIR=/opt/ibm/ILOG/CPLEX_Studio1251/cplex
+# CONCERTDIR=/opt/ibm/ILOG/CPLEX_Studio1251/concert
+# CPLEXNAME=cplex1251
 
 # Directories
 GRBDIR=/opt/gurobi563/linux64
@@ -67,7 +67,7 @@ MAINS=exampleforrobbie \
 	 fangmorris publicinfo commonfpa \
 	 multiplicative survey duopoly onesided \
 	loadingExample \
-	hybridauction
+	hybridauction allpayauction hybridreserve
 
 MAINSGRB=revenuelb onesidedrestricted surplusbnd relaxed
 
