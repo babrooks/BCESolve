@@ -66,8 +66,8 @@ MAINS=exampleforrobbie \
 	stationary stationary2 fpaknown \
 	 fangmorris publicinfo commonfpa \
 	 multiplicative survey duopoly onesided \
-	loadingExample \
-	hybridauction allpayauction hybridreserve
+	loadingExample hybridentryreserve \
+	hybridauction allpayauction hybridreserve 
 
 MAINSGRB=revenuelb onesidedrestricted surplusbnd relaxed
 
