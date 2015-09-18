@@ -6,6 +6,10 @@
 #include "bceenumeration.hpp"
 
 //! Read-only QLineEdits displaying slider values.
+/*!
+
+    \ingroup viewer
+ */
 class BCELineEdit : public QLineEdit
 {
   Q_OBJECT;

@@ -15,12 +15,15 @@
 //! Solves a BCEGame using cplex.
 /*! This class contains routines for solving a BCEGame object using
   CPLEX. The main method is BCESolver::populate, which initializes a
-  CPLEX model with the incentive constraints for the BCEGame, and
-  also creates objectives corresponding to the number of objectives
-  in the BCEGame object. The class also contains the method
+  CPLEX model with the incentive constraints for the BCEGame, and also
+  creates objectives corresponding to the number of objectives in the
+  BCEGame object. The class also contains the method
   BCESolver::mapBoundary, which solves linear programs to trace out
-  the frontier for the objectives in BCESolver::BoundaryObjective1
-  and BCESolver::BoundaryObjective2. */
+  the frontier for the objectives in BCESolver::BoundaryObjective1 and
+  BCESolver::BoundaryObjective2.
+
+  \ingroup src
+*/
 class BCESolver 
 {
 public:

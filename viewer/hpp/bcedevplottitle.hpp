@@ -5,6 +5,10 @@
 #include <sstream>
 
 //! QLabel used for deviation plot titles.
+/*!
+
+    \ingroup viewer
+ */
 class BCEDevPlotTitle : public QLabel
 {
   Q_OBJECT;

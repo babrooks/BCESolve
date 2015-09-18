@@ -17,23 +17,25 @@
 
 //! Class for storing data produced by BCESolver
 /*! This class stores Bayes correlated equilibria as output by the
- BCESolver class. It also contains statistical routines for analyzing
- the list of equilibria. 
+  BCESolver class. It also contains statistical routines for analyzing
+  the list of equilibria. 
 
- The class contains data structures for storing BCE in the
- BCEData::equilibria member. It also stores various information about
- the BCEGame object for which the equilibrium was calculated, in the
- members BCEData::objectives, BCEData::prior, and
- BCEData::dominated. These arrays correspond to the methods of the
- same name in the BCEGame class.
+  The class contains data structures for storing BCE in the
+  BCEData::equilibria member. It also stores various information about
+  the BCEGame object for which the equilibrium was calculated, in the
+  members BCEData::objectives, BCEData::prior, and
+  BCEData::dominated. These arrays correspond to the methods of the
+  same name in the BCEGame class.
 
- BCEData also contains methods for calculating statistics of a BCE. In
- particular, BCEData::getConditionalMarginal is a general purpose tool
- for calculating marginal conditional distributions of the BCE,
- BCEData::getExpectedObjectives can be used to calculate the expected
- objectives under the BCE, and BCEData::getDeviationObjectives can be
- used to calculate counterfactual payoffs if players had used actions
- different from their recommendations.
+  BCEData also contains methods for calculating statistics of a BCE. In
+  particular, BCEData::getConditionalMarginal is a general purpose tool
+  for calculating marginal conditional distributions of the BCE,
+  BCEData::getExpectedObjectives can be used to calculate the expected
+  objectives under the BCE, and BCEData::getDeviationObjectives can be
+  used to calculate counterfactual payoffs if players had used actions
+  different from their recommendations.
+
+  \ingroup src
 */
 class BCEData
 {

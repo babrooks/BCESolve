@@ -67,3 +67,15 @@
 
 
 */
+
+
+/*! \defgroup src BCESolve solver engine
+    @brief The solver routines.
+*/
+
+
+/*! \defgroup viewer BCEViewer graphical interface
+
+    @brief The graphical interface.
+
+*/

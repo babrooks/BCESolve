@@ -6,6 +6,10 @@
 #include "bceenumeration.hpp"
 
 //! QCheckBox with added signal and slot.
+/*!
+
+    \ingroup viewer
+ */
 class BCECheckBox : public QCheckBox
 {
   Q_OBJECT;

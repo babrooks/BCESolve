@@ -14,7 +14,10 @@
 
 //! Class for storing a BCE
 /*! Class for storing equilibria from BCESolver. The class performs
-    very few functions, except for serialization and copying. */
+    very few functions, except for serialization and copying. 
+
+    \ingroup src
+*/
 class BCEquilibrium
 {
 public:

@@ -17,7 +17,11 @@
     well as the objective functions for the players and possible
     auxiliary objective functions. The user can also reimplement the
     BCEGame::dominated method to indicate if there are dominated
-    actions that a given type should never play. */
+    actions that a given type should never play. 
+
+    \ingroup src
+
+*/
 class BCEGame 
 {
 

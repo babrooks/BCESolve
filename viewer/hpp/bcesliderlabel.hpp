@@ -6,6 +6,10 @@
 #include "bceenumeration.hpp"
 
 //! QLabel with added slot. Used for slider labeling.
+/*!
+
+    \ingroup viewer
+ */
 class BCESliderLabel : public QLabel {
   Q_OBJECT;
 

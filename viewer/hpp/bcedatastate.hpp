@@ -10,6 +10,8 @@
 /*! Continuously manipulated upon user interaction.
   Holds all data for plotting and conditions the 
   user must supply.
+
+  \ingroup viewer
 */
 class BCEDataState : public QWidget
 {

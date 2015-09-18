@@ -5,6 +5,10 @@
 #include "qcustomplot.h"
 
 //! QCustomPlot with Tool-tip and click functionality.
+/*!
+
+    \ingroup viewer
+ */
 class BCEValueSetPlot : public QCustomPlot {
   Q_OBJECT;
 

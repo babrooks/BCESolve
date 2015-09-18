@@ -9,7 +9,10 @@ using namespace std;
 //! Utility class for probability distributions
 /*! This is a pure virtual base class for describing bivariate joint
     distributions. You can inherit from this class and reimplement the
-    CDF method. The CDF method should return the joint CDF. */
+    CDF method. The CDF method should return the joint CDF. 
+
+    \ingroup src
+*/
 class BCEDistr
 {
 public:

@@ -21,6 +21,8 @@ using namespace std;
 /*! Contains main viewer functions for displaying
   the GUI. Interacts with every viewer header
   file. Friend class of BCEDataState.
+
+  \ingroup viewer
 */
 class BCEWindow : public QMainWindow
 {

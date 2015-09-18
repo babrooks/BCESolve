@@ -6,6 +6,10 @@
 #include "bceenumeration.hpp"
 
 //! QScrollBar with added signal and slots.
+/*!
+
+    \ingroup viewer
+ */
 class BCESlider : public QScrollBar
 {
   Q_OBJECT;

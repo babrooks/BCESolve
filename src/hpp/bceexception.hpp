@@ -3,7 +3,10 @@
 
 //! Exception class for BCESolve
 /*! This class derives from std::exception and implements special
-    error codes. */
+    error codes. 
+
+    \ingroup src
+*/
 class BCEException: public std::exception
 {
 public:

@@ -6,6 +6,10 @@
 #include <iomanip>
 
 //! QLabel for Set of BCE Plot title.
+/*!
+
+    \ingroup viewer
+ */
 class BCEValueSetPlotTitle : public QLabel {
   Q_OBJECT;
 

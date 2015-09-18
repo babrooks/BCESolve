@@ -11,6 +11,8 @@
   through subsets of types and actions, to facilitate the
   computation of marginal and conditional distributions, assist with
   construction of constraints in BCESolver::populate, etc. 
+
+  \ingroup src
 */
 class BCECounter
 {
