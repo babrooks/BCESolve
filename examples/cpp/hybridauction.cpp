@@ -2,9 +2,9 @@
 
 int main()
 {
-  int numBids = 75;
-  int numVals = 75;
-  double weightOnOwnBid = .01;
+  int numBids = 200;
+  int numVals = 200;
+  double weightOnOwnBid = .75;
   
   HybridAuction ha(numVals,numBids,weightOnOwnBid);
 
