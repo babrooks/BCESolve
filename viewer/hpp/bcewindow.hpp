@@ -40,11 +40,13 @@ public slots:
   void plotDeviationObjectives(int player);
   //! payoffPlot plotting function.
   void plotBCEValueSet();
+  //! Sets a new title for the GUI using fileName information.
+  void setGUITitle();
 
 signals:
 
   //! Sends path to example to BCEDataState.
-  void dataPathChanged(char* path);
+  void dataPathChanged(QString path);
 
 private:
 

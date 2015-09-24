@@ -49,9 +49,9 @@ qcustomplot.cpp
 LIBS += ../lib/libbce.a
 
 
-LIBS += -L../lib/ -L/usr/local/lib/ /usr/lib/x86_64-linux-gnu/libboost_serialization.a
+LIBS += -L../lib/ -L/usr/local/lib/ /usr/lib/x86_64-linux-gnu/libboost_serialization.a /usr/lib/x86_64-linux-gnu/libboost_system.a /usr/lib/x86_64-linux-gnu/libboost_filesystem.a 
 linux-g++ {
-LIBS +=  -Bstatic -L../lib -Wl,-Bstatic  -L/usr/lib/x86_64-linux-gnu/ -lboost_serialization -Wl,-Bdynamic
+LIBS +=  -Bstatic -L../lib -Wl,-Bstatic  -L/usr/lib/x86_64-linux-gnu/ -lboost_filesystem -lboost_serialization -lboost_system -Wl,-Bdynamic
 }
 macx {
 LIBS += -lc++ /usr/local/lib/libboost_serialization.a 

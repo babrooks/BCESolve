@@ -5,6 +5,7 @@
 #include "bceenumeration.hpp"
 #include <QtWidgets>
 #include <cmath>
+#include <boost/filesystem.hpp>
 
 //! Class for storing data used by the GUI.
 /*! Continuously manipulated upon user interaction.
@@ -29,7 +30,9 @@ private: // Properties. Private Functions near EOF.
   //! Currently active BCEData in the GUI.
   BCEData data;
   //! Path to data.
-  char * dataPath;
+  QString dataPath;
+  //! File name of example currently displayed in the GUI.
+  string guiTitle;
   //! If true, GUI displays marginal distribution for player's state.
   bool margS0, margS1;
   //! If true, GUI displays marginal distribution for player's action/type.
@@ -80,7 +83,16 @@ public:
   void setData() {
     try
       {
-	BCEData::load(data,dataPath);
+	QByteArray ba = dataPath.toLocal8Bit();
+	char * newPath_c = ba.data();
+
+	// Get File Name for GUI's Title
+	string filePath = dataPath.toStdString();
+	boost::filesystem::path boostPath(filePath);
+        guiTitle = boostPath.filename().string();
+
+	// Load New Data on Path
+	BCEData::load(data,newPath_c);
 
 	isPrivateVals = !(data.isPrivateValues);
 
@@ -178,6 +190,11 @@ public:
   */
   const vector<vector<double>>& getAllEqm() const {
     return allEqm;
+  }
+
+  //! Shares file name of currently loaded file with BCEWindow.
+  string getGUITitle() {
+    return guiTitle;
   }
 
 
@@ -308,8 +325,8 @@ public slots:
 
   }
 
-  void setDataPath(char * newPath_c) {
-    dataPath = newPath_c;
+  void setDataPath(QString newPath) {
+    dataPath = newPath;
     setData();
   }
 

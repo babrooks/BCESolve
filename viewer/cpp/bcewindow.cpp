@@ -139,8 +139,10 @@ BCEWindow::BCEWindow()
 	  this,SLOT(plotEqm()));
   connect(&guiData,SIGNAL(newDataLoaded()),
 	  this,SLOT(plotBCEValueSet()));
-  connect(this,SIGNAL(dataPathChanged(char*)),
-	  &guiData,SLOT(setDataPath(char*)));
+  connect(this,SIGNAL(dataPathChanged(QString)),
+	  &guiData,SLOT(setDataPath(QString)));
+  connect(&guiData,SIGNAL(newDataLoaded()),
+	  this,SLOT(setGUITitle()));
 
   // End Data Connections
   /////////////////////////////////////////
@@ -281,10 +283,7 @@ void BCEWindow::loadSolution() {
 
   try
     {
-      QByteArray ba = newPath.toLocal8Bit();
-      char * newPath_c = ba.data();
-
-      emit(dataPathChanged(newPath_c));
+      emit(dataPathChanged(newPath));
       
       // Set Up Sliders for Data
 
@@ -517,4 +516,18 @@ void BCEWindow::screenShot() {
   grab().save(newPath);
 }
 
+void BCEWindow::setGUITitle() {
+
+  stringstream dynamicTitle;
+
+  string guiTitle = guiData.getGUITitle();
+
+  dynamicTitle << "BCE Solution Viewer, Current File = "
+	       << guiTitle;
+    
+  string newTitleStr = dynamicTitle.str();
+  QString newTitle = QString::fromStdString(newTitleStr);
+
+  this->setWindowTitle(newTitle);
+}
 
