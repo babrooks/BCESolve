@@ -34,14 +34,19 @@ public:
 
 public slots:
 
-  //! Receives data about changed slider values.
-  void changeSliderValue(int newVal,
-			 BCESliderType type,
-			 int player);
-  //! Receives data about changed checkbox states.
-  void changeMarginalBool(bool newBool,BCESliderType type,int player);
-  //! Receives coordinates of the newly selected eqm.
-  void setNewEqm(double x,double y);
+  //! colorMap,conditionalMarginalPlot plotting function.
+  void plotEqm();
+  //! deviationBarGraphs plotting function.
+  void plotDeviationObjectives(int player);
+  //! payoffPlot plotting function.
+  void plotBCEValueSet();
+  //! Sets a new title for the GUI using fileName information.
+  void setGUITitle();
+
+signals:
+
+  //! Sends path to example to BCEDataState.
+  void dataPathChanged(QString path);
 
 private:
 
@@ -73,25 +78,14 @@ private:
   //! Color of heatmap colorScale.
   QCPColorGradient *mGradient;
   //! Set of BCE Plot.
-  BCEValueSetPlot *payoffPlot;
+  BCEValueSetPlot *setOfBCEPlot;
   //! Bar Graphs.
   QVector<QCustomPlot*> deviationBarGraphs;
   //! Data state.
   /*! Continuously manipulated after user 
     interaction.
   */
-  BCEDataState gui;
-
-  //! colorMap,conditionalMarginalPlot plotting function.
-  void plotEqm();
-  //! deviationBarGraphs plotting function.
-  void plotDeviationObjectives(int player);
-  //! payoffPlot plotting function.
-  void plotBCEValueSet();
-  //! Plotting helper function.
-  void plotSelectGraphics(BCESliderType type,int player);
-  //! Plotting helper function.
-  void plotAllGraphics();
+  BCEDataState guiData;
 
   QMenu *fileMenu;
   QAction *loadSolutionAction;
