@@ -16,7 +16,7 @@ BCESolver::BCESolver ():
   displayLevel(1)
 {} // Default constructor
 
-BCESolver::BCESolver (BCEGame & _game):
+BCESolver::BCESolver (BCEAbstractGame & _game):
   game(&_game),
   env(),
   model(env),

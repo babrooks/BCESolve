@@ -4,7 +4,8 @@
 CXX=g++
 
 # CPLEX
-SYSTEM = x86-64_linux
+SYSTEM = x86-64_osx
+# SYSTEM = x86-64_linux
 # SYSTEM=x86-64_sles10_4.1
 
 LIBFORMAT = static_pic
@@ -19,8 +20,10 @@ LDMTFLAGS = -lpthread
 DEBUG = -g
 
 # Directories
-CPLEXDIR=/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex
-CONCERTDIR=/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/concert
+CPLEXDIR=/Users/benjaminbrooks/Applications/IBM/ILOG/CPLEX_Studio1262/cplex
+CONCERTDIR=/Users/benjaminbrooks/Applications/IBM/ILOG/CPLEX_Studio1262/concert
+# CPLEXDIR=/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex
+# CONCERTDIR=/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/concert
 CPLEXNAME=cplex1262	
 
 # CPLEXDIR=/opt/ibm/ILOG/CPLEX_Studio1251/cplex
@@ -81,7 +84,7 @@ pricediscr: % : $(CPPDIR)/%.cpp
 	$(CXX) $(CFLAGS) $< -L. $(LDFLAGS) -L./cpp -o $@
 
 $(MAINS): % : $(CPPDIR)/%.cpp $(INCLDIR)/bce.hpp libbce.a
-	$(CXX) $(CFLAGS) $< -L. -Bstatic -lbce -Wl,-Bstatic -L/usr/lib/x86_64-linux-gnu/ \
+	$(CXX) $(CFLAGS) $< -L. -Wl,-Bstatic -lbce -Wl,-Bstatic -L/usr/lib/x86_64-linux-gnu/ \
 	 -lboost_serialization \
 	 -Wl,-Bdynamic  $(LDFLAGS) -L./cpp -L../lib -o $@
 

@@ -12,12 +12,12 @@
 #include "bceutilities.hpp"
 #include <ilcplex/ilocplex.h>
 
-//! Solves a BCEGame using cplex.
-/*! This class contains routines for solving a BCEGame object using
+//! Solves a BCEAbstractGame using cplex.
+/*! This class contains routines for solving a BCEAbstractGame object using
   CPLEX. The main method is BCESolver::populate, which initializes a
-  CPLEX model with the incentive constraints for the BCEGame, and also
+  CPLEX model with the incentive constraints for the BCEAbstractGame, and also
   creates objectives corresponding to the number of objectives in the
-  BCEGame object. The class also contains the method
+  BCEAbstractGame object. The class also contains the method
   BCESolver::mapBoundary, which solves linear programs to trace out
   the frontier for the objectives in BCESolver::BoundaryObjective1 and
   BCESolver::BoundaryObjective2.
@@ -62,15 +62,15 @@ public:
   //! Bool parameters
   /*! An enumeration type for parameters of type bool. Pass to
     BCESolver::setParam and BCESolver::getParam to set or retrieve a
-    double parameter value. Will be replaced by new BCEGame
+    double parameter value. Will be replaced by new BCEAbstractGame
     architecture with a constraint checker. */ 
   enum BoolParameter
     {
     };
 
 protected:
-  //! Pointer to the BCEGame object that is being solved. 
-  BCEGame * game; 
+  //! Pointer to the BCEAbstractGame object that is being solved. 
+  BCEAbstractGame * game; 
 
   //! Number of columns in the constraint matrix. 
   long int numColumns; 
@@ -122,7 +122,7 @@ protected:
   // objective is currentobfun. 
   //! Objectives
   /*! An array of objective functions, corresponding to the objectives
-    in the BCEGame object. */
+    in the BCEAbstractGame object. */
   vector<IloNumExpr> objectiveFunctions; 
   //! Boundary objectives, not currently being used. 
   vector<IloNumExpr> bndryObjectives; 
@@ -133,7 +133,7 @@ protected:
 
   //! List of indices of non-zero variables
   /*! The solver only creates variables for events that could occur
-    with positive probability under the prior in the BCEGame
+    with positive probability under the prior in the BCEAbstractGame
     object. This property stores the locations of the non-zero
     probability outcomes. */
   list<int> nonZeroVariableLocations;
@@ -192,7 +192,7 @@ public:
   //! Constructor
   /*! Creates a new BCESolver object and initializes it with the given
     game. */
-  BCESolver(BCEGame & _game);
+  BCESolver(BCEAbstractGame & _game);
 
   //! Destructor
   ~BCESolver()

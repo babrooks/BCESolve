@@ -15,8 +15,10 @@ LDMTFLAGS = -lpthread
 # DEBUG = -O1 -DNDEBUG
 DEBUG = -g
 # Directories
-CPLEXDIR=/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex
-CONCERTDIR=/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/concert
+CPLEXDIR=/Users/benjaminbrooks/Applications/IBM/ILOG/CPLEX_Studio1262/cplex
+CONCERTDIR=/Users/benjaminbrooks/Applications/IBM/ILOG/CPLEX_Studio1262/concert
+# CPLEXDIR=/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex
+# CONCERTDIR=/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/concert
 CPLEXNAME=cplex1262	
 
 CPPDIR=./cpp

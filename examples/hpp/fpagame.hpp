@@ -7,7 +7,7 @@
 
 #include "bce.hpp"
 
-class FPAGame : public BCEGame
+class FPAGame : public BCEAbstractGame
 {
 protected:
   int numValues;
@@ -24,7 +24,7 @@ public:
   
   FPAGame(int na, int nv, double _fee, 
 	  double _reservePrice,double _highbid,bool _exAnteFee)
-    : BCEGame(2,nv*nv,na+1,1,5+2*nv), numValues(nv), 
+    : BCEAbstractGame(nv*nv,na+1,1,5+2*nv), numValues(nv), 
       fee(_fee), highbid(_highbid),
       lowbid(0.0), reservePrice(_reservePrice),
       exAnteFee(_exAnteFee)

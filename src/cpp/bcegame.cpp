@@ -2,98 +2,92 @@
 #include "bcegame.hpp"
 
 BCEGame::BCEGame ():
-  numPlayers(2),
-  numActions(numPlayers,0),
-  numStates(0),
-  numTypes(numPlayers,0)
+  BCEAbstractGame()
 {} // Default constructor
 
-BCEGame::BCEGame (int numPlayersArg, 
-		  int numStatesArg, 
-		  int numActionsArg, 
-		  int numTypesArg, 
-		  int numObjectivesArg):
-  numPlayers(numPlayersArg),
-  numActions(numPlayers,numActionsArg),
-  numStates(numStatesArg),
-  numTypes(numPlayers,numTypesArg),
-  numObjectives(numObjectivesArg)
-{} 
-
-BCEGame::BCEGame (int numPlayersArg, 
-		  int numStatesArg, 
-		  const vector<int> & numActionsArg, 
-		  const vector<int> & numTypesArg, 
-		  int numObjectivesArg):
-  numPlayers(numPlayersArg),
-  numActions(numActionsArg),
-  numStates(numStatesArg),
-  numTypes(numTypesArg),
-  numObjectives(numObjectivesArg)
-{} 
-
-// Overloaded version of prior that finds the marginal.
-double BCEGame::prior(int state, int type, int player) const
+BCEGame::BCEGame(const BCEAbstractGame & game):
+  BCEAbstractGame(game),
+  objectiveData(game.getNumObjectives()),
+  priorData(game.getNumStates()),
+  dominatedData(2),
+  feasibleDeviationData(2)
 {
-  int stateTypeIndex, currentIndex, playerIndex;
-  double probability=0.0;
-  vector<int> types(numPlayers,0);
+  int numActionsTotal = game.getNumActions()[0]*game.getNumActions()[1];
+  int numTypesTotal = game.getNumTypes()[0]*game.getNumTypes()[1];
 
-  assert(state>=0);
-  assert(type>=0);
-  assert(player>=0);
-  assert(state<numStates);
-  assert(type<numTypes[player]);
-  assert(player<numPlayers);
-
-  // Fill in player's valuation and type.
-  types[player]=type;
-  
-  int numTypes_total = 1;
-  for (playerIndex = 0; playerIndex < numPlayers; playerIndex++)
-    numTypes_total *= numTypes[playerIndex];
-
-  for (stateTypeIndex=0; 
-       stateTypeIndex<numStates*(numTypes_total-numTypes[player]); 
-       stateTypeIndex++)
+  // Copy objectives
+  for (int obj = 0; obj < game.getNumObjectives(); obj++)
     {
-      currentIndex=stateTypeIndex;
-
-      // Find other players' types/valuations
-      for (playerIndex=0; playerIndex<numPlayers; playerIndex++)
+      objectiveData[obj]
+	= vector< vector<double> > (numStates,
+				    vector< double> (numActionsTotal,0.0));
+      for (int state = 0; state < game.getNumStates(); state++)
 	{
-	  // Skip p==player
-	  if (playerIndex==numPlayers-1 && playerIndex==player)
-	    break;
-	  else if (playerIndex==player)
-	    playerIndex++;
-	  
-	  types[playerIndex]=currentIndex%numTypes[playerIndex];
-	  currentIndex-=types[playerIndex]; currentIndex/=numTypes[playerIndex];
-	}
-      // The state is currentIndex
-      probability+=prior(currentIndex,types);
-    }
+	  vector<int> actions(2,0);
+	  int actionCounter = 0;
+	  while (actionCounter < numActionsTotal)
+	    {
+	      objectiveData[obj][state][actionCounter]
+		= game.objective(state,actions,obj);
+	      
+	      if (actions[0] != numActions[0]-1)
+		actions[0]++;
+	      else
+		{
+		  actions[0]=0;
+		  actions[1]++;
+		}
+	      actionCounter++;
+	    } // while actions
+	} // for state
+    } // for obj
 
-  return (probability);
-} // prior
-
-// Checks if any player has a dominated action/type.
-bool BCEGame::dominated(const vector<int> &actions, const vector<int> &types) const
-{
-  assert(actions.size()==numPlayers);
-  assert(types.size()==numPlayers);
-
-  for (int playerCounter=0; playerCounter<numPlayers; playerCounter++)
+  // Copy prior
+  for (int state = 0; state < game.getNumStates(); state++)
     {
-      assert(actions[playerCounter]>=0);
-      assert(types[playerCounter]>=0);
-      assert(actions[playerCounter]<numActions[playerCounter]);
-      assert(types[playerCounter]<numTypes[playerCounter]);
+      priorData[state] = vector<double>(numTypesTotal,0.0);
+      vector<int> types(2,0);
+      int typeCounter = 0;
+      while (typeCounter < numTypesTotal)
+	{
+	  priorData[state][typeCounter]
+	    = game.prior(state,types);
+	      
+	  if (types[0] != numTypes[0]-1)
+	    types[0]++;
+	  else
+	    {
+	      types[0]=0;
+	      types[1]++;
+	    }
+	  typeCounter++;
+	} // while types
+    } // for state
+  
+  // Copy dominated and feasible data
+  for (int player = 0; player < 2; player++)
+    {
+      dominatedData[player]
+	= vector< vector<bool> >(game.getNumTypes()[player],
+				 vector<bool>( game.getNumActions()[player],false));
+      feasibleDeviationData[player]
+	= vector< vector<bool> > (game.getNumTypes()[player],
+				  vector<bool> (game.getNumActions()[player]
+						  *game.getNumActions()[player],false));
+      for (int type = 0; type < game.getNumTypes()[player]; type++)
+	{
+	  for (int action=0; action < game.getNumActions()[player]; action++)
+	    {
+	      dominatedData[player][type][action] = game.dominated(action,type,player);
 
-      if (dominated(actions[playerCounter],types[playerCounter],playerCounter))
-	return (true);
-    }
-  return (false);
-}
+	      for (int dev; dev < game.getNumActions()[player]; dev++)
+		{
+		  feasibleDeviationData[player][type]
+		    [action+dev*game.getNumActions()[player]]
+		    = game.feasibleDeviation(action,dev,type,player);
+		}
+	    } // for action
+	} // for type
+    } // for player
+} // Construct from BCEAbstractGame
 

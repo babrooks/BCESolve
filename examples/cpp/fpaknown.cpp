@@ -9,17 +9,14 @@ void solveFPA(int nvals, int nbids,
 
 int main(int argc, char ** argv)
 {
-<<<<<<< HEAD
-  double entryCost=0;
-  double reservePrice=0.0;
-  int nvals=2;
-  int nbids=50;
-=======
+  // double entryCost=0;
+  // double reservePrice=0.0;
+  // int nvals=2;
+  // int nbids=50;
   double entryCost=0.0;
   double reservePrice=0.0;
   int nvals=2;
   int nbids=35;
->>>>>>> b6441cee7c501f0fb932c584d27fcd6c0accdbb7
   double lowbid = 0.0;
 
   solveFPA(nvals,nbids,entryCost,reservePrice,false);
@@ -80,7 +77,6 @@ void solveFPA(int nvals, int nbids,
 
       IloCplex cplex = solver.getCplex();
 
-<<<<<<< HEAD
       for (int player = 0; player < 2; player++)
 	{
 	  for (int val = 0; val < nvals; val++)
@@ -97,7 +93,6 @@ void solveFPA(int nvals, int nbids,
       cplex.getObjective().setSense(IloObjective::Maximize);
       cplex.getObjective().setExpr(-1.0*(solver.getObjectiveFunction(2)));
       cplex.setParam(IloCplex::Threads,4);
-=======
       // for (int player = 0; player < 2; player++)
       // 	{
       // 	  for (int val = 0; val < nvals; val++)
@@ -114,7 +109,6 @@ void solveFPA(int nvals, int nbids,
       // cplex.getObjective().setSense(IloObjective::Maximize);
       // cplex.getObjective().setExpr(-1.0*(solver.getObjectiveFunction(2)));
       // cplex.setParam(IloCplex::Threads,4);
->>>>>>> b6441cee7c501f0fb932c584d27fcd6c0accdbb7
       
       // filename << "_maxbidderssurplus";
       
@@ -190,15 +184,12 @@ void solveFPA(int nvals, int nbids,
       // solver.setParameter(BCESolver::BoundaryObjective1,4);
       // solver.setParameter(BCESolver::BoundaryObjective2,2);
 
-<<<<<<< HEAD
       // solver.mapBoundary("fpaknownbndry.dat");
 
-=======
       // solver.setParameter(BCESolver::BoundaryObjective1,0);
       // solver.setParameter(BCESolver::BoundaryObjective2,1);
 
       // solver.mapBoundary("fpaknownbndry_bidder.dat");
->>>>>>> b6441cee7c501f0fb932c584d27fcd6c0accdbb7
 
     }
   catch (IloException & e)
