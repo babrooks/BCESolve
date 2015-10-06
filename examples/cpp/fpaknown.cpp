@@ -175,6 +175,38 @@ void solveFPA(int nvals, int nbids,
       BCESolution soln;
       solver.getSolution(soln);
 
+      cout << "Num obj: " << soln.getGame().getNumObjectives() << endl;
+      cout << "Num states: " << soln.getGame().getNumStates() << endl;
+      cout << "A payoff: " << soln.getGame().objective(2,vector<int>(2,2),1) << endl;
+
+      // Add and remove a state
+      BCEGame game = soln.getGame();
+      cout << "Num states: " << game.getNumStates() << endl;
+      cout << "Adding a state" << endl;
+      game.addState(1);
+      cout << "New num states: " << game.getNumStates() << endl;
+      cout << "Removing a state" << endl;
+      game.removeState(1);
+      cout << "New new num states: " << game.getNumStates() << endl;
+      
+      // Add and remove an action
+      cout << "Num actions[0]: " << game.getNumActions()[0] << endl;
+      cout << "Adding an action" << endl;
+      game.addAction(0,1);
+      cout << "New num actions[0]: " << game.getNumActions()[0] << endl;
+      cout << "Removing an action" << endl;
+      game.removeAction(0,1);
+      cout << "New new num actions[0]: " << game.getNumActions()[0] << endl;
+
+      // Add and remove a type
+      cout << "Num types[1]: " << game.getNumTypes()[1] << endl;
+      cout << "Adding an type" << endl;
+      game.addType(1,0);
+      cout << "New num types[1]: " << game.getNumTypes()[1] << endl;
+      cout << "Removing an type" << endl;
+      game.removeType(1,0);
+      cout << "New new num types[1]: " << game.getNumTypes()[1] << endl;
+
       filename << ".bce";
       const string & filenamestring = filename.str();
       const char* filenamecstring = filenamestring.c_str();

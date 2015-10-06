@@ -218,11 +218,11 @@ void BCESolver::populate ()
     {
       // Only create variables if neither action is dominated and 
       // if the combination of values and types could arise.
-      if ((!game->dominated(counter.actions,counter.types))
-	  && game->prior(counter.state,counter.types)>0.0)
+      if ((!game->dominated(counter.getActions(),counter.getTypes()))
+	  && game->prior(counter.getState(),counter.getTypes())>0.0)
 	{
-	  nonZeroVariableLocations.push_back(counter.variable);
-	  variableLocationsMap.emplace(counter.variable,numProbabilityVariables);
+	  nonZeroVariableLocations.push_back(counter.getVariable());
+	  variableLocationsMap.emplace(counter.getVariable(),numProbabilityVariables);
 	  numProbabilityVariables++;
 	}
     } while (++counter); // variableCounter
@@ -267,9 +267,9 @@ void BCESolver::populate ()
 		       true,vector<bool>(2,false),vector<bool>(2,true));
   do
     {
-      if (game->prior(counter.state,counter.types)>0.0)
+      if (game->prior(counter.getState(),counter.getTypes())>0.0)
 	{
-	  probabilityConstraintLocations[counter.marginal]=numProbabilityConstraints;
+	  probabilityConstraintLocations[counter.getMarginal()]=numProbabilityConstraints;
 	  numProbabilityConstraints++;
 	}
     } while (++counter);
@@ -346,20 +346,20 @@ void BCESolver::populate ()
 				   stateConditions,actionConditions,typeConditions,
 				   stateMarginal,actionMarginal,typeMarginal);
 		      
-	      assert(counter.actions[player]==action);
-	      assert(counter.types[player]==type);
+	      assert(counter.getActions()[player]==action);
+	      assert(counter.getTypes()[player]==type);
 
 	      do
 		{
-		  if (variableLocationsMap.count(counter.variable))
+		  if (variableLocationsMap.count(counter.getVariable()))
 		    {
-		      deviations[1-player] = counter.actions[1-player];
-		      types[1-player] = counter.types[1-player];
+		      deviations[1-player] = counter.getActions()[1-player];
+		      types[1-player] = counter.getTypes()[1-player];
 
-		      lhs += variables[variableLocationsMap.at(counter.variable)]
-			*(game->objective(counter.state,deviations,player)
-			  -game->objective(counter.state,counter.actions,player))
-			*game->prior(counter.state,counter.types);
+		      lhs += variables[variableLocationsMap.at(counter.getVariable())]
+			*(game->objective(counter.getState(),deviations,player)
+			  -game->objective(counter.getState(),counter.getActions(),player))
+			*game->prior(counter.getState(),counter.getTypes());
 		    }
 		} while (++counter);
 	      lhs += variables[numProbabilityVariables + row];
@@ -422,17 +422,17 @@ void BCESolver::populate ()
   col=0; 
   do
     {
-      if ((!game->dominated(counter.actions,counter.types)) 
-	  && game->prior(counter.state,counter.types)>0.0)
+      if ((!game->dominated(counter.getActions(),counter.getTypes())) 
+	  && game->prior(counter.getState(),counter.getTypes())>0.0)
 	{
 	  // New column.
 
 	  // Objective functions
 	  for (objectiveCounter=0; objectiveCounter<numObjectives; objectiveCounter++)
 	    objectiveFunctions[objectiveCounter] 
-	      += (game->objective(counter.state,counter.actions,objectiveCounter)
-		  *game->prior(counter.state,counter.types)
-		  *variables[variableLocationsMap[counter.variable]]);
+	      += (game->objective(counter.getState(),counter.getActions(),objectiveCounter)
+		  *game->prior(counter.getState(),counter.getTypes())
+		  *variables[variableLocationsMap[counter.getVariable()]]);
 	  
 	  // Every once in a while, print progress.
 	  if (!(col%(5000)) && displayLevel)
@@ -451,54 +451,6 @@ void BCESolver::populate ()
 
   cplexObjective=cplex.getObjective();
   cplexObjective.setExpr(objectiveFunctions[1]);
-
-  // Set the objectives for the BCESolution object
-  vector< vector<double> > objectivesVector(numObjectives, 
-					    vector<double>(numStates*numActions_total,0.0));
-  vector<double> priorVector(numStates*numTypes_total,0.0);
-  vector<bool> dominatedVector(numActionsTypesPerPlayer_total,false);
-
-  // Fill in the objectives, prior, and dominated vectors
-  counter = BCECounter(numStates,numActions,numTypes,
-		       vector<int>(0),vector<vector<int> >(2),
-		       vector< vector<int> >(2,vector<int>(1,1)),
-		       true,vector<bool>(2,true),vector<bool>(2,false));
-
-  do
-    {
-      for (objectiveCounter=0; objectiveCounter<numObjectives; objectiveCounter++)
-	{
-	  objectivesVector[objectiveCounter][counter.marginal]
-	    = game->objective(counter.state,counter.actions,objectiveCounter);
-	} // objectiveCounter
-    } while (++counter);
-  
-  counter = BCECounter(numStates,numActions,numTypes,
-		       vector<int>(0),vector< vector<int> >(2,vector<int>(1,1)),
-		       vector<vector<int> >(2),
-		       true,vector<bool>(2,false),vector<bool>(2,true));
-  do
-    {
-      priorVector[counter.stateType]=game->prior(counter.state,counter.types);
-    } while (++counter);
-
-  if (displayLevel)
-    cout << "numActionsTypes_total=" << numActionsTypes_total << endl;
-
-  for (player=0; player<numPlayers; player++)
-    {
-      variableCounter = 0;
-      for (type = 0; type < numTypes[player]; type++)
-	{
-	  for (action = 0; action < numActions[player]; action++)
-	    {
-      
-	      dominatedVector[variableCounter]
-		= game->dominated(action,type,player);
-	      variableCounter++;
-	    } // action
-	} // type
-    } // player
 
 } // populate
 

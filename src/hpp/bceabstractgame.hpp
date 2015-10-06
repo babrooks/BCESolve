@@ -112,10 +112,13 @@ public:
     hasProductStructure = true;
   }
 
-
+  //! Returns the number of objectives
   int getNumObjectives() const { return numObjectives; }
+  //! Returns the number of states
   int getNumStates() const { return numStates; }
+  //! Returns a vector of the numbers of actions
   const vector<int> & getNumActions() const { return numActions; }
+  //! Returns a vector of the numbers of types
   const vector<int> & getNumTypes() const { return numTypes; }
   
   //! Default constructor

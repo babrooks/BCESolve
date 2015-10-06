@@ -10,10 +10,9 @@
 
 //! The base class for games of incomplete information.
 /*! This game is derived from BCEAbstractGame and is primarily for the
-    purpose of serializing games.
+    purpose of constructing and serializing games.
 
     \ingroup src
-
 */
 class BCEGame : public BCEAbstractGame
 {
@@ -23,9 +22,17 @@ class BCEGame : public BCEAbstractGame
    */
 
 private:
+  //! Data for the objectives
+  /*! Access via objectiveData[obj][state][actionIndex] */
   vector< vector< vector<double> > > objectiveData;
+  //! Data for the prior
+  /*! Access via priorData[state][typeIndex] */
   vector< vector<double> > priorData;
+  //! Data for the dominated array
+  /*! Access via dominatedData[player][type][action] */
   vector< vector< vector<bool> > > dominatedData;
+  //! Data for the feasibleDeviation array
+  /*! Access via feasibleDeviationData[player][type][action + dev*numActions[player]] */
   vector< vector< vector<bool> > > feasibleDeviationData;
   
 public:
@@ -36,19 +43,6 @@ public:
   /*! Copies a BCEAbstractGame into a BCEGame. */
   BCEGame(const BCEAbstractGame & game);
   
-  // //! Constructor
-  // /*! This constructor allows different players to have different
-  //     numbers of types and actions. */
-  // BCEGame(int numPlayersArg, 
-  // 	  int numStatesArg, 
-  // 	  const vector<int> & numActionsArg, 
-  // 	  const vector<int> & numTypesArg, 
-  // 	  int numObjectivesArg,
-  // 	  const & vector< vector<double> > _objectives,
-  // 	  const & vector< double > _prior,
-  // 	  const & vector< bool > _dominated = vector<bool>(false),
-  // 	  const & vector< bool > _feasibleDeviation = vector<bool>(false));
-
   //! Destructor
   ~BCEGame()
   {} 
@@ -60,7 +54,15 @@ public:
   double prior(int state, const vector<int> &types) const
   {
     return priorData[state][types[0] + types[1] * numTypes[0]];
-  }
+  } // prior
+
+  //! Sets the prior
+  bool setPrior(int state, const vector<int> &types, double value)
+  {
+    priorData[state][types[0] + types[1] * numTypes[0]] = value;
+
+    return true;
+  } // setPrior
 
   //! Objective function
   /*! Maps actions and values into objective functions. The argument
@@ -73,7 +75,16 @@ public:
   {
     return objectiveData[objectiveIndex][state]
       [actions[0] + actions[1]*numActions[0]];
-  }
+  } // objective
+
+  //! Sets the objective
+  bool setObjective(int state, const vector<int> &actions, 
+		    int objectiveIndex, double value)
+  {
+    objectiveData[objectiveIndex][state]
+      [actions[0] + actions[1]*numActions[0]] = value;
+    return true;
+  } // setObjective
 
   //! Indicates if a combination of actions and types is dominated.
   /*! If a combination of actions and types is dominated, the
@@ -83,7 +94,13 @@ public:
   bool dominated(int action, int type, int player) const
   {
     return dominatedData[player][type][action];
-  }
+  } // dominated
+
+  //! Set dominated
+  bool setDominated(int action, int type, int player, bool value)
+  {
+    dominatedData[player][type][action] = value;
+  } // setDominated
 
   //! Check if deviation is feasible
   /*! Indicates whether or not it is feasible to deviate from the
@@ -94,7 +111,33 @@ public:
 				 int type, int player) const
   {
     return feasibleDeviationData[player][type][action+dev*numActions[player]];
-  }
+  } // feasibleDeviation
+
+  //! Set feasible
+  bool setFeasibleDeviation(int action, int dev, 
+			    int type, int player, bool value)
+  {
+    feasibleDeviationData[player][type][action+dev*numActions[player]] = value;
+
+    return true;
+  } // setFeasibleDeviation
+
+  //! Adds a new objective after position
+  bool addObjective(int position);
+  //! Removes the objective obj
+  bool removeObjective(int obj);
+  //! Adds a new state after position
+  bool addState(int position);
+  //! Removes state from the game
+  bool removeState(int state);
+  //! Add type for player at position
+  bool addType(int player, int position);
+  //! Remove type for player
+  bool removeType(int player, int type);
+  //! Add action for player at position
+  bool addAction(int player, int position);
+  //! Remove action for player
+  bool removeAction(int player, int action);
 
   //! Serialization routine
   template <class Archive>
@@ -113,7 +156,7 @@ public:
     ar & numPrivateStates;
   } // serialize
   
-  //! Serialize a BCEData object using Boost.
+  //! Serialize a BCEGame object using Boost.
   static void save(const BCEGame & game, const char* filename)
   {
     ofstream ofs(filename);
@@ -126,10 +169,9 @@ public:
       }
     else
       throw(BCEException(BCEException::FailedOpen));
-
   }
 
-  //! Deserialize a BCEData object using Boost.
+  //! Deserialize a BCEGame object using Boost.
   static void load(BCEGame & game, const char* filename)
   {
     ifstream ifs(filename);
@@ -142,10 +184,8 @@ public:
       }
     else
       throw(BCEException(BCEException::FailedOpen));
-
   }
   
-
   friend class boost::serialization::access;
 }; // BCEGame
 

@@ -16,7 +16,7 @@
 */
 class BCECounter
 {
-public:
+private:
   //! Variable counter
   /*! Index of the variable over all state/action profile/type profile
     combinations. */
@@ -36,7 +36,88 @@ public:
   vector<int> actions; 
   //! Current type profile.
   vector<int> types; 
+  //! Index of the current state
+  /*! The index of the current state within the stateConditions array.
+   */
+  int stateIndex; 
+  //! Indices of the current actions
+  /*! actionIndices[k] is the index of that player k's current action
+    in the array actionConditions[k]. */
+  vector<int> actionIndices; 
+  //! Indices of the current types
+  /*! typeIndices[k] is the index of that player k's current type in
+    the array typeConditions[k]. */
+  vector<int> typeIndices;
 
+  //! Maximum marginal index
+  /*! The maximum marginal index, or equivalently, the number of
+    combinations of the variables whose marginal is true. */  
+  int numMarginalVariables; 
+  //! Maximum variable index
+  /*! The maximum variable index, or equivalently, the total number of
+    combinations of states, action profiles, and type profiles. */
+  int numVariables; 
+
+  //! Conditions on the state
+  /*! A vector of admissible values for the state. */
+  vector<int> stateConditions; 
+  //! Conditions on the action profile
+  /*! actionConditions[k] is a vector of admissible values for player
+    k's actions. */
+  vector< vector<int> > actionConditions; 
+  //! Conditions on the type profile
+  /*! typeConditions[k] is a vector of admissible values for player
+    k's types. */
+  vector< vector<int> > typeConditions; 
+
+  //! Determines if the state is a marginal dimension
+  /*! If ture, the marginal index will iterate when the state
+    changes.  */
+  bool stateMarginal; 
+  //! Determines if actions are marginal dimensions
+  /*! If actionMarginal[k] is true, the marginal index will iterate
+    when player k's action changes. */ 
+  vector<bool> actionMarginal; 
+  //! Determines if types are marginal directions.
+  /*! If typeMarginal[k] is true, the marginal index will iterate when
+    player k's action changes. */
+  vector<bool> typeMarginal;
+  
+  //! The number of states
+  int numStates; 
+  //! Each player's number ofactions
+  vector<int> numActions;
+  //! Each player's number of types
+  vector<int> numTypes;
+
+  //! Variable index increment when actions increase
+  vector<int> actionIncrements;
+  //! Variable index increment when types increase
+  vector<int> typeIncrements;
+  //! Variable index decrement when actions decrease
+  vector<int> actionDecrements;
+  //! Variable index decrement when actions decrease
+  vector<int> typeDecrements;
+
+  //! Marginal index increment when state increases
+  int stateIncrementMarginal;
+  //! Marginal index increment when actions increase
+  vector<int> actionIncrementsMarginal;
+  //! Marginal index increment when types increase
+  vector<int> typeIncrementsMarginal;
+  //! Marginal index decrement when actions decrease
+  vector<int> actionDecrementsMarginal;
+  //! Marginal index decrement when types decrease
+  vector<int> typeDecrementsMarginal;
+
+  //! State/type index increment when actions increase
+  vector<int> actionIncrementsStateType;
+  //! State/type index increment when types increase
+  vector<int> typeIncrementsStateType;
+  //! State/type index decrement when types decrease
+  vector<int> typeDecrementsStateType;
+
+public:
   //! Default constructor
   BCECounter() {}
 
@@ -127,93 +208,17 @@ public:
 
   //! Returns the maximum marginal index
   int getNumMarginal() {return numMarginalVariables;}
-
-  int getState() const { return state; }
+  //! Return the variable index
   int getVariable() const { return variable; }
+  //! Return the marginal index
+  int getMarginal() const { return marginal; }
+  //! Return the current state
+  int getState() const { return state; }
+  //! Return the current vector of types
   const vector<int> & getTypes() const { return types; }
+  //! Return the current vector of actions
   const vector<int> & getActions() const { return actions; }
   
-private:
-  //! Index of the current state
-  /*! The index of the current state within the stateConditions array.
-   */
-  int stateIndex; 
-  //! Indices of the current actions
-  /*! actionIndices[k] is the index of that player k's current action
-    in the array actionConditions[k]. */
-  vector<int> actionIndices; 
-  //! Indices of the current types
-  /*! typeIndices[k] is the index of that player k's current type in
-    the array typeConditions[k]. */
-  vector<int> typeIndices;
-
-  //! Maximum marginal index
-  /*! The maximum marginal index, or equivalently, the number of
-    combinations of the variables whose marginal is true. */  
-  int numMarginalVariables; 
-  //! Maximum variable index
-  /*! The maximum variable index, or equivalently, the total number of
-    combinations of states, action profiles, and type profiles. */
-  int numVariables; 
-
-  //! Conditions on the state
-  /*! A vector of admissible values for the state. */
-  vector<int> stateConditions; 
-  //! Conditions on the action profile
-  /*! actionConditions[k] is a vector of admissible values for player
-    k's actions. */
-  vector< vector<int> > actionConditions; 
-  //! Conditions on the type profile
-  /*! typeConditions[k] is a vector of admissible values for player
-    k's types. */
-  vector< vector<int> > typeConditions; 
-
-  //! Determines if the state is a marginal dimension
-  /*! If ture, the marginal index will iterate when the state
-    changes.  */
-  bool stateMarginal; 
-  //! Determines if actions are marginal dimensions
-  /*! If actionMarginal[k] is true, the marginal index will iterate
-    when player k's action changes. */ 
-  vector<bool> actionMarginal; 
-  //! Determines if types are marginal directions.
-  /*! If typeMarginal[k] is true, the marginal index will iterate when
-    player k's action changes. */
-  vector<bool> typeMarginal;
-  
-  //! The number of states
-  int numStates; 
-  //! Each player's number ofactions
-  vector<int> numActions;
-  //! Each player's number of types
-  vector<int> numTypes;
-
-  //! Variable index increment when actions increase
-  vector<int> actionIncrements;
-  //! Variable index increment when types increase
-  vector<int> typeIncrements;
-  //! Variable index decrement when actions decrease
-  vector<int> actionDecrements;
-  //! Variable index decrement when actions decrease
-  vector<int> typeDecrements;
-
-  //! Marginal index increment when state increases
-  int stateIncrementMarginal;
-  //! Marginal index increment when actions increase
-  vector<int> actionIncrementsMarginal;
-  //! Marginal index increment when types increase
-  vector<int> typeIncrementsMarginal;
-  //! Marginal index decrement when actions decrease
-  vector<int> actionDecrementsMarginal;
-  //! Marginal index decrement when types decrease
-  vector<int> typeDecrementsMarginal;
-
-  //! State/type index increment when actions increase
-  vector<int> actionIncrementsStateType;
-  //! State/type index increment when types increase
-  vector<int> typeIncrementsStateType;
-  //! State/type index decrement when types decrease
-  vector<int> typeDecrementsStateType;
 }; // BCECounter
 
 
