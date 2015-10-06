@@ -6,7 +6,7 @@
 
 #include "bcecommon.hpp"
 #include "bcegame.hpp"
-#include "bcedata.hpp"
+#include "bcesolution.hpp"
 #include "bcecounter.hpp"
 #include "bceexception.hpp"
 #include "bceutilities.hpp"
@@ -167,8 +167,8 @@ protected:
     points traced out by the
     BCESolver::mapBoundary routine. */
   list<double> boundaryYs; 
-  //! BCEData object for serializing output of the algorithm.
-  BCEData data; 
+  //! BCESolution object for serializing output of the algorithm.
+  BCESolution soln; 
 
   /*! Initializes the properties that count the number of actions and
   types. */
@@ -223,7 +223,7 @@ public:
 
   //! Returns the data object
   /*! Copies the data object to output. */
-  void getData(BCEData & output);
+  void getSolution(BCESolution & output);
 
   //! Copies the BCE to a map
   /*! This method copies the BCE, which is a vector of doubles, to a

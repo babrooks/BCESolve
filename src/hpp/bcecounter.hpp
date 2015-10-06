@@ -127,6 +127,11 @@ public:
 
   //! Returns the maximum marginal index
   int getNumMarginal() {return numMarginalVariables;}
+
+  int getState() const { return state; }
+  int getVariable() const { return variable; }
+  const vector<int> & getTypes() const { return types; }
+  const vector<int> & getActions() const { return actions; }
   
 private:
   //! Index of the current state

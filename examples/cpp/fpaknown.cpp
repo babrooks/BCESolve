@@ -172,14 +172,13 @@ void solveFPA(int nvals, int nbids,
 
       solver.mapBoundary("fpaknownbndry.dat");
 
-      BCEData data;
-      solver.getData(data);
-      data.setNumValues(vector<int>(2,nvals));
+      BCESolution soln;
+      solver.getSolution(soln);
 
       filename << ".bce";
       const string & filenamestring = filename.str();
       const char* filenamecstring = filenamestring.c_str();
-      BCEData::save(data,filenamecstring);
+      BCESolution::save(soln,filenamecstring);
       
       // solver.setParameter(BCESolver::BoundaryObjective1,4);
       // solver.setParameter(BCESolver::BoundaryObjective2,2);

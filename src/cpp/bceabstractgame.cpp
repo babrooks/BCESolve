@@ -8,8 +8,7 @@ BCEAbstractGame::BCEAbstractGame ():
   numTypes(numPlayers,0)
 {} // Default constructor
 
-BCEAbstractGame::BCEAbstractGame (int numPlayersArg, 
-				  int numStatesArg, 
+BCEAbstractGame::BCEAbstractGame (int numStatesArg, 
 				  int numActionsArg, 
 				  int numTypesArg, 
 				  int numObjectivesArg):
@@ -20,8 +19,7 @@ BCEAbstractGame::BCEAbstractGame (int numPlayersArg,
   numObjectives(numObjectivesArg)
 {} 
 
-BCEAbstractGame::BCEAbstractGame (int numPlayersArg, 
-				  int numStatesArg, 
+BCEAbstractGame::BCEAbstractGame (int numStatesArg, 
 				  const vector<int> & numActionsArg, 
 				  const vector<int> & numTypesArg, 
 				  int numObjectivesArg):

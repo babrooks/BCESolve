@@ -109,6 +109,8 @@ public:
     ar & priorData;
     ar & dominatedData;
     ar & feasibleDeviationData;
+    ar & hasProductStructure;
+    ar & numPrivateStates;
   } // serialize
   
   //! Serialize a BCEData object using Boost.
@@ -143,6 +145,7 @@ public:
 
   }
   
+
   friend class boost::serialization::access;
 }; // BCEGame
 

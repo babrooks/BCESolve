@@ -40,6 +40,18 @@ protected:
   //! The number of objective functions. Must be >= 2.
   int numObjectives; 
 
+  //! Indicates if the state has a product structure.
+  /*! If true, the state has a product structure, and each player's
+      payoff only depends on their coordinate. */
+  bool hasProductStructure;
+  //! Number of states for each player.
+  /*! If the state has a product structure, this vector indicates how
+      many private values each player has. Should be that the product
+      of the numbers of private values is equal to the total numer of
+      states. */
+  vector<int> numPrivateStates;
+
+
 public:
   //! Prior over state and types
   /*! For each state and vector of types, returns the prior
@@ -84,6 +96,23 @@ public:
 				 int type, int player) const
   {return true;};
 
+
+  void setNumPrivateStates(const vector<int> & _numPrivateStates)
+  {
+    if (_numPrivateStates.size()!=numPlayers)
+      throw(BCEException(BCEException::BadArgument));
+
+    int player, product=1;
+    for (player=0; player<numPlayers; player++)
+      product*=_numPrivateStates[player];
+    if (product!=numStates)
+      throw(BCEException(BCEException::BadArgument));
+  
+    numPrivateStates = _numPrivateStates;
+    hasProductStructure = true;
+  }
+
+
   int getNumObjectives() const { return numObjectives; }
   int getNumStates() const { return numStates; }
   const vector<int> & getNumActions() const { return numActions; }
@@ -109,8 +138,6 @@ public:
   //! Destructor
   ~BCEAbstractGame()
   {} 
-
-  friend class BCESolver;
 };
 
 #endif

@@ -26,15 +26,11 @@ BCESolver::BCESolver (BCEAbstractGame & _game):
   constraints(env),
   objectiveFunctions(2,IloNumExpr(env)),
   bndryObjectives(2,IloNumExpr(0)),
-  numICConstraints(_game.numPlayers,0),
+  numICConstraints(2,0),
   minAngleIncrement(0.0),
   boundaryObjectiveIndex1(0),
   boundaryObjectiveIndex2(1),
-  data(_game.numPlayers,
-       _game.numStates,
-       _game.numActions,
-       _game.numTypes,
-       _game.numObjectives),
+  soln(BCEGame(_game)),
   numActions_total(1),
   numTypes_total(1),
   numActionsTypes_total(1),
@@ -50,11 +46,11 @@ void BCESolver::countActionsTypes()
   // Set the numActions_total and numTypes_total
   int playerCounter;
 
-  const int numPlayers = game->numPlayers;
-  const int numStates = game->numStates;
-  const int numObjectives = game->numObjectives;
-  const vector<int> & numTypes = game->numTypes;
-  const vector<int> & numActions = game->numActions;
+  const int numPlayers = 2;
+  const int numStates = game->getNumStates();
+  const int numObjectives = game->getNumObjectives();
+  const vector<int> & numTypes = game->getNumTypes();
+  const vector<int> & numActions = game->getNumActions();
   
   for (playerCounter=0; playerCounter<numPlayers; playerCounter++)
     {
@@ -91,7 +87,7 @@ void BCESolver::setParameter(BCESolver::IntParameter param, int arg)
   switch (param)
     {
     case CurrentObjective:
-      if (arg<0 || arg>=game->numObjectives)
+      if (arg<0 || arg>=game->getNumObjectives())
 	throw(BCEException(BCEException::InvalidParameterValue));
 
       currentObjective = arg;
@@ -170,11 +166,11 @@ void BCESolver::setBndryObjective(int index, const IloNumExpr & expr)
 // Constructs the constraint matrix and objective function
 void BCESolver::populate ()
 {
-  const int numPlayers = game->numPlayers;
-  const int numStates = game->numStates;
-  const int numObjectives = game->numObjectives;
-  const vector<int> & numTypes = game->numTypes;
-  const vector<int> & numActions = game->numActions;
+  const int numPlayers = 2;
+  const int numStates = game->getNumStates();
+  const int numObjectives = game->getNumObjectives();
+  const vector<int> & numTypes = game->getNumTypes();
+  const vector<int> & numActions = game->getNumActions();
 
   int state, type, action, deviation;
   vector<int> types(numPlayers,0), 
@@ -456,7 +452,7 @@ void BCESolver::populate ()
   cplexObjective=cplex.getObjective();
   cplexObjective.setExpr(objectiveFunctions[1]);
 
-  // Set the objectives for the BCEData object
+  // Set the objectives for the BCESolution object
   vector< vector<double> > objectivesVector(numObjectives, 
 					    vector<double>(numStates*numActions_total,0.0));
   vector<double> priorVector(numStates*numTypes_total,0.0);
@@ -470,11 +466,6 @@ void BCESolver::populate ()
 
   do
     {
-      assert(counter.marginal
-	     ==data.stateTypesActionsToMarginalIndex(counter.state,
-						     counter.types,counter.actions,
-						     true,vector<bool>(2,true),
-						     vector<bool>(2,false)));
       for (objectiveCounter=0; objectiveCounter<numObjectives; objectiveCounter++)
 	{
 	  objectivesVector[objectiveCounter][counter.marginal]
@@ -509,7 +500,6 @@ void BCESolver::populate ()
 	} // type
     } // player
 
-  data.setObjectivesPriorDominated(objectivesVector,priorVector,dominatedVector);
 } // populate
 
 void BCESolver::solve()
@@ -527,10 +517,10 @@ void BCESolver::solve()
   if (displayLevel)
     cout << "Objective = " << setprecision(16) << cplex.getObjValue() << endl;
 
-  data.clearEquilibria();
+  soln.clearEquilibria();
   bceToMap(solutionEquilibrium);
-  data.addEquilibrium(solutionEquilibrium);
-  data.consolidateEquilibria();
+  soln.addEquilibrium(solutionEquilibrium);
+  soln.consolidateEquilibria();
 }
 
 void BCESolver::mapBoundary()
@@ -552,7 +542,7 @@ void BCESolver::mapBoundary(const char * fname)
   cplex.setParam(IloCplex::NetDisplay, 0);
 
   // Clear the equilibria array.
-  data.clearEquilibria();
+  soln.clearEquilibria();
 
   // First solve 
   cplexObjective.setExpr(objectiveFunctions[boundaryObjectiveIndex1]);
@@ -588,7 +578,7 @@ void BCESolver::mapBoundary(const char * fname)
     vertexData << *XIterator << " " << *YIterator << endl;
   vertexData.close();
   
-  data.consolidateEquilibria();
+  soln.consolidateEquilibria();
 
   cplex.setParam(IloCplex::BarDisplay,BarDisplayDefault);
   cplex.setParam(IloCplex::SimDisplay,DisplayDefault);
@@ -641,7 +631,7 @@ void BCESolver::mapFrontier(int plusOrMinus1, int plusOrMinus2, bool reversePrin
       cplex.getBasisStatuses(basisStatuses,variables);
       // Print current equilibrium
       bceToMap(currentEquilibrium);
-      data.addEquilibrium(currentEquilibrium);
+      soln.addEquilibrium(currentEquilibrium);
 
       // Find the next weight
       cplexObjective.setExpr(bndryObjectives[0]);
@@ -720,9 +710,9 @@ void BCESolver::mapFrontier(int plusOrMinus1, int plusOrMinus2, bool reversePrin
   cplex.setParam(IloCplex::ItLim,ItLimDefault);
 } // mapFrontier
 
-void BCESolver::getData(BCEData & output)
+void BCESolver::getSolution(BCESolution & output)
 {
-  output=data;
+  output=soln;
 }
 
 void BCESolver::bceToMap(map<int,double> & distribution)
@@ -751,19 +741,20 @@ void BCESolver::bceToMap(map<int,double> & distribution)
 void BCESolver::indexToTypeActionDeviation(int index, int player, int &type, int &action, int &deviation)
 {
   assert(index>=0);
-  assert(index<game->numTypes[player]*game->numActions[player]*game->numActions[player]);
+  assert(index<game->getNumTypes()[player]*
+	 game->getNumActions()[player]*game->getNumActions()[player]);
 
-  deviation=index%game->numActions[player];
-  index-=deviation; index/=game->numActions[player];
-  action=index%game->numActions[player];
-  index-=action; index/=game->numActions[player];
+  deviation=index%game->getNumActions()[player];
+  index-=deviation; index/=game->getNumActions()[player];
+  action=index%game->getNumActions()[player];
+  index-=action; index/=game->getNumActions()[player];
   type=index;
 
   assert(type>=0);
   assert(action>=0);
   assert(deviation>=0);
-  assert(type<game->numTypes[player]);
-  assert(action<game->numActions[player]);
-  assert(deviation<game->numActions[player]);
+  assert(type<game->getNumTypes()[player]);
+  assert(action<game->getNumActions()[player]);
+  assert(deviation<game->getNumActions()[player]);
 }
 
