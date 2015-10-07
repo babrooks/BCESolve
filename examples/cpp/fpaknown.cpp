@@ -93,6 +93,8 @@ void solveFPA(int nvals, int nbids,
       cplex.getObjective().setSense(IloObjective::Maximize);
       cplex.getObjective().setExpr(-1.0*(solver.getObjectiveFunction(2)));
       cplex.setParam(IloCplex::Threads,4);
+
+      
       // for (int player = 0; player < 2; player++)
       // 	{
       // 	  for (int val = 0; val < nvals; val++)
@@ -116,18 +118,18 @@ void solveFPA(int nvals, int nbids,
       // cplex.getObjective().setExpr(solver.getObjectiveFunction(2));
       // filename << "_minrevenue";
       
-      // if (verbose)
-      // 	cout << "Objective function set" << endl;
-      // solver.solve();
+      if (verbose)
+      	cout << "Objective function set" << endl;
+      solver.solve();
 
-      // cout << "Bidder 1's surplus: " 
-      // 	   << cplex.getValue(solver.getObjectiveFunction(0)) << endl;
-      // cout << "Bidder 2's surplus: "
-      // 	   << cplex.getValue(solver.getObjectiveFunction(1)) << endl;
-      // cout << "Revenue: " 
-      // 	   << cplex.getValue(solver.getObjectiveFunction(2)) << endl;
-      // cout << "Total surplus: " 
-      // 	   << cplex.getValue(solver.getObjectiveFunction(3)) << endl;
+      cout << "Bidder 1's surplus: " 
+      	   << cplex.getValue(solver.getObjectiveFunction(0)) << endl;
+      cout << "Bidder 2's surplus: "
+      	   << cplex.getValue(solver.getObjectiveFunction(1)) << endl;
+      cout << "Revenue: " 
+      	   << cplex.getValue(solver.getObjectiveFunction(2)) << endl;
+      cout << "Total surplus: " 
+      	   << cplex.getValue(solver.getObjectiveFunction(3)) << endl;
 
       // cout << "Adding constraint" << endl;
       // cplex.getModel().add(solver.getObjectiveFunction(0)+solver.getObjectiveFunction(1) == cplex.getObjValue());
@@ -161,26 +163,58 @@ void solveFPA(int nvals, int nbids,
       // if (verbose)
       // 	cout << "Saving data..." << endl;
 
-      solver.setParameter(BCESolver::BoundaryObjective1,0);
-      solver.setParameter(BCESolver::BoundaryObjective2,1);
+      // solver.setParameter(BCESolver::BoundaryObjective1,0);
+      // solver.setParameter(BCESolver::BoundaryObjective2,1);
 
-      solver.setBndryObjective(1,solver.getObjectiveFunction(0)
-      			       +solver.getObjectiveFunction(1));
-      solver.setBndryObjective(2,solver.getObjectiveFunction(2));
+      // solver.setBndryObjective(1,solver.getObjectiveFunction(0)
+      // 			       +solver.getObjectiveFunction(1));
+      // solver.setBndryObjective(2,solver.getObjectiveFunction(2));
 
-      solver.mapBoundary("fpaknownbndry_bidder.dat");
+      // solver.mapBoundary("fpaknownbndry_bidder.dat");
 
-      solver.mapBoundary("fpaknownbndry.dat");
+      // solver.mapBoundary("fpaknownbndry.dat");
 
       BCESolution soln;
       solver.getSolution(soln);
 
+      // Add and remove a state
+      BCEGame game = soln.getGame();
+
+      BCESolver solver2(game);
+      solver2.populate();
+      IloCplex cplex2 = solver2.getCplex();
+
+      for (int player = 0; player < 2; player++)
+	{
+	  for (int val = 0; val < nvals; val++)
+	    {
+	      cplex2.getModel()
+		.add(solver2.getObjectiveFunction(5+val+player*nvals)>=0.0);
+	    } // val
+	}
+
+      cplex2.setParam(IloCplex::RootAlg,IloCplex::Barrier);
+      cplex2.setParam(IloCplex::SimDisplay,0);
+      solver2.setParameter(BCESolver::DisplayLevel,1);
+
+      cplex2.getObjective().setSense(IloObjective::Maximize);
+      cplex2.getObjective().setExpr(-1.0*(solver2.getObjectiveFunction(2)));
+      cplex2.setParam(IloCplex::Threads,4);
+
       cout << "Num obj: " << soln.getGame().getNumObjectives() << endl;
       cout << "Num states: " << soln.getGame().getNumStates() << endl;
       cout << "A payoff: " << soln.getGame().objective(2,vector<int>(2,2),1) << endl;
+      solver2.solve();
 
-      // Add and remove a state
-      BCEGame game = soln.getGame();
+      cout << "Bidder 1's surplus: " 
+      	   << cplex2.getValue(solver.getObjectiveFunction(0)) << endl;
+      cout << "Bidder 2's surplus: "
+      	   << cplex2.getValue(solver.getObjectiveFunction(1)) << endl;
+      cout << "Revenue: " 
+      	   << cplex2.getValue(solver.getObjectiveFunction(2)) << endl;
+      cout << "Total surplus: " 
+      	   << cplex2.getValue(solver.getObjectiveFunction(3)) << endl;
+
       cout << "Num states: " << game.getNumStates() << endl;
       cout << "Adding a state" << endl;
       game.addState(1);

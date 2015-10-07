@@ -84,15 +84,17 @@ BCEGame::BCEGame(const BCEAbstractGame & game):
 	    {
 	      dominatedData[player][type][action] = game.dominated(action,type,player);
 
-	      for (int dev; dev < game.getNumActions()[player]; dev++)
+	      for (int dev = 0; dev < game.getNumActions()[player]; dev++)
 		{
 		  feasibleDeviationData[player][type]
 		    [action+dev*game.getNumActions()[player]]
 		    = game.feasibleDeviation(action,dev,type,player);
 		}
 	    } // for action
+	  
 	} // for type
     } // for player
+
 } // Construct from BCEAbstractGame
 
 bool BCEGame::addObjective(int position)

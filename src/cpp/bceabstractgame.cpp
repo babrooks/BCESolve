@@ -5,7 +5,9 @@ BCEAbstractGame::BCEAbstractGame ():
   numPlayers(2),
   numActions(numPlayers,0),
   numStates(0),
-  numTypes(numPlayers,0)
+  numTypes(numPlayers,0),
+  hasProductStructure(false),
+  numPrivateStates(2,0)
 {} // Default constructor
 
 BCEAbstractGame::BCEAbstractGame (int numStatesArg, 
@@ -16,7 +18,9 @@ BCEAbstractGame::BCEAbstractGame (int numStatesArg,
   numActions(numPlayers,numActionsArg),
   numStates(numStatesArg),
   numTypes(numPlayers,numTypesArg),
-  numObjectives(numObjectivesArg)
+  numObjectives(numObjectivesArg),
+  hasProductStructure(false),
+  numPrivateStates(2,0)
 {} 
 
 BCEAbstractGame::BCEAbstractGame (int numStatesArg, 
@@ -27,7 +31,9 @@ BCEAbstractGame::BCEAbstractGame (int numStatesArg,
   numActions(numActionsArg),
   numStates(numStatesArg),
   numTypes(numTypesArg),
-  numObjectives(numObjectivesArg)
+  numObjectives(numObjectivesArg),
+  hasProductStructure(false),
+  numPrivateStates(2,0)
 {} 
 
 // Overloaded version of prior that finds the marginal.

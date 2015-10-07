@@ -2,8 +2,8 @@
 
 int main()
 {
-  int numBids = 200;
-  int numVals = 200;
+  int numBids = 20;
+  int numVals = 20;
   double weightOnOwnBid = .75;
   
   HybridAuction ha(numVals,numBids,weightOnOwnBid);
@@ -18,8 +18,8 @@ int main()
   
   solver.solve();
 
-  BCEData data;
-  solver.getData(data);
+  BCESolution soln;
+  solver.getSolution(soln);
   
   stringstream fName;
   fName << "hybridauction_nv=" << numVals
@@ -27,6 +27,17 @@ int main()
 	<< "_w=" << weightOnOwnBid << ".bce";
   string fNameStr = fName.str();
   const char * fNameC = fNameStr.c_str();
-  BCEData::save(data,fNameC);
+  BCESolution::save(soln,fNameC);
+
+  BCEGame game = soln.getGame();
+  BCESolver solver2(game);
+  solver2.populate();
   
+  cplex = solver2.getCplex();
+  cplex.getObjective().setSense(IloObjective::Minimize);
+  cplex.getObjective().setExpr(solver2.getObjectiveFunction(2));
+  
+  solver2.solve();
+
+
 } // main

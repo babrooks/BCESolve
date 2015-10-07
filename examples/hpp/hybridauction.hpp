@@ -6,14 +6,14 @@
 
 #include "bce.hpp"
 
-class HybridAuction : public BCEGame
+class HybridAuction : public BCEAbstractGame
 {
 private:
   double weightOnOwnBid;
   
 public:
   HybridAuction(int nv, int na, double _weightOnOwnBid):
-    BCEGame(2,nv,na,1,3), weightOnOwnBid(_weightOnOwnBid)
+    BCEAbstractGame(nv,na,1,3), weightOnOwnBid(_weightOnOwnBid)
   { }
 
   double prior (int state, const vector<int> & types) const

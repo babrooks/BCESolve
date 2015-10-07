@@ -71,17 +71,17 @@ public:
     players 1 through numPlayers, respectively. This is a pure virtual
     function that must be implemented by the derived class. */
   double objective(int state, const vector<int> &actions, 
-			   int objectiveIndex) const
+		   int obj) const
   {
-    return objectiveData[objectiveIndex][state]
+    return objectiveData[obj][state]
       [actions[0] + actions[1]*numActions[0]];
   } // objective
 
   //! Sets the objective
   bool setObjective(int state, const vector<int> &actions, 
-		    int objectiveIndex, double value)
+		    int obj, double value)
   {
-    objectiveData[objectiveIndex][state]
+    objectiveData[obj][state]
       [actions[0] + actions[1]*numActions[0]] = value;
     return true;
   } // setObjective
