@@ -59,9 +59,23 @@ public:
       that must be implemented by the derived class. */
   virtual double prior(int state, const vector<int> &types) const = 0;
 
+  //! Overloaded prior if the game has a product structure
+  double prior(vector<int> states, const vector<int> &types) const
+  {
+    if (hasProductStructure
+	&& states[0] >= 0 && states[0] < numPrivateStates[0]
+	&& states[1] >= 0 && states[1] < numPrivateStates[1])
+      return prior(states[0] + states[1]*numPrivateStates[0],types);
+    return -99;
+  }
+
   //! Marginal prior distribution
   /*! Calculates the marginal joint distribution of a given player's
-      type and the state. */
+      type and the state. 
+      
+      TODO: Have behavior depend on whether or not the state has a
+      product structure.
+  */
   double prior(int state, int type, int player) const; // marginal distribution
 
   //! Objective function
@@ -71,7 +85,20 @@ public:
     players 1 through numPlayers, respectively. This is a pure virtual
     function that must be implemented by the derived class. */
   virtual double objective(int state, const vector<int> &actions, 
-			   int objectiveIndex) const = 0; 
+			   int obj) const = 0; 
+
+  //! Overloaded objective if the game has a product structure
+  double objective(vector<int> states, 
+		   const vector<int> &actions
+		   int obj) const
+  {
+    if (hasProductStructure
+	&& states[0] >= 0 && states[0] < numPrivateStates[0]
+	&& states[1] >= 0 && states[1] < numPrivateStates[1])
+      return objective(states[0] + states[1]*numPrivateStates[0],
+		       actions,obj);
+    return -99;
+  }
 
   //! Indicates if a combination of actions and types is dominated.
   /*! If a combination of actions and types is dominated, the
@@ -96,21 +123,41 @@ public:
 				 int type, int player) const
   {return true;};
 
-
-  void setNumPrivateStates(const vector<int> & _numPrivateStates)
+  //! Sets the number of private states if the state has a product
+  //! structure
+  /*! The products of the number of private states must equal the
+      total number of states. If an argument of vector<double>(2,0) is
+      passed, hasProductStructure will be set equal to zero. */
+  bool setNumPrivateStates(const vector<int> & _numPrivateStates)
   {
     if (_numPrivateStates.size()!=numPlayers)
       throw(BCEException(BCEException::BadArgument));
+
+    if (_numPrivateStates[0] == 0
+	&& _numPrivateStates[1] == 0)
+      {
+	numPrivateStates = _numPrivateStates;
+	hasProductStructure = false;
+	return true;
+      }
 
     int player, product=1;
     for (player=0; player<numPlayers; player++)
       product*=_numPrivateStates[player];
     if (product!=numStates)
-      throw(BCEException(BCEException::BadArgument));
+      return false;
   
     numPrivateStates = _numPrivateStates;
     hasProductStructure = true;
+
+    return true;
   }
+
+  //! Returns whether or not the state has a product structure
+  bool hasProductStructure() const { return hasProductStructure; }
+
+  //! Returns the numbers of private states
+  const vector<int> & getNumPrivateStates () const { return numPrivateStates; }
 
   //! Returns the number of objectives
   int getNumObjectives() const { return numObjectives; }
