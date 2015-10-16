@@ -1,7 +1,9 @@
 #ifndef BCEDATASTATE_HPP
 #define BCEDATASTATE_HPP
 
-#include "bcedata.hpp"
+#include "bcesolution.hpp"
+#include "bcegame.hpp"
+#include "bceabstractgame.hpp"
 #include "bceenumeration.hpp"
 #include <QtWidgets>
 #include <cmath>
@@ -27,18 +29,14 @@ private: // Private Properties. Private Functions near EOF.
   vector<int> actions;
   //! A 2 element vector holding the current type for each player.
   vector<int> types;
-  //! A 2 element vector holding the current value/state for each player.
-  vector<int> values;
+  //! Holds the number of states.
+  int state;
   //! If true, GUI is displaying solution of a private-values game.
   bool isPrivateVals;
-  //! State of the game, used for private-value games.
-  /*! For private-value games, the values vector is not used. Instead,
-    this state variable is altered through user interactoin with 
-    sliders. In non private-value games, the values vector is used.
-  */
-  int state;
-  //! Currently active BCEData in the GUI.
-  BCEData data;
+  //! Currently active BCESolution in the GUI.
+  BCESolution solutionData;
+  //! Currently active BCEGame in the GUI.
+  BCEGame gameData;
   //! File name of example currently displayed in the GUI.
   string guiTitle;
   //! If true, GUI displays marginal distribution for player's state.
@@ -79,7 +77,6 @@ public:
   BCEDataState() {
     actions = vector<int>(2,0);
     types = vector<int>(2,0);
-    values = vector<int>(2,0);
     state = 0;
     margS0 = false;
     margS1 = false;
@@ -103,16 +100,11 @@ public:
   */
   int shareDataProperties(BCESliderType st,int player) {
     switch(st) {
-    case Action: return data.numActions[player];
+    case Action: return gameData.getNumActions[player];
       break;
-    case Type: return data.numTypes[player];
+    case Type: return gameData.getNumTypes[player];
       break;
-    case State: {
-      if (isPrivateVals == true) 
-	return data.numStates;
-      else
-	return data.numValues[player];
-    }
+    case State: return gameData.getNumStates;
       break;
     }
   }
@@ -133,12 +125,7 @@ public:
       break;
     case Type: return types[player];
       break;
-    case State: {
-      if (isPrivateVals)
-	return state;
-      else
-	return values[player];
-    }
+    case State: return state;
       break;
     }
   }
@@ -206,13 +193,7 @@ public slots:
     case Type: types[player] = value;
       break;
     case State: {
-      if (isPrivateVals == true) {
-	state = value;
-	values[player] = value;
-      }
-      else
-	values[player] = value;
-
+      state = value;
       emit(newStateSignal(values[0],values[1],state,isPrivateVals));
     }
       break;
@@ -306,7 +287,7 @@ public slots:
     }
 
     currentEqmIndex = newEqmIndex;
-    data.setCurrentEquilibrium(currentEqmIndex);
+    solutionData.setCurrentEquilibrium(currentEqmIndex);
 
     double xClosest = 0;
     double yClosest = 0;
@@ -343,7 +324,7 @@ public slots:
         guiTitle = boostPath.filename().string();
 
 	// Load New Data on Path
-	BCEData::load(data,newPath_c);
+	BCEGame::load(gameData,newPath_c);
 
 	isPrivateVals = !(data.isPrivateValues);
 
@@ -440,8 +421,6 @@ private: //functions
     // State Conditions
 
     vector<int> stateConditions(1,state);
-    if (isPrivateVals == false)
-      stateConditions = vector<int>(1,values[0]+values[1]*data.numValues[0]); 
 
     // Action Conditions
 
@@ -452,7 +431,7 @@ private: //functions
     vector<vector<int>> typeConditions(2,vector<int>(0));
 
     double prob
-      = data.getConditionalMarginal(stateConditions,
+      = solutionData.getConditionalMarginal(stateConditions,
 				    actionConditions, 
 				    typeConditions,
 				    margS0,
@@ -460,27 +439,29 @@ private: //functions
 				    margT,
 				    distribution);
 
-    assert(data.numActions_total == distribution.size());
+    assert(solutionData.numActions_total == distribution.size());
 
-    equilibriumMatrix = vector<vector<double>>(data.numActions[1],
-					       vector<double>(data.numActions[0],0));
+    vector<int> numActions = gameData.getNumActions;
 
-    for (int a1 = 0; a1 < data.numActions[1]; a1++)
+    equilibriumMatrix = vector<vector<double>>(numActions[1],
+					       vector<double>(numActions[0],0));
+
+    for (int a1 = 0; a1 < numActions[1]; a1++)
       {
-	for (int a0 = 0; a0 < data.numActions[0]; a0++)
+	for (int a0 = 0; a0 < numActions[0]; a0++)
 	  {
-	    int index = a1 * data.numActions[0] + a0;
+	    int index = a1 * numActions[0] + a0;
 	    equilibriumMatrix[a0][a1] = distribution[index];
 	  } // for a0
       } // for a1
 
     // Gets marginal probability of an action from the joint distn.
     double acc0 = 0.0;
-    for (int a = 0; a < data.numActions[0]; a++)
+    for (int a = 0; a < numActions[0]; a++)
       acc0 += equilibriumMatrix[actions[0]][a];
 
     double acc1 = 0.0;
-    for (int a = 0; a < data.numActions[1]; a++)
+    for (int a = 0; a < numActions[1]; a++)
       acc1 += equilibriumMatrix[a][actions[1]];
 
     emit(devPlotPrChange(0,acc0));
@@ -496,7 +477,7 @@ private: //functions
   */
   void setObjectiveVals(int player) {
 
-    data.getDeviationObjectives(player,actions[player],types[player],objectiveValues);
+    solutionData.getDeviationObjectives(player,actions[player],types[player],objectiveValues);
 
     emit(devPlotTitleChange(player,
 			    actions[player],
@@ -504,8 +485,9 @@ private: //functions
 			    objectiveValues[player][actions[player]]));
 
     // Gets marginal probability of an action from the joint distn.
+    vector<int> numActions = gameData.getNumActions;
     double acc = 0.0;
-    for (int a = 0; a < data.numActions[1-player]; a++) {
+    for (int a = 0; a < numActions[1-player]; a++) {
       if (player == 0)
 	acc += equilibriumMatrix[actions[player]][a];
       else
@@ -523,7 +505,7 @@ private: //functions
   */
   void setAllEqm() {
 
-    data.getExpectedObjectives(allEqm);
+    solutionData.getExpectedObjectives(allEqm);
 
   }
 

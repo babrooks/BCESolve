@@ -89,7 +89,7 @@ public:
 
   //! Overloaded objective if the game has a product structure
   double objective(vector<int> states, 
-		   const vector<int> &actions
+		   const vector<int> &actions,
 		   int obj) const
   {
     if (hasProductStructure

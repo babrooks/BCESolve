@@ -32,7 +32,7 @@ VPATH += ../viewer/hpp
 HEADERS += bcedatastate.hpp \
 bcewindow.hpp \
 qcustomplot.h \
-bcedata.hpp \
+bcesolution.hpp \
 bceslider.hpp \
 bcelineedit.hpp \
 bcecheckbox.hpp \
