@@ -3,4 +3,6 @@
 
 enum BCESliderType{Action,Type,State};
 
+enum LabelType{DeviationPlot,SliderLabel,ValueSetPlot,HeatMap};
+
 #endif

@@ -10,17 +10,18 @@
 #include "bcecheckbox.hpp"
 #include "bcevaluesetplot.hpp"
 #include "bceenumeration.hpp"
-#include "bcedevplottitle.hpp"
-#include "bcevaluesetplottitle.hpp"
-#include "bceheatmaptitle.hpp"
-#include "bcesliderlabel.hpp"
+#include "bcelabelhandler.hpp"
 
 using namespace std;
 
 //! Viewer Window Class
-/*! Contains main viewer functions for displaying
-  the GUI. Interacts with every viewer header
-  file. Friend class of BCEDataState.
+/*! Handles plotting and layout of the GUI. 
+  Interacts with every viewer header file. Connects
+  user interaction in the GUI with BCEDataState to
+  modify data elements for plotting. Gets data from
+  BCEDataState for plotting. Connects data change signals
+  in BCEDataState with slots to change plot titles.
+  Handles file menu actions.
 
   \ingroup viewer
 */
@@ -34,71 +35,134 @@ public:
 
 public slots:
 
-  //! Receives data about changed slider values.
-  void changeSliderValue(int newVal,
-			 BCESliderType type,
-			 int player);
-  //! Receives data about changed checkbox states.
-  void changeMarginalBool(bool newBool,BCESliderType type,int player);
-  //! Receives coordinates of the newly selected eqm.
-  void setNewEqm(double x,double y);
+  //! colorMap,conditionalMarginalPlot plotting function.
+  /*! Removes currently plotted data, gets new data from 
+    BCEDataState, and plots the new data in a heat map.
+    Slot is triggered when the equilibrium matrix is 
+    changed in BCEDataState.
+  */
+  void plotEqm();
+  //! deviationBarGraphs plotting function.
+  /*! Removes currently plotted data, gets new data from 
+    BCEDataState, and plots the new data in a bar graph.
+    Contains additional plottables for highlighting
+    players' indifferent deviations and highlighting the
+    currently selected action. Slot is triggered when a 
+    player's objectiveValues vector matrix is changed in
+    BCEDataState.
+  */
+  void plotDeviationObjectives(int player);
+  //! payoffPlot plotting function.
+  /*! Slot triggered when the vector of BCEquilibria is
+    updated after loading or when a new equilibrium index
+    is selected. Contains additional plottable to highlight
+    the currently selected equilibrium.
+  */
+  void plotBCEValueSet();
+  //! Sets a new title for the GUI using fileName information.
+  /*! Gets guiTitle from BCEDataState and sets the main window
+    title << "BCE Solution Viewer, Current File = "
+    << getGUITitle_output
+  */
+  void setGUITitle();
+
+signals:
+
+  //! Sends path to example to BCEDataState.
+  /*! Gets path to example data from user interaction.
+    Sends that path to BCEDataState in order to load
+    new data.
+  */
+  void dataPathChanged(QString path);
 
 private:
-
-  QAction *linearScale;
-  QAction *colorfulDistn;
 
   //! Screen Resolution Width.
   int resWidth;
   //! Screen Resolution Height.
   int resHeight;
 
-  QVector<BCESlider*> sliderGroup;
-  QVector<BCELineEdit*> lineEditGroup;
-  QVector<BCECheckBox*> checkBoxGroup;
-  QVector<QLabel*> sliderLabels;
-  QVector<BCEDevPlotTitle*> devPlotTitles;
+  //! Data state. 
+  /*! Stores all data currently held or 
+    displayed in the GUI. "Held" data 
+    refers to parameters the user supplies 
+    through slider manipulation and loading
+    actions. "Displayed" data refers to 
+    the data BCEDataState has manipulated
+    for plotting.
 
-  //! Default path to saved .bce files.
+    Continuously manipulated upon user 
+    interaction. This class has access to
+    guiData through BCEDataState's "get"
+    functions.
+  */
+  BCEDataState guiData;
+
+  //! Vector of user controlled sliders.
+  /*! Each element is identified by slider
+    type and player. There are 2 players and
+    3 slider types (Action, Type, State). The
+    size of the vector is 6.
+  */
+  QVector<BCESlider*> sliderGroup;
+  //! Vector of read-only line edits.
+  /*! Displays value of corresponding slider.
+    Each element is identified by slider
+    type and player. There are 2 players and
+    3 slider types (Action, Type, State). The
+    size of the vector is 6.
+  */
+  QVector<BCELineEdit*> lineEditGroup;
+  //! Not currently implemented.
+  /*! Checkboxes are displayed in the GUI but
+    are not fully implemented. Using them in the
+    GUI will cause the program to crash.
+  */
+  QVector<BCECheckBox*> checkBoxGroup;
+  //! Default path to saved *.bce files.
+  /*! Currently set as ../examples
+   */
   QString path;
   //! Default path to gui screenshots (*.png files).
+  /*! Currently set as ../examples/screenshots/
+   */
   QString screenShotPath;
-
   //! Heatmap template.
+  /*! Stores the colorMap plottable, which
+    contains data in BCEDataState's 
+    equilibriumMatrix. Also holds the colorScale,
+    which provides a numerical scale for
+    the heatmap's colors.
+  */
   BCEValueSetPlot *conditionalMarginalPlot;
   //! Heatmap.
+  /*! A QCustomPlot class. Contains built-in
+    functionality for the heatmap displayed
+    in the GUI.
+  */
   QCPColorMap *colorMap;
   //! Scale for heatmap colors.
   QCPColorScale *colorScale;
+  //! Linear/Log incrementation toggle for colorScale.
+  QAction *linearScale;
+  //! Colorful/Blue theme toggle for colorScale.
+  QAction *colorfulDistn;
   //! Color of heatmap colorScale.
   QCPColorGradient *mGradient;
   //! Set of BCE Plot.
-  BCEValueSetPlot *payoffPlot;
+  BCEValueSetPlot *setOfBCEPlot;
   //! Bar Graphs.
   QVector<QCustomPlot*> deviationBarGraphs;
-  //! Data state.
-  /*! Continuously manipulated after user 
-    interaction.
-  */
-  BCEDataState gui;
-
-  //! colorMap,conditionalMarginalPlot plotting function.
-  void plotEqm();
-  //! deviationBarGraphs plotting function.
-  void plotDeviationObjectives(int player);
-  //! payoffPlot plotting function.
-  void plotBCEValueSet();
-  //! Plotting helper function.
-  void plotSelectGraphics(BCESliderType type,int player);
-  //! Plotting helper function.
-  void plotAllGraphics();
-
-  QMenu *fileMenu;
-  QAction *loadSolutionAction;
+  QVector<BCELabel*> devPlotTitles;
 
 private slots:
 
   //! Interacts with BCEDataState to load new data.
+  /*! Sends the new data path to BCEDataState to load
+    the new data. Resets sliders and line-edits to 0.
+    Sets range of sliders according to the number of
+    actions, types, and states in the new data.
+  */
   void loadSolution();
   //! Toggles colorScale between linear and log scales.
   void toggleLinearScale(bool checked);

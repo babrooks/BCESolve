@@ -64,6 +64,8 @@ private: // Private Properties. Private Functions near EOF.
     called in the example .cpp file.
   */
   vector<vector<double>> allEqm;
+  //! Layout Holding Sliders and Other Data Controls
+  QVBoxLayout *controlsLayout;
 
 public:
 
@@ -174,6 +176,10 @@ public:
   //! Shares file name of currently loaded file with BCEWindow.
   string getGUITitle() {
     return guiTitle;
+  }
+
+  const QVBoxLayout& getLayout() const {
+    return controlsLayout;
   }
 
 
@@ -516,6 +522,9 @@ private: //functions
     return sqrt(pow((y2-y1),2)+pow((x2-x1),2));
   }
 
+  void setupControlsLayout() {
+
+  }
 
 }; // BCEDataState
 
