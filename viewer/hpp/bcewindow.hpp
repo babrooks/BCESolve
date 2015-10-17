@@ -1,5 +1,5 @@
-#ifndef PLOTTABHANDLER_H
-#define PLOTTABHANDLER_H
+#ifndef BCEWINDOW_HPP
+#define BCEWINDOW_HPP
 
 #include <vector>
 #include <QtWidgets>
@@ -97,22 +97,6 @@ private:
     functions.
   */
   BCEDataState guiData;
-
-  //! Vector of user controlled sliders.
-  /*! Each element is identified by slider
-    type and player. There are 2 players and
-    3 slider types (Action, Type, State). The
-    size of the vector is 6.
-  */
-  QVector<BCESlider*> sliderGroup;
-  //! Vector of read-only line edits.
-  /*! Displays value of corresponding slider.
-    Each element is identified by slider
-    type and player. There are 2 players and
-    3 slider types (Action, Type, State). The
-    size of the vector is 6.
-  */
-  QVector<BCELineEdit*> lineEditGroup;
   //! Not currently implemented.
   /*! Checkboxes are displayed in the GUI but
     are not fully implemented. Using them in the

@@ -6,7 +6,7 @@ BCEAbstractGame::BCEAbstractGame ():
   numActions(numPlayers,0),
   numStates(0),
   numTypes(numPlayers,0),
-  hasProductStructure(false),
+  hasProductStructureData(false),
   numPrivateStates(2,0)
 {} // Default constructor
 
@@ -19,7 +19,7 @@ BCEAbstractGame::BCEAbstractGame (int numStatesArg,
   numStates(numStatesArg),
   numTypes(numPlayers,numTypesArg),
   numObjectives(numObjectivesArg),
-  hasProductStructure(false),
+  hasProductStructureData(false),
   numPrivateStates(2,0)
 {} 
 
@@ -32,7 +32,7 @@ BCEAbstractGame::BCEAbstractGame (int numStatesArg,
   numStates(numStatesArg),
   numTypes(numTypesArg),
   numObjectives(numObjectivesArg),
-  hasProductStructure(false),
+  hasProductStructureData(false),
   numPrivateStates(2,0)
 {} 
 

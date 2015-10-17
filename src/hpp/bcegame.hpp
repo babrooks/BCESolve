@@ -152,7 +152,7 @@ public:
     ar & priorData;
     ar & dominatedData;
     ar & feasibleDeviationData;
-    ar & hasProductStructure;
+    ar & hasProductStructureData;
     ar & numPrivateStates;
   } // serialize
   

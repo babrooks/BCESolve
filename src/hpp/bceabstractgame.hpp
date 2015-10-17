@@ -43,7 +43,7 @@ protected:
   //! Indicates if the state has a product structure.
   /*! If true, the state has a product structure, and each player's
       payoff only depends on their coordinate. */
-  bool hasProductStructure;
+  bool hasProductStructureData;
   //! Number of states for each player.
   /*! If the state has a product structure, this vector indicates how
       many private values each player has. Should be that the product
@@ -62,7 +62,7 @@ public:
   //! Overloaded prior if the game has a product structure
   double prior(vector<int> states, const vector<int> &types) const
   {
-    if (hasProductStructure
+    if (hasProductStructureData
 	&& states[0] >= 0 && states[0] < numPrivateStates[0]
 	&& states[1] >= 0 && states[1] < numPrivateStates[1])
       return prior(states[0] + states[1]*numPrivateStates[0],types);
@@ -92,7 +92,7 @@ public:
 		   const vector<int> &actions,
 		   int obj) const
   {
-    if (hasProductStructure
+    if (hasProductStructureData
 	&& states[0] >= 0 && states[0] < numPrivateStates[0]
 	&& states[1] >= 0 && states[1] < numPrivateStates[1])
       return objective(states[0] + states[1]*numPrivateStates[0],
@@ -127,7 +127,7 @@ public:
   //! structure
   /*! The products of the number of private states must equal the
       total number of states. If an argument of vector<double>(2,0) is
-      passed, hasProductStructure will be set equal to zero. */
+      passed, hasProductStructureData will be set equal to zero. */
   bool setNumPrivateStates(const vector<int> & _numPrivateStates)
   {
     if (_numPrivateStates.size()!=numPlayers)
@@ -137,7 +137,7 @@ public:
 	&& _numPrivateStates[1] == 0)
       {
 	numPrivateStates = _numPrivateStates;
-	hasProductStructure = false;
+	hasProductStructureData = false;
 	return true;
       }
 
@@ -148,13 +148,13 @@ public:
       return false;
   
     numPrivateStates = _numPrivateStates;
-    hasProductStructure = true;
+    hasProductStructureData = true;
 
     return true;
   }
 
   //! Returns whether or not the state has a product structure
-  bool hasProductStructure() const { return hasProductStructure; }
+  bool hasProductStructure() const { return hasProductStructureData; }
 
   //! Returns the numbers of private states
   const vector<int> & getNumPrivateStates () const { return numPrivateStates; }
