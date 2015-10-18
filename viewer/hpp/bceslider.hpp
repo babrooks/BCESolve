@@ -2,7 +2,6 @@
 #define BCESLIDER_HPP
 
 #include <QtWidgets>
-#include "bcedatastate.hpp"
 #include "bceenumeration.hpp"
 
 //! QScrollBar with added signal and slots.

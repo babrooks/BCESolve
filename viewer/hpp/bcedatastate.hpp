@@ -5,7 +5,12 @@
 #include "bcegame.hpp"
 #include "bceabstractgame.hpp"
 #include "bceenumeration.hpp"
+#include "bceslider.hpp"
+#include "bcelineedit.hpp"
+#include "bcecheckbox.hpp"
+#include "bcelabelhandler.hpp"
 #include <QtWidgets>
+#include <vector>
 #include <cmath>
 #include <boost/filesystem.hpp>
 
@@ -29,6 +34,8 @@ private: // Private Properties. Private Functions near EOF.
   vector<int> actions;
   //! A 2 element vector holding the current type for each player.
   vector<int> types;
+  //! A 2 element vector holding the current value for each player.
+  vector<int> values;
   //! Holds the number of states.
   int state;
   //! If true, GUI is displaying solution of a private-values game.
@@ -64,15 +71,15 @@ private: // Private Properties. Private Functions near EOF.
     called in the example .cpp file.
   */
   vector<vector<double>> allEqm;
-  //! Layout Holding Sliders and Other Data Controls
-  QGridLayout *controlsLayout;
+  //! Vector of Controls Check Boxes
+  QVector<BCECheckBox*> checkBoxGroup;
   //! Vector of Controls Sliders
   /*! Each element is identified by slider
     type and player. There are 2 players and
     3 slider types (Action, Type, State). The
     size of the vector is 6.
   */
-  vector<BCESlider*> sliderGroup;
+  QVector<BCESlider*> sliderGroup;
   //! Vector of Line Edits
   /*! Displays value of corresponding slider.
     Each element is identified by slider
@@ -80,7 +87,11 @@ private: // Private Properties. Private Functions near EOF.
     3 slider types (Action, Type, State). The
     size of the vector is 6.
   */
-  vector<BCELineEdit*> lineEditGroup;
+  QVector<BCELineEdit*> lineEditGroup;
+  //! Resolution Width
+  int resWidth = 1920;
+  //! Resolution Height
+  int resHeight = 1080;
 
 public:
 
@@ -101,14 +112,11 @@ public:
     margT = {false,false};
     currentEqmIndex = 0;
     isPrivateVals=false;
-    connect(this,SIGNAL(sliderDataChanged(BCESliderType,int)),
-	    this,SLOT(resetManipulatedData(BCESliderType,int)));
-    connect(this,SIGNAL(selectedEqmChanged()),
-	    this,SLOT(resetManipulatedData()));
-    connect(this,SIGNAL(newDataLoaded()),
-	    this,SLOT(resetManipulatedData()));
     setupControlsLayout();
   }
+
+  //! Layout Holding Sliders and Other Data Controls
+  QGridLayout *controlsLayout;
 
   //! Shares basic game data (e.g. numActions) with BCEWindow.
   /*! Returns basic properties of currently stored BCEData
@@ -118,11 +126,11 @@ public:
   */
   int shareDataProperties(BCESliderType st,int player) {
     switch(st) {
-    case Action: return gameData.getNumActions[player];
+    case Action: return gameData.getNumActions()[player];
       break;
-    case Type: return gameData.getNumTypes[player];
+    case Type: return gameData.getNumTypes()[player];
       break;
-    case State: return gameData.getNumStates;
+    case State: return gameData.getNumStates();
       break;
     }
   }
@@ -194,10 +202,6 @@ public:
     return guiTitle;
   }
 
-  const QGridLayout& getLayout() const {
-    return controlsLayout;
-  }
-
 
 public slots:
 
@@ -224,14 +228,14 @@ public slots:
     /* Handles adjustment of read-only line-edits
        and changing two sliders at once for private-values */
     if (isPrivateVals == true && st == State) {
-      for (int playerIt=0; playerIt < data.numPlayers; playerIt++)
+      for (int playerIt=0; playerIt < gameData.getNumPlayers(); playerIt++)
 	emit(valueChanged(value,st,playerIt));
     }
     else 
       emit(valueChanged(value,st,player));
 
     // Signals that manipulated data in the gui must be changed.
-    emit(sliderDataChanged(st,player));
+    resetManipulatedData(st,player);
 
   }
 
@@ -319,7 +323,7 @@ public slots:
 
     emit(eqmCoordSignal(xClosest,yClosest));
 
-    emit(selectedEqmChanged());
+    resetManipulatedData();
 
   }
 
@@ -348,10 +352,9 @@ public slots:
 	// Load New Data on Path
 	BCEGame::load(gameData,newPath_c);
 
-	isPrivateVals = !(data.isPrivateValues);
+	isPrivateVals = !(gameData.hasProductStructure());
 
 	currentEqmIndex = 0;
-	emit(selectedEqmChanged());
 	actions = vector<int>(2,0);
 	types = vector<int>(2,0);
 	values = vector<int>(2,0);
@@ -360,17 +363,45 @@ public slots:
 	for (int player = 0; player < 2; player++)
 	  emit(sliderLabelsChanged(isPrivateVals,player));
 
+	resetManipulatedData();
 	emit(newDataLoaded());
+
+	vector<int> numActions = gameData.getNumActions();
+	vector<int> numTypes = gameData.getNumTypes();
+	int numStates = gameData.getNumStates();
+
+	for (int player = 0; player < 2; player++) {
+	  sliderGroup[3*player]->setRange(0,numActions[player]-1);
+	  sliderGroup[3*player+1]->setRange(0,numTypes[player]-1);
+	  sliderGroup[3*player+2]->setRange(0,numStates-1);
+	}
+
+	for (int i = 0; i < 6; i++) {
+	  sliderGroup[i]->setSliderPosition(0);
+	  sliderGroup[i]->setSingleStep(1);
+	  lineEditGroup[i]->setText("0");
+	}
 
       }
     catch (std::exception & e)
       {
-	qDebug() << "Load solution didnt work :(" << endl;
+	qDebug() << "Load solution didnt work :( BCEDataState" << endl;
       }
   }
 
 signals:
 
+  //! Signal that data for the set of BCE plot has been changed.
+  /*! Connected to the plotter for the BCE value set plot
+    in BCEWindow.
+  */
+  void selectedEqmChanged();
+  //! Signal that new data has been loaded.
+  /*! Connected to changing the title of the graphical 
+    user interface. The GUI gets the file name from the
+    path and displays it in the GUI's title bar.
+   */
+  void newDataLoaded();
   //! Signal for a changed slider value.
   /*! Connected to BCESlider and BCELineEdit. Slots serve 
     to change read-only line edits when a slider has been
@@ -418,16 +449,10 @@ signals:
     (in the private-values case).
   */
   void sliderLabelsChanged(bool privateVals,int player);
-  //! Signals that stored slider data has been changed.
-  void sliderDataChanged(BCESliderType st,int player);
-  //! Signals that the equilibrium index has been changed.
-  void selectedEqmChanged();
   //! Signals that objectiveValues have been manipulated.
   void objectiveValuesChanged(int player);
   //! Signals that equilibriumMatrix has been manipulated.
   void equilibriumMatrixChanged();
-  //! Signals that a load action has occurred.
-  void newDataLoaded();
 
 private: //functions
 
@@ -461,9 +486,9 @@ private: //functions
 				    margT,
 				    distribution);
 
-    assert(solutionData.numActions_total == distribution.size());
+    // assert(solutionData.numActions_total == distribution.size());
 
-    vector<int> numActions = gameData.getNumActions;
+    vector<int> numActions = gameData.getNumActions();
 
     equilibriumMatrix = vector<vector<double>>(numActions[1],
 					       vector<double>(numActions[0],0));
@@ -507,7 +532,7 @@ private: //functions
 			    objectiveValues[player][actions[player]]));
 
     // Gets marginal probability of an action from the joint distn.
-    vector<int> numActions = gameData.getNumActions;
+    vector<int> numActions = gameData.getNumActions();
     double acc = 0.0;
     for (int a = 0; a < numActions[1-player]; a++) {
       if (player == 0)
@@ -528,6 +553,7 @@ private: //functions
   void setAllEqm() {
 
     solutionData.getExpectedObjectives(allEqm);
+    emit(selectedEqmChanged());
 
   }
 
@@ -538,92 +564,11 @@ private: //functions
     return sqrt(pow((y2-y1),2)+pow((x2-x1),2));
   }
 
-  void setupControlsLayout() {
-
-  // Slider, LineEdit, and CheckBox Controls Creation
-
-  for (int player = 0; player < 2; player++) {
-    sliderGroup.push_back(new BCESlider(Action,player));
-    sliderGroup.push_back(new BCESlider(Type,player));
-
-    lineEditGroup.push_back(new BCELineEdit(Action,player));
-    lineEditGroup.push_back(new BCELineEdit(Type,player));
-
-    checkBoxGroup.push_back(new BCECheckBox(Action,player));
-    checkBoxGroup.push_back(new BCECheckBox(Type,player));
+  void setControlsLayout(QGridLayout *layout) {
+    controlsLayout = layout;
   }
 
-  sliderGroup.push_back(new BCESlider(State,0));
-  lineEditGroup.push_back(new BCELineEdit(State,0));
-  checkBoxGroup.push_back(new BCECheckBox(State,0));
-
-  for (int widgetIndex = 0; widgetIndex < 5; widgetIndex++) {
-    lineEditGroup[widgetIndex]->setReadOnly(true);
-    sliderGroup[widgetIndex]->setMaximumHeight(resHeight/54);
-    sliderGroup[widgetIndex]->setMinimumWidth(resWidth/16);
-    sliderGroup[widgetIndex]->setOrientation(Qt::Horizontal);
-    lineEditGroup[widgetIndex]->setMaximumSize(resWidth/64,resHeight/54);
-    connect(sliderGroup[widgetIndex],
-	    SIGNAL(valueChanged(int,BCESliderType,int)),
-	    this,SLOT(setSliderValue(int,BCESliderType,int)));
-    connect(this,
-	    SIGNAL(valueChanged(int,BCESliderType,int)),
-	    lineEditGroup[widgetIndex],
-	    SLOT(changeDisplayValue(int,BCESliderType,int)));
-    connect(this,
-	    SIGNAL(valueChanged(int,BCESliderType,int)),
-	    sliderGroup[widgetIndex],
-	    SLOT(changeSliderPosition(int,BCESliderType,int)));
-    connect(checkBoxGroup[widgetIndex],
-	    SIGNAL(boolChanged(bool,BCESliderType,int)),
-	    this,SLOT(setMarginalConditions(bool,BCESliderType,int)));
-  }
-
-  // Slider Labels
-
-  QVector<BCELabel*> sliderLabels;
-
-  for (int player = 0; player < 2; player++) {
-    sliderLabels.push_back(new BCELabel(SliderLabel,Action,player));
-    sliderLabels.push_back(new BCELabel(SliderLabel,Type,player));
-  }
-  sliderLabels.push_back(new BCELabel(SliderLabel,State,0));	 
-
-  for (int labelIt = 0; labelIt < 5; labelIt++) {
-    sliderLabels[labelIt]->setMaximumHeight(resHeight/54);
-    connect(this,SIGNAL(sliderLabelsChanged(bool,int)),
-	    sliderLabels[labelIt],SLOT(displayStateOrValues(bool,int)));
-  }
-
-  for (int i = 0; i < 2; i++)
-    checkBoxGroup[3*i]->setChecked(true);
-
-  // Slider, LineEdit, and CheckBox Layout Creation
-
-  QVector<QHBoxLayout*> gridSubLayouts;
-  QVector<QVBoxLayout*> subLayoutWithLabels;
-  QGridLayout *controlsGrid = new QGridLayout();
-
-  for (int i = 0; i < 2; i++) {
-    for (int j = 0; j < 3; j++) {
-      if (3*i+j < 6) {
-	gridSubLayouts.push_back(new QHBoxLayout());
-	subLayoutWithLabels.push_back(new QVBoxLayout());
-	gridSubLayouts[3*i+j]->addWidget(sliderGroup[3*i+j]);
-	gridSubLayouts[3*i+j]->addWidget(lineEditGroup[3*i+j]);
-	gridSubLayouts[3*i+j]->addWidget(checkBoxGroup[3*i+j]);
-	subLayoutWithLabels[3*i+j]->addWidget(sliderLabels[3*i+j]);
-	subLayoutWithLabels[3*i+j]->addLayout(gridSubLayouts[3*i+j]);
-	controlsGrid->addLayout(subLayoutWithLabels[3*i+j],j,i); // Layout Matrix
-      }
-    } // Rows
-  } // Columns
-
-  controlsLayout = controlsGrid;
-
-  // End Slider, LineEdit, CheckBox Creation
-  //////////////////////////////////////////
-  }
+  void setupControlsLayout();
 
 }; // BCEDataState
 

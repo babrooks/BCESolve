@@ -22,6 +22,8 @@ INCLUDEPATH += ../src/cpp
 INCLUDEPATH += ../src/hpp
 INCLUDEPATH += ../viewer/cpp
 INCLUDEPATH += ../viewer/hpp
+INCLUDEPATH += /opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/concert/include
+INCLUDEPATH += /opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex/include
 VPATH += ../src/cpp
 VPATH += ../src/hpp
 VPATH += /usr/local/include
@@ -32,7 +34,9 @@ VPATH += ../viewer/hpp
 HEADERS += bcedatastate.hpp \
 bcewindow.hpp \
 qcustomplot.h \
-bcedata.hpp \
+bcesolution.hpp \
+bcegame.hpp \
+bceabstractgame.hpp \
 bceslider.hpp \
 bcelineedit.hpp \
 bcecheckbox.hpp \
@@ -42,9 +46,12 @@ bcelabelhandler.hpp
 
 SOURCES += main.cpp \
 bcewindow.cpp \
-qcustomplot.cpp 
+qcustomplot.cpp \
+bceabstractgame.cpp \
+bcesolution.cpp \
+bcegame.cpp \
+bcedatastate.cpp
 LIBS += ../lib/libbce.a
-
 
 LIBS += -L../lib/ -L/usr/local/lib/ /usr/lib/x86_64-linux-gnu/libboost_serialization.a /usr/lib/x86_64-linux-gnu/libboost_system.a /usr/lib/x86_64-linux-gnu/libboost_filesystem.a 
 linux-g++ {

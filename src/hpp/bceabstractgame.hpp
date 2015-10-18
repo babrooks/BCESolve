@@ -60,7 +60,7 @@ public:
   virtual double prior(int state, const vector<int> &types) const = 0;
 
   //! Overloaded prior if the game has a product structure
-  double prior(vector<int> states, const vector<int> &types) const
+  double prior(const vector<int> & states, const vector<int> &types) const
   {
     if (hasProductStructureData
 	&& states[0] >= 0 && states[0] < numPrivateStates[0]
@@ -88,7 +88,7 @@ public:
 			   int obj) const = 0; 
 
   //! Overloaded objective if the game has a product structure
-  double objective(vector<int> states, 
+  double objective(const vector<int> &states, 
 		   const vector<int> &actions,
 		   int obj) const
   {
@@ -167,6 +167,8 @@ public:
   const vector<int> & getNumActions() const { return numActions; }
   //! Returns a vector of the numbers of types
   const vector<int> & getNumTypes() const { return numTypes; }
+  //! Returns the number of players (always 2)
+  int getNumPlayers() const { return numPlayers; }
   
   //! Default constructor
   BCEAbstractGame();

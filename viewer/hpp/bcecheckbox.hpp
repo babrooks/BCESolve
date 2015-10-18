@@ -2,7 +2,6 @@
 #define BCECHECKBOX_HPP
 
 #include <QtWidgets>
-#include "bcedatastate.hpp"
 #include "bceenumeration.hpp"
 
 //! QCheckBox with added signal and slot.

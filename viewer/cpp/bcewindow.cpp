@@ -4,7 +4,6 @@
 #include <QMenuBar>
 #include <QMainWindow>
 #include "bceslider.hpp"
-#include "bcedata.hpp"
 #include "bceenumeration.hpp"
 #include "bcelabelhandler.hpp"
 
@@ -93,6 +92,8 @@ BCEWindow::BCEWindow()
 	    devPlotTitles[player],
 	    SLOT(changeProbability(int,double)));
   }
+
+  QGridLayout *controlsGrid = guiData.controlsLayout;
 
   // BCE Set Plot and Sliders Horizontal Layout
   QVBoxLayout *setOfBCEPlotWithTitle = new QVBoxLayout();
@@ -199,25 +200,11 @@ void BCEWindow::loadSolution() {
   try
     {
       emit(dataPathChanged(newPath));
-      
-      // Set Up Sliders for Data
-
-      for (int player = 0; player < 2; player++) {
-	sliderGroup[3*player]->setRange(0,guiData.shareDataProperties(Action,player)-1);
-	sliderGroup[3*player+1]->setRange(0,guiData.shareDataProperties(Type,player)-1);
-	sliderGroup[3*player+2]->setRange(0,guiData.shareDataProperties(State,player)-1);
-      }
-
-      for (int i = 0; i < 6; i++) {
-	sliderGroup[i]->setSliderPosition(0);
-	sliderGroup[i]->setSingleStep(1);
-	lineEditGroup[i]->setText("0");
-      }
 
     }
   catch (std::exception & e)
     {
-      qDebug() << "Load solution didnt work :(" << endl;
+      qDebug() << "Load solution didnt work :( from BCEWindow" << endl;
     }
 } // slot for loading a solution
 

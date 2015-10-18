@@ -2,7 +2,6 @@
 #define BCELINEEDIT_HPP
 
 #include <QtWidgets>
-#include "bcedatastate.hpp"
 #include "bceenumeration.hpp"
 
 //! Read-only QLineEdits displaying slider values.
