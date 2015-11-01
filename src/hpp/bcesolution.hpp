@@ -58,7 +58,7 @@ public:
   {
     ar & newEquilibria;
     ar & equilibria;
-
+    ar & game;
     ar & currentEquilibrium;
   }
 

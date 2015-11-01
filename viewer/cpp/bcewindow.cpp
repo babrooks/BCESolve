@@ -14,8 +14,8 @@ BCEWindow::BCEWindow()
 
   // Resolution Settings
 
-  resWidth = 1920;
-  resHeight = 1080;
+  int resWidth = guiData.resWidth;
+  int resHeight = guiData.resHeight;
 
   // Menu Bar
   QMenu * fileMenu = menuBar()->addMenu(tr("&File"));
@@ -54,7 +54,7 @@ BCEWindow::BCEWindow()
   connect(&guiData,SIGNAL(equilibriumMatrixChanged()),
 	  this,SLOT(plotEqm()));
   connect(this,SIGNAL(dataPathChanged(QString)),
-	  &guiData,SLOT(setData(QString)));
+  	  &guiData,SLOT(setData(QString)));
   connect(&guiData,SIGNAL(newDataLoaded()),
 	  this,SLOT(setGUITitle()));
 
@@ -194,13 +194,15 @@ void BCEWindow::loadSolution() {
 						 path,
 						 tr("BCESolve solution files (*.bce)"));
 
-  if (newPath.isEmpty())
+
+  if (newPath.isEmpty()) {
+    cout << "isEmpty" << endl;
     return;
+  }
 
   try
     {
       emit(dataPathChanged(newPath));
-
     }
   catch (std::exception & e)
     {

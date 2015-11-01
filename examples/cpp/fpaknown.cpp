@@ -177,74 +177,83 @@ void solveFPA(int nvals, int nbids,
       BCESolution soln;
       solver.getSolution(soln);
 
-      // Add and remove a state
-      BCEGame game = soln.getGame();
+      // // Add and remove a state
+      // BCEGame game = soln.getGame();
 
-      BCESolver solver2(game);
-      solver2.populate();
-      IloCplex cplex2 = solver2.getCplex();
+      // BCESolver solver2(game);
+      // solver2.populate();
+      // IloCplex cplex2 = solver2.getCplex();
 
-      for (int player = 0; player < 2; player++)
-	{
-	  for (int val = 0; val < nvals; val++)
-	    {
-	      cplex2.getModel()
-		.add(solver2.getObjectiveFunction(5+val+player*nvals)>=0.0);
-	    } // val
-	}
+      // for (int player = 0; player < 2; player++)
+      // 	{
+      // 	  for (int val = 0; val < nvals; val++)
+      // 	    {
+      // 	      cplex2.getModel()
+      // 		.add(solver2.getObjectiveFunction(5+val+player*nvals)>=0.0);
+      // 	    } // val
+      // 	}
 
-      cplex2.setParam(IloCplex::RootAlg,IloCplex::Barrier);
-      cplex2.setParam(IloCplex::SimDisplay,0);
-      solver2.setParameter(BCESolver::DisplayLevel,1);
+      // cplex2.setParam(IloCplex::RootAlg,IloCplex::Barrier);
+      // cplex2.setParam(IloCplex::SimDisplay,0);
+      // solver2.setParameter(BCESolver::DisplayLevel,1);
 
-      cplex2.getObjective().setSense(IloObjective::Maximize);
-      cplex2.getObjective().setExpr(-1.0*(solver2.getObjectiveFunction(2)));
-      cplex2.setParam(IloCplex::Threads,4);
+      // cplex2.getObjective().setSense(IloObjective::Maximize);
+      // cplex2.getObjective().setExpr(-1.0*(solver2.getObjectiveFunction(2)));
+      // cplex2.setParam(IloCplex::Threads,4);
 
-      cout << "Num obj: " << soln.getGame().getNumObjectives() << endl;
-      cout << "Num states: " << soln.getGame().getNumStates() << endl;
-      cout << "A payoff: " << soln.getGame().objective(2,vector<int>(2,2),1) << endl;
-      solver2.solve();
+      // cout << "Num obj: " << soln.getGame().getNumObjectives() << endl;
+      // cout << "Num states: " << soln.getGame().getNumStates() << endl;
+      // cout << "A payoff: " << soln.getGame().objective(2,vector<int>(2,2),1) << endl;
+      // solver2.solve();
 
-      cout << "Bidder 1's surplus: " 
-      	   << cplex2.getValue(solver.getObjectiveFunction(0)) << endl;
-      cout << "Bidder 2's surplus: "
-      	   << cplex2.getValue(solver.getObjectiveFunction(1)) << endl;
-      cout << "Revenue: " 
-      	   << cplex2.getValue(solver.getObjectiveFunction(2)) << endl;
-      cout << "Total surplus: " 
-      	   << cplex2.getValue(solver.getObjectiveFunction(3)) << endl;
+      // cout << "Bidder 1's surplus: " 
+      // 	   << cplex2.getValue(solver.getObjectiveFunction(0)) << endl;
+      // cout << "Bidder 2's surplus: "
+      // 	   << cplex2.getValue(solver.getObjectiveFunction(1)) << endl;
+      // cout << "Revenue: " 
+      // 	   << cplex2.getValue(solver.getObjectiveFunction(2)) << endl;
+      // cout << "Total surplus: " 
+      // 	   << cplex2.getValue(solver.getObjectiveFunction(3)) << endl;
 
-      cout << "Num states: " << game.getNumStates() << endl;
-      cout << "Adding a state" << endl;
-      game.addState(1);
-      cout << "New num states: " << game.getNumStates() << endl;
-      cout << "Removing a state" << endl;
-      game.removeState(1);
-      cout << "New new num states: " << game.getNumStates() << endl;
+      // cout << "Num states: " << game.getNumStates() << endl;
+      // cout << "Adding a state" << endl;
+      // game.addState(1);
+      // cout << "New num states: " << game.getNumStates() << endl;
+      // cout << "Removing a state" << endl;
+      // game.removeState(1);
+      // cout << "New new num states: " << game.getNumStates() << endl;
       
-      // Add and remove an action
-      cout << "Num actions[0]: " << game.getNumActions()[0] << endl;
-      cout << "Adding an action" << endl;
-      game.addAction(0,1);
-      cout << "New num actions[0]: " << game.getNumActions()[0] << endl;
-      cout << "Removing an action" << endl;
-      game.removeAction(0,1);
-      cout << "New new num actions[0]: " << game.getNumActions()[0] << endl;
+      // // Add and remove an action
+      // cout << "Num actions[0]: " << game.getNumActions()[0] << endl;
+      // cout << "Adding an action" << endl;
+      // game.addAction(0,1);
+      // cout << "New num actions[0]: " << game.getNumActions()[0] << endl;
+      // cout << "Removing an action" << endl;
+      // game.removeAction(0,1);
+      // cout << "New new num actions[0]: " << game.getNumActions()[0] << endl;
 
-      // Add and remove a type
-      cout << "Num types[1]: " << game.getNumTypes()[1] << endl;
-      cout << "Adding an type" << endl;
-      game.addType(1,0);
-      cout << "New num types[1]: " << game.getNumTypes()[1] << endl;
-      cout << "Removing an type" << endl;
-      game.removeType(1,0);
-      cout << "New new num types[1]: " << game.getNumTypes()[1] << endl;
+      // // Add and remove a type
+      // cout << "Num types[1]: " << game.getNumTypes()[1] << endl;
+      // cout << "Adding an type" << endl;
+      // game.addType(1,0);
+      // cout << "New num types[1]: " << game.getNumTypes()[1] << endl;
+      // cout << "Removing an type" << endl;
+      // game.removeType(1,0);
+      // cout << "New new num types[1]: " << game.getNumTypes()[1] << endl;
 
       filename << ".bce";
       const string & filenamestring = filename.str();
       const char* filenamecstring = filenamestring.c_str();
       BCESolution::save(soln,filenamecstring);
+
+      BCESolution solutionTest;
+      BCESolution::load(solutionTest,filenamecstring);
+      BCEGame gameTest = BCEGame(solutionTest.getGame());
+
+      cout << "test num actions 0: " << gameTest.getNumActions()[0] << endl;
+      cout << "test num actions 1: " << gameTest.getNumActions()[1] << endl;
+      cout << "test num types 0: " << gameTest.getNumTypes()[0] << endl;
+      cout << "test num types 1: " << gameTest.getNumTypes()[1] << endl;
       
       // solver.setParameter(BCESolver::BoundaryObjective1,4);
       // solver.setParameter(BCESolver::BoundaryObjective2,2);
