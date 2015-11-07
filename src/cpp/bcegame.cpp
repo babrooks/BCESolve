@@ -4,7 +4,8 @@
 BCEGame::BCEGame ():
   BCEAbstractGame(1,1,1,2),
   objectiveData(2,vector< vector<double> > (1, vector<double> (1,0.0))),
-  priorData(1,vector<double>(1,1.0)),
+  priorData(1),
+  conditionalData(1,vector<double>(1,1.0)),
   dominatedData(2,vector< vector<bool> >(1,vector<bool>(1,false))),
   feasibleDeviationData(2,vector< vector<bool> > (1,vector<bool>(1,false)))
 {} // Default constructor
@@ -13,6 +14,7 @@ BCEGame::BCEGame(const BCEAbstractGame & game):
   BCEAbstractGame(game),
   objectiveData(game.getNumObjectives()),
   priorData(game.getNumStates()),
+  conditionalData(game.getNumStates()),
   dominatedData(2),
   feasibleDeviationData(2)
 {
@@ -49,12 +51,15 @@ BCEGame::BCEGame(const BCEAbstractGame & game):
   // Copy prior
   for (int state = 0; state < game.getNumStates(); state++)
     {
-      priorData[state] = vector<double>(numTypesTotal,0.0);
+      priorData[state] = 0; 
+      conditionalData[state] = vector<double>(numTypesTotal,0.0);
       vector<int> types(2,0);
       int typeCounter = 0;
       while (typeCounter < numTypesTotal)
 	{
-	  priorData[state][typeCounter]
+	  priorData[state] += game.prior(state,types);
+
+	  conditionalData[state][typeCounter]
 	    = game.prior(state,types);
 	      
 	  if (types[0] != numTypes[0]-1)
@@ -131,8 +136,10 @@ bool BCEGame::addState(int position)
   for (int obj = 0; obj < numObjectives; obj++)
     objectiveData[obj].insert(objectiveData[obj].begin()+position,
 			      vector<double>(numActions[0]*numActions[1],0.0));
-  priorData.insert(priorData.begin()+position,
-		   vector<double>(numTypes[0]*numTypes[1],0.0));
+  priorData.insert(priorData.begin()+position,0);
+  conditionalData.insert(conditionalData.begin()+position,
+			 vector<double>(numTypes[0]*numTypes[1],
+					1.0/numTypes[0]/numTypes[1]));
     
 } // add state
 
@@ -147,6 +154,7 @@ bool BCEGame::removeState(int state)
   for (int obj = 0; obj < numObjectives; obj++)
     objectiveData[obj].erase(objectiveData[obj].begin() + state);
   priorData.erase(priorData.begin()+state);
+  conditionalData.erase(conditionalData.begin()+state);
     
   return true;
 } // remove state
@@ -171,9 +179,10 @@ bool BCEGame::addType(int player, int position)
     
   for (int state = 0; state < numStates; state++)
     {
-      priorData[state].reserve(priorData[state].size()+numTypes[1-player]);
+      conditionalData[state].reserve(conditionalData[state].size()
+				     +numTypes[1-player]);
       for (int otherType = 0; otherType < numTypes[1-player]; otherType++)
-	priorData[state].insert(priorData[state].begin()
+	conditionalData[state].insert(conditionalData[state].begin()
 				+position*ownIncrement
 				+otherType*otherIncrement,
 				0.0);
@@ -203,7 +212,7 @@ bool BCEGame::removeType(int player, int type)
       for (int otherType = numTypes[1-player]-1;
 	   otherType >= 0;
 	   otherType--)
-	priorData[state].erase(priorData[state].begin()
+	conditionalData[state].erase(conditionalData[state].begin()
 			       +type*ownIncrement
 			       +otherType*otherIncrement);
     } // for state

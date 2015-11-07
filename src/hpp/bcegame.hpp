@@ -26,8 +26,11 @@ private:
   /*! Access via objectiveData[obj][state][actionIndex] */
   vector< vector< vector<double> > > objectiveData;
   //! Data for the prior
-  /*! Access via priorData[state][typeIndex] */
-  vector< vector<double> > priorData;
+  /*! Access via priorData[state] */
+  vector<double> priorData;
+  //! Data for conditional distributions of types
+  /*! Access via conditionalData[state][typeIndex] */
+  vector< vector<double> > conditionalData;
   //! Data for the dominated array
   /*! Access via dominatedData[player][type][action] */
   vector< vector< vector<bool> > > dominatedData;
@@ -49,17 +52,40 @@ public:
 
   //! Prior over state and types
   /*! For each state and vector of types, returns the prior
-      probability of those occuring. This is a pure virtual function
-      that must be implemented by the derived class. */
+      probability of those occuring. Definition of virtual
+      function. */
   double prior(int state, const vector<int> &types) const
   {
-    return priorData[state][types[0] + types[1] * numTypes[0]];
+    return priorData[state]
+      *conditionalData[state][types[0] + types[1] * numTypes[0]];
+  } // prior
+
+  //! Prior over state
+  /*! Returns the prior probability of the given state occuring. */
+  double prior(int state) const
+  {
+    return priorData[state];
+  } // prior
+
+  //! Conditional distribution of types given states
+  /*! For each state and vector of types, returns the conditional
+      probability of the types given the state.  */
+  double conditional(int state, const vector<int> &types) const
+  {
+    return conditionalData[state][types[0] + types[1] * numTypes[0]];
   } // prior
 
   //! Sets the prior
-  bool setPrior(int state, const vector<int> &types, double value)
+  bool setConditional(int state, const vector<int> &types, double value)
   {
-    priorData[state][types[0] + types[1] * numTypes[0]] = value;
+    conditionalData[state][types[0] + types[1] * numTypes[0]] = value;
+
+    return true;
+  } // setPrior
+
+  bool setPrior(int state, double value)
+  {
+    priorData[state] = value;
 
     return true;
   } // setPrior
@@ -150,6 +176,7 @@ public:
     ar & numObjectives;
     ar & objectiveData;
     ar & priorData;
+    ar & conditionalData;
     ar & dominatedData;
     ar & feasibleDeviationData;
     ar & hasProductStructureData;
