@@ -1,7 +1,7 @@
 #include "bce.hpp"
 #include "bcegame.hpp"
 
-BCEGame::BCEGame ():
+BCEGame::BCEGame():
   BCEAbstractGame(1,1,1,2),
   objectiveData(2,vector< vector<double> > (1, vector<double> (1,0.0))),
   priorData(1,vector<double>(1,1.0)),

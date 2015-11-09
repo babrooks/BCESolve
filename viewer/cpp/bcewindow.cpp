@@ -1,4 +1,4 @@
-#include "bcewindow.hpp"
+#include "bceplothandler.hpp"
 #include "qcustomplot.h"
 #include <QtWidgets>
 #include <QMenuBar>
@@ -7,7 +7,7 @@
 #include "bceenumeration.hpp"
 #include "bcelabelhandler.hpp"
 
-BCEWindow::BCEWindow() 
+BCEPlotHandler::BCEPlotHandler() 
 {
   path=QString("../examples/");
   screenShotPath=QString("../examples/screenshots/");
@@ -45,7 +45,7 @@ BCEWindow::BCEWindow()
   connect(colorfulDistn,SIGNAL(toggled(bool)),this,SLOT(toggleColorfulTheme(bool)));
   connect(screenShotAction,SIGNAL(triggered()),this,SLOT(screenShot()));
 
-  // BCEDataState Connections to BCEWindow
+  // BCEDataState Connections to BCEPlotHandler
 
   connect(&guiData,SIGNAL(selectedEqmChanged()),
 	  this,SLOT(plotBCEValueSet()));
@@ -188,7 +188,7 @@ BCEWindow::BCEWindow()
 /////////////////////////////////////////////
 // Load Solution Slot
 
-void BCEWindow::loadSolution() {
+void BCEPlotHandler::loadSolution() {
 
   QString newPath = QFileDialog::getOpenFileName(this,tr("Select a solution file"),
 						 path,
@@ -206,14 +206,14 @@ void BCEWindow::loadSolution() {
     }
   catch (std::exception & e)
     {
-      qDebug() << "Load solution didnt work :( from BCEWindow" << endl;
+      qDebug() << "Load solution didnt work :( from BCEPlotHandler" << endl;
     }
 } // slot for loading a solution
 
 /////////////////////////////////////////////
 // Plot Conditional-Marginal Distribution
 
-void BCEWindow::plotEqm() {
+void BCEPlotHandler::plotEqm() {
 
   vector<vector<double>> eqmMatrix = guiData.getEqmMatrix();
 
@@ -247,7 +247,7 @@ void BCEWindow::plotEqm() {
 ////////////////////////////////////
 // Plot Set of BCE
 
-void BCEWindow::plotBCEValueSet() {
+void BCEPlotHandler::plotBCEValueSet() {
 
   // Erase Current Contents
 
@@ -315,7 +315,7 @@ void BCEWindow::plotBCEValueSet() {
 ////////////////////////////////////
 // Plot Deviation Objectives
 
-void BCEWindow::plotDeviationObjectives(int player) {
+void BCEPlotHandler::plotDeviationObjectives(int player) {
 
   // Erase Current Graphics
 
@@ -394,7 +394,7 @@ void BCEWindow::plotDeviationObjectives(int player) {
 /////////////////////////////////
 // View Slots
 
-void BCEWindow::toggleLinearScale(bool checked) {
+void BCEPlotHandler::toggleLinearScale(bool checked) {
   if (checked)
     colorScale->setDataScaleType(QCPAxis::stLinear);
   else 
@@ -402,7 +402,7 @@ void BCEWindow::toggleLinearScale(bool checked) {
   plotEqm();
 } // Slot to set a linear color scale for the distribution's heat map
 
-void BCEWindow::toggleColorfulTheme(bool checked) {
+void BCEPlotHandler::toggleColorfulTheme(bool checked) {
   QCPColorGradient *newGradient = new QCPColorGradient();
   if (checked)
     colorMap->setGradient(newGradient->gpSpectrum);
@@ -411,7 +411,7 @@ void BCEWindow::toggleColorfulTheme(bool checked) {
   plotEqm();
 } // Slot to change color theme of heat map for conditional marginal distribution
 
-void BCEWindow::screenShot() {
+void BCEPlotHandler::screenShot() {
   QString newPath = QFileDialog::getSaveFileName(this, tr("Save PNG"),
 						 screenShotPath, tr("PNG files (*.png)"));
   if (newPath.isEmpty())
@@ -420,7 +420,7 @@ void BCEWindow::screenShot() {
   grab().save(newPath);
 }
 
-void BCEWindow::setGUITitle() {
+void BCEPlotHandler::setGUITitle() {
 
   stringstream dynamicTitle;
 

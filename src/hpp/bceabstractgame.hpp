@@ -3,6 +3,10 @@
 
 #include "bcecommon.hpp"
 #include "bceexception.hpp"
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/serialization/vector.hpp>
+
 
 //! The base class for games of incomplete information.
 /*! This is a pure virtual base class from which to create classes
