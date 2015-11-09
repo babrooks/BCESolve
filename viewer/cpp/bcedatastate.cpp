@@ -68,7 +68,10 @@ void BCEDataState::setData(QString dataPath) {
     for (int player = 0; player < 2; player++) {
       sliderGroup[3*player]->setRange(0,numActions[player]-1);
       sliderGroup[3*player+1]->setRange(0,numTypes[player]-1);
-      sliderGroup[3*player+2]->setRange(0,numStates-1);
+      if (isPrivateVals)
+	sliderGroup[3*player+2]->setRange(0,numStates-1);
+      else
+	sliderGroup[3*player+2]->setRange(0,sqrt(numStates)-1);
       cout << "Slider setting completed." << endl;
     }
 
@@ -178,8 +181,11 @@ void BCEDataState::setSliderValue(int value,
   case Type: types[player] = value;
     break;
   case State: {
-    state = value;
     values[player] = value;
+    if (isPrivateVals)
+      state = value;
+    else
+      state = values[0]+sqrt(gameData.getNumStates())*values[1];
     emit(newStateSignal(values[0],values[1],state,isPrivateVals));
   }
     break;

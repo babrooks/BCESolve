@@ -28,7 +28,7 @@ VPATH += ../viewer/cpp
 VPATH += ../viewer/hpp
 
 HEADERS += bcedatastate.hpp \
-bcewindow.hpp \
+bceplothandler.hpp \
 qcustomplot.h \
 bcesolution.hpp \
 bcegame.hpp \
@@ -38,15 +38,21 @@ bcelineedit.hpp \
 bcecheckbox.hpp \
 bcevaluesetplot.hpp \
 bceenumeration.hpp \
-bcelabelhandler.hpp
+bcelabelhandler.hpp \
+bcegamehandler.hpp \
+bcepayofftablemodel.hpp \
+bcetableview.hpp \
+bcetablemodel.hpp
 
 SOURCES += main.cpp \
-bcewindow.cpp \
+bceplothandler.cpp \
 qcustomplot.cpp \
 bceabstractgame.cpp \
 bcesolution.cpp \
 bcegame.cpp \
-bcedatastate.cpp
+bcedatastate.cpp \
+bcegamehandler.cpp \
+bcepayofftablemodel.cpp 
 LIBS += ../lib/libbce.a
 
 LIBS += -L../lib/ -L/usr/local/lib/ /usr/lib/x86_64-linux-gnu/libboost_serialization.a /usr/lib/x86_64-linux-gnu/libboost_system.a /usr/lib/x86_64-linux-gnu/libboost_filesystem.a 
