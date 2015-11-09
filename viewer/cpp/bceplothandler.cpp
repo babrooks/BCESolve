@@ -6,6 +6,7 @@
 #include "bceslider.hpp"
 #include "bceenumeration.hpp"
 #include "bcelabelhandler.hpp"
+#include "bcegamehandler.hpp"
 
 BCEPlotHandler::BCEPlotHandler() 
 {
@@ -45,7 +46,7 @@ BCEPlotHandler::BCEPlotHandler()
   connect(colorfulDistn,SIGNAL(toggled(bool)),this,SLOT(toggleColorfulTheme(bool)));
   connect(screenShotAction,SIGNAL(triggered()),this,SLOT(screenShot()));
 
-  // BCEDataState Connections to BCEPlotHandler
+  // BCEDataState Connections to BCEWindow
 
   connect(&guiData,SIGNAL(selectedEqmChanged()),
 	  this,SLOT(plotBCEValueSet()));
@@ -168,7 +169,10 @@ BCEPlotHandler::BCEPlotHandler()
 
   // Main Widget
   QTabWidget *tabWidget = new QTabWidget();
-  tabWidget->addTab(graphTab,"Graphs");
+  tabWidget->addTab(graphTab,"Solution");
+  QWidget *gameWidget = new QWidget();
+  gameWidget->setLayout(gameTab.getLayout());
+  tabWidget->addTab(gameWidget,"Game");
   mainLayout->addWidget(tabWidget);
 
   mainPanel->setLayout(mainLayout);
