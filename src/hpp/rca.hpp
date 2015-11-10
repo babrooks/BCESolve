@@ -207,7 +207,7 @@ protected:
 		     int mechanism);
 
   // Returns the probability of the action profile being observed.
-  double observedProbability(const vector<int> &actions);
+  double observedProbability(const vector<int> &actions) const;
   
   // Bounds on the conditional distribution over states given a
   // type. For example, when there is no minimum information, there
@@ -225,10 +225,10 @@ protected:
   // objective=0 through 2*numPlayers-1 are the payoffs of players 1
   // through numPlayers in mechanisms 0 and 1, i.e. player i in
   // mechanism j is j*numPlayers+i..
-  virtual double payoff(int state, vector< vector<int> > actions, int objective) = 0; 
+  virtual double payoff(int state, vector< vector<int> > actions, int objective) const = 0; 
 
   // Indicates if a combination of actions and types is dominated.
-  virtual bool dominated(int action, int type, int player, int mechanism) {return 0;}; 
+  virtual bool dominated(int action, int type, int player, int mechanism) const {return false;} ; 
   // Check if no players' action is dominated
   bool dominated(const vector<int> &actions, const vector<int> &types, int mechanism); 
   bool dominated(const vector< vector<int> > &actions, const vector<int> &types);
@@ -280,6 +280,6 @@ public:
       result*=base;
     return result;
   }
-};
+}; // RCABase
 
 #endif

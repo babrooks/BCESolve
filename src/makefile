@@ -4,7 +4,8 @@
 CXX=g++
 
 # CPLEX
-SYSTEM = x86-64_linux
+# SYSTEM = x86-64_linux
+SYSTEM = x86-64_sles10_4.1
 LIBFORMAT = static_pic
 CSYSFLAGS  = -fPIC -DIL_STD 
 LDSYSFLAGS = 
@@ -57,7 +58,7 @@ all: libbce.a
 
 # BCE
 BCEOBJ=bceabstractgame.o bcegame.o bceutilities.o bcesolver.o \
-	 rca.o bcecounter.o bcesolution.o
+	rca.o bcecounter.o bcesolution.o
 
 $(BCEOBJ): %.o : $(CPPDIR)/%.cpp $(HPPDIR)/%.hpp $(HPPDIR)/bce.hpp
 	$(CXX) $(CFLAGS) $< -c

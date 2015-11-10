@@ -75,6 +75,8 @@ MAINS=exampleforrobbie \
 
 MAINSGRB=revenuelb onesidedrestricted surplusbnd relaxed
 
+RCAMAINS=rcatest2
+
 all: $(MAINS)
 
 # BCE
@@ -89,7 +91,12 @@ $(MAINS): % : $(CPPDIR)/%.cpp $(INCLDIR)/bce.hpp libbce.a
 	 -lboost_serialization \
 	 -Wl,-Bdynamic  $(LDFLAGS) -L./cpp -L../lib -o $@
 
-rcatest.o: $(CPPDIR)/rcatest.cpp $(CPPDIR)/rca.hpp $(CPPDIR)/bce.hpp
+$(RCAMAINS): % : $(CPPDIR)/%.cpp $(INCLDIR)/bce.hpp  $(INCLDIR)/rca.hpp libbce.a
+	$(CXX) $(CFLAGS) $< -L. -Wl,-Bstatic -lbce -Wl,-Bstatic -L/usr/lib/x86_64-linux-gnu/ \
+	 -lboost_serialization \
+	 -Wl,-Bdynamic  $(LDFLAGS) -L./cpp -L../lib -o $@
+
+rcatest.o: $(CPPDIR)/rcatest.cpp $(INCLDIR)/rca.hpp $(INCLDIR)/bce.hpp
 	$(CXX) $(CFLAGS) -I./cpp $(CPPDIR)/rcatest.cpp -c
 
 rcatest: rcatest.o rca.o bce.o

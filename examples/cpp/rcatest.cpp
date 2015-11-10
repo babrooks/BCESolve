@@ -111,16 +111,16 @@ public:
 // BCEModel inherits BCEBase and FPABase. It treats the payoff,
 // dominated, and prior virtual methods in the BCEBase class as
 // wrappers for the corresponding methods of FPABase.
-class FPA_BCEModel : public BCEBase, public FPABase
+class FPA_BCEModel : public BCEAbstractGame, public FPABase
 {
 private:
-  double prior (int state, vector<int> types)
+  double prior (int state, vector<int> types) const
   { return FPAPrior(state,types); }
 
-  double payoff (int state, vector<int> actions, int objective)
+  double objective (int state, vector<int> actions, int objective) const
   { return FPAPayoff(state,actions,objective,numActions,0); }
 
-  bool dominated(int a, int t, int player)
+  bool dominated(int a, int t, int player) const
   { return FPADominated(a,t,player,numActions); }
 
 public:

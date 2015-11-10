@@ -290,7 +290,8 @@ void RCABase::populate ()
 						     *variables[columnCounter]);
 
 	  // Reset the row counters.
-	  ICRowsCounter[0][0]=0;
+	  // ICRowsCounter[0][0]=0;
+	  ICRowsCounter = vector< vector<int> >(2,vector<int>(2,0));
 	  for (mechanismCounter=0; mechanismCounter<numMechanisms; mechanismCounter++)
 	    {
 	      mechanismICRow=0;
