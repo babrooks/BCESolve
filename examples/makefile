@@ -4,7 +4,6 @@
 CXX=g++
 
 # CPLEX
-SYSTEM=x86-64_sles10_4.1
 
 LIBFORMAT = static_pic
 CSYSFLAGS  = -fPIC -DIL_STD 

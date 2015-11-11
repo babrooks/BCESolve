@@ -4,6 +4,8 @@
 #define BCEGAME_HPP
 
 #include "bceabstractgame.hpp"
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
 
 
 //! The base class for games of incomplete information.
