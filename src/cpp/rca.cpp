@@ -1,4 +1,5 @@
 #include "rca.hpp"
+#include "multiindex.hpp"
 
 RCABase::RCABase ():
   env(),
@@ -36,6 +37,7 @@ RCABase::RCABase (int numPlayersArg,
   numStates(numStatesArg),
   numTypes(numTypesArg),
   numObjectives(numObjectivesArg),
+  ICslack(0.0),
   numMechanisms(2),
   numICConstraints(numMechanisms,vector<int>(numPlayers,0)),
   minAngleIncrement(0.0),
@@ -61,7 +63,8 @@ RCABase::RCABase (int numPlayersArg,
 		  int numStatesArg, 
 		  int numTypesArg, 
 		  int numObjectivesArg,
-		  vector<double> distributionArg):
+		  vector<double> distributionArg,
+		  double _observedTol):
   env(),
   model(env),
   cplex(env),
@@ -79,6 +82,7 @@ RCABase::RCABase (int numPlayersArg,
   minAngleIncrement(0.0),
   boundaryObjectiveIndex1(0),
   boundaryObjectiveIndex2(1),
+  observedTol(_observedTol),
   observedDistribution(distributionArg)
 {
   assert(numPlayers>1);
@@ -250,13 +254,13 @@ void RCABase::populate ()
   /********************************/
   // Add variables and constraints.
   variables.add(IloNumVarArray(env,numProbabilityVariables,0.0,1.0));
-  variables.add(IloNumVarArray(env,numICConstraints_total,-ICslack,IloInfinity));
+  // variables.add(IloNumVarArray(env,numICConstraints_total,-ICslack,IloInfinity));
   model.add(variables);
 
-  constraints.add(IloRangeArray(env,numICConstraints_total,0.0,0.0));
-  constraints.add(IloRangeArray(env,numProbabilityEqualityConstraints,1.0,1.0));
-  constraints.add(IloRangeArray(env,numProbabilityUBConstraints,0.0,IloInfinity));
-  constraints.add(IloRangeArray(env,numProbabilityLBConstraints,0.0,IloInfinity));
+  // constraints.add(IloRangeArray(env,numICConstraints_total,0.0,0.0));
+  // constraints.add(IloRangeArray(env,numProbabilityEqualityConstraints,1.0,1.0));
+  // constraints.add(IloRangeArray(env,numProbabilityUBConstraints,0.0,IloInfinity));
+  // constraints.add(IloRangeArray(env,numProbabilityLBConstraints,0.0,IloInfinity));
 
   // For some reason, the initialization list gives a different environment.
   // We reinitialize objectives with default expressions of 0.
@@ -270,186 +274,283 @@ void RCABase::populate ()
   /********************************/
   // Step 3: Fill in coefficients of the constraint matrix.
   /********************************/
-  // Set coefficients.
-  columnCounter=0; 
-  probabilityConstraintCounter=0;
-  for (variableCounter=0; 
-       variableCounter<numStates*pow(numTypes*numActions_total,numPlayers); 
-       variableCounter++)
-    {
-      indexToStateTypeAction(variableCounter,state,types,actions);
 
-      if (!dominated(actions,types)
-	  && observedDistribution[actionToIndex(actions,0)]>0)
+  // // Set coefficients.
+  // columnCounter=0; 
+  // probabilityConstraintCounter=0;
+  // for (variableCounter=0; 
+  //      variableCounter<numStates*pow(numTypes*numActions_total,numPlayers); 
+  //      variableCounter++)
+  //   {
+  //     indexToStateTypeAction(variableCounter,state,types,actions);
+
+  //     if (!dominated(actions,types)
+  // 	  && observedDistribution[actionToIndex(actions,0)]>0)
+  // 	{
+  // 	  // New column
+
+  // 	  // Objective functions
+  // 	  for (objectiveCounter=0; objectiveCounter<numObjectives; objectiveCounter++)
+  // 	    objectiveFunctions[objectiveCounter] += (payoff(state,actions,objectiveCounter)
+  // 						     *variables[columnCounter]);
+
+  // 	  // Reset the row counters.
+  // 	  // ICRowsCounter[0][0]=0;
+  // 	  ICRowsCounter = vector< vector<int> >(2,vector<int>(2,0));
+  // 	  for (mechanismCounter=0; mechanismCounter<numMechanisms; mechanismCounter++)
+  // 	    {
+  // 	      mechanismICRow=0;
+  // 	      for (playerCounter=1; playerCounter<numPlayers; playerCounter++)
+  // 		{
+  // 		  ICRowsCounter[mechanismCounter][playerCounter]
+  // 		    =ICRowsCounter[mechanismCounter][playerCounter-1]
+  // 		    +numICConstraints[mechanismCounter][playerCounter-1]
+  // 		    +mechanismICRow;
+  // 		}
+  // 	      mechanismICRow+=numICConstraints_totalByMechanism[mechanismCounter];
+  // 	    }
+
+  // 	  deviations=actions;
+  // 	  /* IC constraints */
+  // 	  for (mechanismCounter=0; mechanismCounter<numMechanisms; mechanismCounter++)
+  // 	    {
+  // 	      for (ICCounter=0; 
+  // 		   ICCounter<numTypes*numActions_total*numActions[mechanismCounter]; 
+  // 		   ICCounter++)
+  // 		{
+  // 		  indexToTypeActionDeviation(ICCounter,type,action,deviation,0);
+
+  // 		  // The coefficients should be the gain from deviating
+  // 		  // from actions[player] to deviation
+  // 		  for (playerCounter=0; playerCounter<numPlayers; playerCounter++)
+  // 		    {
+  // 		      if (action[mechanismCounter]==actions[mechanismCounter][playerCounter] 
+  // 			  && type==types[playerCounter] 
+  // 			  && deviation!=actions[mechanismCounter][playerCounter] 
+  // 			  && !dominated(deviation,type,playerCounter,mechanismCounter))
+  // 			{
+  // 			  deviations[mechanismCounter][playerCounter]=deviation;
+
+  // 			  constraints[ICRowsCounter[mechanismCounter][playerCounter]]
+  // 			    .setLinearCoef(variables[columnCounter],
+  // 					   (payoff(state,deviations,mechanismCounter*numPlayers+playerCounter)
+  // 					    -payoff(state,actions,mechanismCounter*numPlayers+playerCounter)));
+
+  // 			  deviations[mechanismCounter][playerCounter]
+  // 			    =actions[mechanismCounter][playerCounter];
+  // 			}
+  // 		    }
+  // 		  for (playerCounter=0; playerCounter<numPlayers; playerCounter++)
+  // 		    {
+  // 		      if (!(dominated(action[mechanismCounter],type,playerCounter,mechanismCounter) 
+  // 			    || dominated(deviation,type,playerCounter,mechanismCounter) 
+  // 			    || action[mechanismCounter]==deviation))
+  // 			ICRowsCounter[mechanismCounter][playerCounter]++;
+  // 		    }
+  // 		} // ICCounter
+  // 	    } // mechanismCounter
+  // 	  // row
+
+  // 	  /* Probability constraints */
+  // 	  // All probabilities sum to 1.
+  // 	  constraints[numICConstraints_total].setLinearCoef(variables[columnCounter],1.0);
+	  
+  // 	  // Marginal constraints. We put the marginal for actions[0]
+  // 	  // in row determined by actionToIndex
+  // 	  constraints[numICConstraints_total+1+actionToIndex(actions,0)]
+  // 	    .setLinearCoef(variables[columnCounter],1.0);
+
+  // 	  // Conditional distribution bounds. For each player, we need
+  // 	  // to add this variable to the LB constraint for this
+  // 	  // state/type, and subtract it from the UB constraint, with
+  // 	  // coefficient equal to the conditional bound. Also, for
+  // 	  // each player, we need to add this variable to the UB
+  // 	  // constraint for this type and every state, and subtract it
+  // 	  // from the LB constraint for this type and every state.  So
+  // 	  // we need a function to map player/state/type to an index.
+
+  // 	  // Note that we just count through all of these constraints
+  // 	  // in the same order as we did for part 1, and just check if
+  // 	  // each row corresponds to this column in that they
+  // 	  // correspond to the same state and type for a given
+  // 	  // player. This is an inefficient system, but that is not so
+  // 	  // big a deal.
+  // 	  for (probabilityConstraintCounter=0; 
+  // 	       probabilityConstraintCounter<numStates*pow(numTypes,numPlayers); 
+  // 	       probabilityConstraintCounter++)
+  // 	    {
+  // 	      indexToStateType(probabilityConstraintCounter,tempState,tempTypes);
+
+  // 	      for (playerCounter=0; playerCounter<numPlayers; playerCounter++)
+  // 		{
+  // 		  if (conditionalLB(state,types[playerCounter],playerCounter)>0.0)
+  // 		    {
+  // 		      // There exists a constraint for this player/state/type
+  // 		      LBCoeff = -conditionalLB(playerCounter,state,types[playerCounter]);
+
+  // 		      if (tempTypes[playerCounter]==types[playerCounter])
+  // 			{
+  // 			  // This column has a non-zero coefficient
+  // 			  // since tempType matches player's type.
+  // 			  if (state==tempState)
+  // 			    LBCoeff+=1.0;
+			  
+  // 			  constraints[numICConstraints_total+1+pow(numActions[0],numPlayers)
+  // 				      +probabilityLBConstraintsCounter]
+  // 			    .setLinearCoef(variables[columnCounter],LBCoeff);
+  // 			}
+
+  // 		      probabilityLBConstraintsCounter++;
+  // 		    }
+  // 		  if (conditionalUB(state,types[playerCounter],playerCounter)<1.0)
+  // 		    {
+  // 		      // There exists a constraint for this player/state/type
+  // 		      UBCoeff = conditionalUB(playerCounter,state,types[playerCounter]);
+
+  // 		      if (tempTypes[playerCounter]==types[playerCounter])
+  // 			{
+  // 			  // This column has a non-zero coefficient
+  // 			  // since tempType matches player's type.
+  // 			  if (state==tempState)
+  // 			    UBCoeff-=1.0;
+			  
+  // 			  constraints[numICConstraints_total+1+pow(numActions[0],numPlayers)
+  // 				      +numProbabilityLBConstraints
+  // 				      +probabilityUBConstraintsCounter]
+  // 			    .setLinearCoef(variables[columnCounter],UBCoeff);
+  // 			}
+
+  // 		      probabilityUBConstraintsCounter++;
+  // 		    }
+  // 		} // Player
+  // 	    } // probabilityConstraintCounter
+
+  // 	  // Every once in a while, print progress.
+  // 	  if (!(columnCounter%(1000)))
+  // 	    cout << "columnCounter=" << columnCounter << endl;
+	  
+  // 	  columnCounter++;
+  // 	} // if
+  //   } // column
+
+  // // Set the RHS for the marginal constraints. It doesn't really
+  // // matter how we map actions[0] into a linear index, as long as we
+  // // do it consistently.
+  // for (probabilityConstraintCounter=0; 
+  //      probabilityConstraintCounter<pow(numActions[0],numPlayers);
+  //      probabilityConstraintCounter++)
+  //   {
+  //     constraints[probabilityConstraintCounter+numICConstraints_total]
+  // 	.setBounds(observedDistribution[probabilityConstraintCounter]-observedTol,
+  // 		   observedDistribution[probabilityConstraintCounter]+observedTol);
+  //   }
+
+  // // The first numICConstraints_total rows need slack variables.
+  // for (ICCounter=0; ICCounter<numICConstraints_total; ICCounter++)
+  //   {
+  //     constraints[ICCounter].setLinearCoef(variables[numProbabilityVariables+ICCounter],1.0);
+  //   }
+
+  /* IC constraints */
+
+
+  
+
+  // Set up the iterator
+  MultiIndex stateTypesActions;
+
+  IntIndex * state = new IntIndex(numStates);
+  stateTypesActions->push_back(state);
+
+  vector<IntIndex*> types;
+  vector<MultiIntIndex*> actions;
+  vector<MultiIndex*> typeActions;
+  for (int player = 0; player < numPlayers; player++)
+    {
+      types.push_back(new IntIndex(numTypes));
+
+      actions.push_back(new MultiIntIndex(numActions));
+
+      typeActions[player].push_back(types[player]);
+      typeActions[player].push_back(actions[player]);
+
+      stateTypesActions.push_back(typeActions[player]); 
+    } // for player
+  
+
+  for (player = 0; player < numPlayers; player++)
+    {
+      // Turn this player's typeActions off for the inner iteration
+      stateTypesActions->setActive(1+player,false);
+      actionsType[player]->reset();
+
+      while ( (*typeActions)++ )
 	{
-	  // New column
-
-	  // Objective functions
-	  for (objectiveCounter=0; objectiveCounter<numObjectives; objectiveCounter++)
-	    objectiveFunctions[objectiveCounter] += (payoff(state,actions,objectiveCounter)
-						     *variables[columnCounter]);
-
-	  // Reset the row counters.
-	  // ICRowsCounter[0][0]=0;
-	  ICRowsCounter = vector< vector<int> >(2,vector<int>(2,0));
-	  for (mechanismCounter=0; mechanismCounter<numMechanisms; mechanismCounter++)
+	  stateTypesActions->reset();
+	  
+	  for (int mech = 0; mech < numMechanisms; mech++)
 	    {
-	      mechanismICRow=0;
-	      for (playerCounter=1; playerCounter<numPlayers; playerCounter++)
+	      IloNumExpr lhs(env,0);
+	      
+	      // First consider deviations in first mechanism
+	      for (int dev = 0; deviate < numActions[mech]; dev++)
 		{
-		  ICRowsCounter[mechanismCounter][playerCounter]
-		    =ICRowsCounter[mechanismCounter][playerCounter-1]
-		    +numICConstraints[mechanismCounter][playerCounter-1]
-		    +mechanismICRow;
+		  while (stateTypesActions++)
+		    {
+		      // lhs += ;
+		    } // while
+		} // Deviation
+
+	    } // for mech
+	} // actions
+      
+      // Turn this player's typeActions back on for the next player
+      stateTypeActions->setActive(1+player,true);
+    } // player
+
+
+      for (ICCounter=0; 
+	   ICCounter<numTypes*numActions_total*numActions[mechanismCounter]; 
+	   ICCounter++)
+	{
+	  indexToTypeActionDeviation(ICCounter,type,action,deviation,0);
+
+	  // The coefficients should be the gain from deviating
+	  // from actions[player] to deviation
+	  for (playerCounter=0; playerCounter<numPlayers; playerCounter++)
+	    {
+	      if (action[mechanismCounter]==actions[mechanismCounter][playerCounter] 
+		  && type==types[playerCounter] 
+		  && deviation!=actions[mechanismCounter][playerCounter] 
+		  && !dominated(deviation,type,playerCounter,mechanismCounter))
+		{
+		  deviations[mechanismCounter][playerCounter]=deviation;
+
+		  constraints[ICRowsCounter[mechanismCounter][playerCounter]]
+		    .setLinearCoef(variables[columnCounter],
+				   (payoff(state,deviations,mechanismCounter*numPlayers+playerCounter)
+				    -payoff(state,actions,mechanismCounter*numPlayers+playerCounter)));
+
+		  deviations[mechanismCounter][playerCounter]
+		    =actions[mechanismCounter][playerCounter];
 		}
-	      mechanismICRow+=numICConstraints_totalByMechanism[mechanismCounter];
 	    }
-
-	  deviations=actions;
-	  /* IC constraints */
-	  for (mechanismCounter=0; mechanismCounter<numMechanisms; mechanismCounter++)
+	  for (playerCounter=0; playerCounter<numPlayers; playerCounter++)
 	    {
-	      for (ICCounter=0; 
-		   ICCounter<numTypes*numActions_total*numActions[mechanismCounter]; 
-		   ICCounter++)
-		{
-		  indexToTypeActionDeviation(ICCounter,type,action,deviation,0);
-
-		  // The coefficients should be the gain from deviating
-		  // from actions[player] to deviation
-		  for (playerCounter=0; playerCounter<numPlayers; playerCounter++)
-		    {
-		      if (action[mechanismCounter]==actions[mechanismCounter][playerCounter] 
-			  && type==types[playerCounter] 
-			  && deviation!=actions[mechanismCounter][playerCounter] 
-			  && !dominated(deviation,type,playerCounter,mechanismCounter))
-			{
-			  deviations[mechanismCounter][playerCounter]=deviation;
-
-			  constraints[ICRowsCounter[mechanismCounter][playerCounter]]
-			    .setLinearCoef(variables[columnCounter],
-					   (payoff(state,deviations,mechanismCounter*numPlayers+playerCounter)
-					    -payoff(state,actions,mechanismCounter*numPlayers+playerCounter)));
-
-			  deviations[mechanismCounter][playerCounter]
-			    =actions[mechanismCounter][playerCounter];
-			}
-		    }
-		  for (playerCounter=0; playerCounter<numPlayers; playerCounter++)
-		    {
-		      if (!(dominated(action[mechanismCounter],type,playerCounter,mechanismCounter) 
-			    || dominated(deviation,type,playerCounter,mechanismCounter) 
-			    || action[mechanismCounter]==deviation))
-			ICRowsCounter[mechanismCounter][playerCounter]++;
-		    }
-		} // ICCounter
-	    } // mechanismCounter
-	  // row
-
-	  /* Probability constraints */
-	  // All probabilities sum to 1.
-	  constraints[numICConstraints_total].setLinearCoef(variables[columnCounter],1.0);
-	  
-	  // Marginal constraints. We put the marginal for actions[0]
-	  // in row determined by actionToIndex
-	  constraints[numICConstraints_total+1+actionToIndex(actions,0)]
-	    .setLinearCoef(variables[columnCounter],1.0);
-
-	  // Conditional distribution bounds. For each player, we need
-	  // to add this variable to the LB constraint for this
-	  // state/type, and subtract it from the UB constraint, with
-	  // coefficient equal to the conditional bound. Also, for
-	  // each player, we need to add this variable to the UB
-	  // constraint for this type and every state, and subtract it
-	  // from the LB constraint for this type and every state.  So
-	  // we need a function to map player/state/type to an index.
-
-	  // Note that we just count through all of these constraints
-	  // in the same order as we did for part 1, and just check if
-	  // each row corresponds to this column in that they
-	  // correspond to the same state and type for a given
-	  // player. This is an inefficient system, but that is not so
-	  // big a deal.
-	  for (probabilityConstraintCounter=0; 
-	       probabilityConstraintCounter<numStates*pow(numTypes,numPlayers); 
-	       probabilityConstraintCounter++)
-	    {
-	      indexToStateType(probabilityConstraintCounter,tempState,tempTypes);
-
-	      for (playerCounter=0; playerCounter<numPlayers; playerCounter++)
-		{
-		  if (conditionalLB(state,types[playerCounter],playerCounter)>0.0)
-		    {
-		      // There exists a constraint for this player/state/type
-		      LBCoeff = -conditionalLB(playerCounter,state,types[playerCounter]);
-
-		      if (tempTypes[playerCounter]==types[playerCounter])
-			{
-			  // This column has a non-zero coefficient
-			  // since tempType matches player's type.
-			  if (state==tempState)
-			    LBCoeff+=1.0;
-			  
-			  constraints[numICConstraints_total+1+pow(numActions[0],numPlayers)
-				      +probabilityLBConstraintsCounter]
-			    .setLinearCoef(variables[columnCounter],LBCoeff);
-			}
-
-		      probabilityLBConstraintsCounter++;
-		    }
-		  if (conditionalUB(state,types[playerCounter],playerCounter)<1.0)
-		    {
-		      // There exists a constraint for this player/state/type
-		      UBCoeff = conditionalUB(playerCounter,state,types[playerCounter]);
-
-		      if (tempTypes[playerCounter]==types[playerCounter])
-			{
-			  // This column has a non-zero coefficient
-			  // since tempType matches player's type.
-			  if (state==tempState)
-			    UBCoeff-=1.0;
-			  
-			  constraints[numICConstraints_total+1+pow(numActions[0],numPlayers)
-				      +numProbabilityLBConstraints
-				      +probabilityUBConstraintsCounter]
-			    .setLinearCoef(variables[columnCounter],UBCoeff);
-			}
-
-		      probabilityUBConstraintsCounter++;
-		    }
-		} // Player
-	    } // probabilityConstraintCounter
-
-	  // Every once in a while, print progress.
-	  if (!(columnCounter%(1000)))
-	    cout << "columnCounter=" << columnCounter << endl;
-	  
-	  columnCounter++;
-	} // if
-    } // column
-
-  // Set the RHS for the marginal constraints. It doesn't really
-  // matter how we map actions[0] into a linear index, as long as we
-  // do it consistently.
-  for (probabilityConstraintCounter=0; 
-       probabilityConstraintCounter<pow(numActions[0],numPlayers);
-       probabilityConstraintCounter++)
-    {
-      constraints[probabilityConstraintCounter+numICConstraints_total+1]
-	.setBounds(observedDistribution[probabilityConstraintCounter],
-		   observedDistribution[probabilityConstraintCounter]);
-    }
-
-  // The first numICConstraints_total rows need slack variables.
-  for (ICCounter=0; ICCounter<numICConstraints_total; ICCounter++)
-    {
-      constraints[ICCounter].setLinearCoef(variables[numProbabilityVariables+ICCounter],1.0);
-    }
+	      if (!(dominated(action[mechanismCounter],type,playerCounter,mechanismCounter) 
+		    || dominated(deviation,type,playerCounter,mechanismCounter) 
+		    || action[mechanismCounter]==deviation))
+		ICRowsCounter[mechanismCounter][playerCounter]++;
+	    }
+	} // ICCounter
+    } // mechanismCounter
+  // row
+  
 
   /********************************/
   // Step 4: Add constraints to the model.
   /********************************/
-  model.add(constraints);
+  // model.add(constraints);
 
   cplexObjective=IloMaximize(env);
   model.add(cplexObjective);

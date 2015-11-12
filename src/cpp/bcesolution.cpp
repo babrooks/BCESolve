@@ -140,7 +140,7 @@ void BCESolution::getExpectedObjectives(vector<double> &values,
 } // getExpectedObjectives (for a particular distribution)
 
 double BCESolution::getDeviationObjectives(int player, int action, int type,
-				       vector< vector<double> > &values) const
+					   vector< vector<double> > &values) const
 {
   if (!equilibria.size())
     throw(BCEException(BCEException::NoEquilibria));
@@ -169,7 +169,7 @@ double BCESolution::getDeviationObjectives(int player, int action, int type,
   BCECounter counter(game.getNumStates(),game.getNumActions(),game.getNumTypes(),
 		     stateConditions,actionConditions,typeConditions,
 		     stateMarginal,actionMarginal,typeMarginal);
-
+  
   for (map<int,double>::const_iterator it
 	 = equilibria[currentEquilibrium].distribution.begin();
        it != equilibria[currentEquilibrium].distribution.end();
@@ -195,7 +195,7 @@ double BCESolution::getDeviationObjectives(int player, int action, int type,
 	  for (obj=0; obj<game.getNumObjectives(); obj++)
 	    {
 	      values[obj][devs[player]]
-		+= prob*game.objective(counter.getState(),counter.getActions(),obj);
+		+= prob*game.objective(counter.getState(),devs,obj);
 	    } // objectives
 	} // devs
       

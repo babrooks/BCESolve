@@ -141,6 +141,8 @@ protected:
   int numProbabilityConstraints;
 
   vector<double> observedDistribution;
+  double observedTol; // Difference in sup norm between observed and
+		      // actual
 
   // Cplex components
   IloEnv env;
@@ -247,7 +249,8 @@ public:
 	  int numStatesArg, 
 	  int numTypesArg, 
 	  int numObjectivesArg,
-	  vector<double> distributionArg);
+	  vector<double> distributionArg,
+	  double _observedTol=1e-1);
 
   // Destructor
   ~RCABase()

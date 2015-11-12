@@ -126,43 +126,53 @@ int main (int argc, char **argv)
     revenueUB(numBids/reserveBidIncrement,0), 
     revenueLB(numBids/reserveBidIncrement,0); // Intentional integer division.
 
-  FPA_BCEModel dataGenerator(numBids,numValues,4);
-  BCESolver solver(dataGenerator);
-
   try
     {
       /**********************************/
       // Generate the data 
       /**********************************/
 
-      // Set up the model to generate data.
-      solver.populate();
+      // FPA_BCEModel dataGenerator(numBids,numValues,4);
+      // BCESolver solver(dataGenerator);
 
-      // Set the objective function (max p1 + p2)
-      IloCplex dataGeneratorCplex = solver.getCplex();
-      dataGeneratorCplex.getObjective().setExpr(solver.getObjectiveFunction(1)
-						+solver.getObjectiveFunction(0));
+      // // Set up the model to generate data.
+      // solver.populate();
 
-      // A couple of parameters
-      // dataGeneratorCplex.setParam(IloCplex::BarDisplay,1);
-      // dataGeneratorCplex.setParam(IloCplex::SimDisplay,1);
-      dataGeneratorCplex.setParam(IloCplex::RootAlg,IloCplex::Barrier);
+      // // Set the objective function (max p1 + p2)
+      // IloCplex dataGeneratorCplex = solver.getCplex();
+      // dataGeneratorCplex.getObjective().setExpr(solver.getObjectiveFunction(1)
+      // 						+solver.getObjectiveFunction(0));
 
-      // Solve the model
-      solver.solve();
+      // // A couple of parameters
+      // // dataGeneratorCplex.setParam(IloCplex::BarDisplay,1);
+      // // dataGeneratorCplex.setParam(IloCplex::SimDisplay,1);
+      // dataGeneratorCplex.setParam(IloCplex::RootAlg,IloCplex::Barrier);
 
-      cout << "Solved data generator." << endl;
+      // // Solve the model
+      // solver.solve();
 
-      // Save the marginal distribution of bids
-      BCESolution soln;
-      solver.getSolution(soln);
-      soln.getConditionalMarginal(vector<int>(0),
-				  vector< vector<int> > (2,vector<int>(0)), 
-				  vector< vector<int> > (2,vector<int>(0)),
-				  false,vector<bool>(2,true),vector<bool>(2,false),
-				  empiricalDistribution);
+      // cout << "Solved data generator." << endl;
 
-      cout << "Retrieved empirical distribution." << endl;
+      // // Save the marginal distribution of bids
+      // BCESolution soln;
+      // solver.getSolution(soln);
+      // soln.getConditionalMarginal(vector<int>(0),
+      // 				  vector< vector<int> > (2,vector<int>(0)), 
+      // 				  vector< vector<int> > (2,vector<int>(0)),
+      // 				  false,vector<bool>(2,true),vector<bool>(2,false),
+      // 				  empiricalDistribution);
+
+      // cout << "Retrieved empirical distribution." << endl;
+
+      empiricalDistribution = vector<double>(numBids*numBids,0);
+      int maxBid = numBids/2;
+      for (int b0 = 0; b0 < maxBid; b0++)
+	{
+	  for (int b1 = 0; b1 < maxBid; b1++)
+	    {
+	      empiricalDistribution[b0+b1*numBids]=1.0/(maxBid*maxBid);
+	    } // b1
+	} // b0
 
       /**********************************/
       // Find counter factual max and min revenue
