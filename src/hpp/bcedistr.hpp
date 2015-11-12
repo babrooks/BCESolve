@@ -98,8 +98,8 @@ public:
     // Now check if any of the elements of distributions are distr. If
     // any of the elements of distributions are themselves arrays,
     // initiate a recursive check.
-    for (auto it = distributions.cbegin();
-	 it != distributions.cend();
+    for (vector<BCEDistr*>::const_iterator it = distributions.begin();
+	 it != distributions.end();
 	 ++it)
       {
 	BCEDistrArray * distrArray = dynamic_cast<BCEDistrArray *>(distr);
@@ -350,7 +350,11 @@ public:
   /*! Truncates the given BCEDistr at _distr to the range
       \f$[0,1]^2\f$. */
   truncated(BCEDistr * _dist):
-    truncated(_dist,0,1)
+    dist(_dist),
+    min0(0),
+    min1(0),
+    max0(1),
+    max1(1)
   {}
 
   //! Constructor
@@ -358,7 +362,11 @@ public:
       \f$[min,max]^2\f$. */
   truncated(BCEDistr * _dist, 
 	    double _min, double _max): 
-    truncated(_dist,_min,_min,_max,_max)
+    dist(_dist),
+    min0(_min),
+    min1(_min),
+    max0(_max),
+    max1(_max)
   {}
 
   //! Constructor. 
