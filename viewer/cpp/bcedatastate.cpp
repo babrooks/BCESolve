@@ -200,7 +200,7 @@ void BCEDataState::setSliderValue(int value,
   else 
     emit(valueChanged(value,st,player));
 
-  // Signals that manipulated data in the gui must be changed.
+  // Changes data in the gui must be changed.
   resetManipulatedData(st,player);
 }
 
