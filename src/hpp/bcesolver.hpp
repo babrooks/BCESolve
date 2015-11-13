@@ -144,7 +144,7 @@ protected:
   //! Map from variable indices to non-zero variable locations
   /*! A map from standard indices to the corresponding non-zero
     variable location. (See BCECounter.) */
-  unordered_map<int,int> variableLocationsMap;
+  map<int,int> variableLocationsMap;
 
   //! Minimum angle increment when mapping boundary
   /*! The minimum increment of the angle for
