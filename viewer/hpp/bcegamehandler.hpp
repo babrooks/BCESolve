@@ -8,6 +8,8 @@
 #include "bcepayofftablemodel.hpp"
 // #include "bceprobabilitytablemodel.hpp"
 #include "bcetableview.hpp"
+#include "bcepriortablemodel.hpp"
+#include "bceconditionaltablemodel.hpp"
 
 //! This class handles the widgets for editing/displaying the game.
 /*! All of the widgets in the game tab and their slots are members of
@@ -34,8 +36,10 @@ private:
 
   //! The model for interfacing with payoffs
   BCEPayoffTableModel* payoffModel;
-  // //! Vector of models for interfacing with transition probabilities
-  // vector<BCEProbabilityTableModel*> probabilityModels;
+  //! Model for interfacing with prior
+  BCEPriorTableModel* priorModel;
+  //! Model for interfacing with conditional distn of types
+  BCEConditionalTableModel * conditionalModel;
 
   //! Layout for the game tab.
   QVBoxLayout * layout;
@@ -47,11 +51,11 @@ private:
 
   // Edits
   //! Edits for number of actions
-  QLineEdit * numActionsEdit;
+  vector<QLineEdit*> numActionsEdits;
   //! Edit for number of states.
   QLineEdit * numStatesEdit;
   //! Edit for number of states.
-  QLineEdit * numTypesEdit;
+  vector<QLineEdit*> numTypesEdits;
 
   // Combo box
   //! Drop down menu for selecting a state.
@@ -59,8 +63,11 @@ private:
   
   // Tables
   //! Table for displaying stage payoffs
-  QTableView * payoffTableView;
-  // //! Vector of tables for displaying transition probabilities.
+  BCETableView * payoffTableView;
+  //! Table for displaying prior
+  BCETableView* priorTableView;
+  //! Table for displaying conditional distn of types
+  BCETableView* conditionalTableView;
   // vector<BCETableView *> probabilityTableViews;
   // //! Layout for holding transition probability tables.
   // QVBoxLayout * probabilityTableLayout;
@@ -116,19 +123,14 @@ private slots:
   void currentStateChanged(int newS);
   //! Adds a new state. Calls changeNumberOfStates.
   void stateAdded();
-  //! Action added for player 1. Calls actionAdded.
-  void action1Added();
-  //! Action added for player 2. Calls actionAdded.
-  void action2Added();
   //! Adds a new action for the indicated player.
   void actionAdded(int player);
-
+  //! Adds a new type for the indicated player.
+  void typeAdded(int player);
+  //! Removes a type for the indicated player.
+  void typeRemoved(int player);
   //! Removes the current state.
   void stateRemoved();
-  //! Action removed for player 1. Calls actionRemoved.
-  void action1Removed();
-  //! Action removed for player 2. Calls actionRemoved.
-  void action2Removed();
   //! Removes action for the given player. 
   /*! Will remove the action that is currently selected in the payoff
       table, if one is selected. */

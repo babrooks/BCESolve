@@ -34,11 +34,11 @@ ifneq "$(wildcard /opt/ibm/ILOG/CPLEX_Studio1251/cplex/bin/x86-64_sles10_4.1/cpl
 
  CXX=g++
 endif
-ifneq "$(wildcard /opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex/bin/x86-64_linux/cplex )" "" 
+ifneq "$(wildcard /opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex/bin/x86-64_linux/cplex )" ""
  $(info Compiling on Robbies laptop)
  CPLEXDIR=/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex
  CONCERTDIR=/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/concert
- CPLEXLIB=-lcplex1262	
+ CPLEXLIB=-lcplex1262
  SYSTEM = x86-64_linux
 
  STATIC=-Wl,-Bstatic

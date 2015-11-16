@@ -42,7 +42,10 @@ bcelabelhandler.hpp \
 bcegamehandler.hpp \
 bcepayofftablemodel.hpp \
 bcetableview.hpp \
-bcetablemodel.hpp
+bcetablemodel.hpp \
+bcepriortablemodel.hpp \
+bceconditionaltablemodel.hpp \
+bcepushbutton.hpp
 
 SOURCES += main.cpp \
 bceplothandler.cpp \
@@ -52,7 +55,9 @@ bcesolution.cpp \
 bcegame.cpp \
 bcedatastate.cpp \
 bcegamehandler.cpp \
-bcepayofftablemodel.cpp 
+bcepayofftablemodel.cpp \
+bcepriortablemodel.cpp \
+bceconditionaltablemodel.cpp
 LIBS += ../lib/libbce.a
 
 LIBS += -L../lib/ -L/usr/local/lib/ /usr/lib/x86_64-linux-gnu/libboost_serialization.a /usr/lib/x86_64-linux-gnu/libboost_system.a /usr/lib/x86_64-linux-gnu/libboost_filesystem.a 
