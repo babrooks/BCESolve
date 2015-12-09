@@ -1,5 +1,4 @@
-#include "bce.hpp"
-#include "bcegame.hpp"
+#include "bceabstractgame.hpp"
 
 BCEAbstractGame::BCEAbstractGame ():
   numPlayers(2),

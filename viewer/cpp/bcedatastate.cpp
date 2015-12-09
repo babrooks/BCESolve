@@ -38,8 +38,10 @@ void BCEDataState::setData(QString dataPath) {
 
     // Get File Name for GUI's Title
     string filePath = dataPath.toStdString();
-    boost::filesystem::path boostPath(filePath);
-    guiTitle = boostPath.filename().string();
+    // boost::filesystem::path boostPath(filePath);
+    // guiTitle = boostPath.filename().string();
+    QFileInfo info(dataPath);
+    guiTitle = info.fileName().toStdString();
 		
     isPrivateVals = gameData.hasProductStructure();
     cout << isPrivateVals << endl;

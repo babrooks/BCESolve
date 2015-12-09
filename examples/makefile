@@ -28,7 +28,7 @@ LIBDIR=../lib
 BOOSTINCLDIR=/usr/include/boost
 BOOSTDIR=/usr/include/boost
 
-CFLAGS = -stdlib=libstdc++ -m64 -O -I$(CONCERTDIR)/include $(CSYSFLAGS) $(DEBUG) \
+CFLAGS =-std=gnu++11 -m64 -O -I$(CONCERTDIR)/include $(CSYSFLAGS) $(DEBUG) \
 	-I$(CPLEXDIR)/include \
 	-I$(CONCERTDIR)/include \
 	-I$(BOOSTDIR) \

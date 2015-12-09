@@ -1,4 +1,3 @@
-#include "bce.hpp"
 #include "bcegame.hpp"
 
 BCEGame::BCEGame():

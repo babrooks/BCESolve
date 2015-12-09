@@ -48,11 +48,7 @@ all: libbce.a
 
 # BCE
 BCEOBJ=bceabstractgame.o bcegame.o bceutilities.o bcesolver.o \
-<<<<<<< HEAD
 	 bcecounter.o bcesolution.o #rca.o
-=======
-	bcecounter.o bcesolution.o # rca.o
->>>>>>> ffaa11d69923a62498559e1d9caeef1bc9f8975c
 
 $(BCEOBJ): %.o : $(CPPDIR)/%.cpp $(HPPDIR)/%.hpp $(HPPDIR)/bce.hpp
 	$(CXX) $(CFLAGS) $< -c
