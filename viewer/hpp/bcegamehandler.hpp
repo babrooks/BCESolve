@@ -31,7 +31,10 @@ private:
   //! The game object.
   /*! This is the game that is represented in the game tab. Note that
       this can be a different game than the one that is associated
-      with the solution in the solution tab. */
+      with the solution in the solution tab. 
+
+      \ingroup viewer
+  */
   BCEGame game;
 
   //! The model for interfacing with payoffs
@@ -48,6 +51,8 @@ private:
   QPushButton * solveButton;
   //! Button that cancels solve.
   QPushButton * cancelButton;
+  //! Thread for solverWorker
+  QThread solverWorker;
 
   // Edits
   //! Edits for number of actions
@@ -111,10 +116,6 @@ private:
   //! Delete old data models and create new ones.
   /*! Called in constructor and whenever game changes. */
   void initializeModels();
-  //! Adds a new probability table model
-  void pushBackProbabilityTable(int newS);
-  //! Removes last probability table model
-  void popBackProbabilityTable();
   //! Adds/removes models to achieve correct number of states.
   void changeNumberOfStates(int newS);
 				     
@@ -140,6 +141,16 @@ private slots:
   void nextState();
   //! Decreases currentState to the previous state.
   void prevState();
+  //! Slot called when user presses the solve button.
+  /*! Initiates a new thread for the solver worker. Signals to 
+    solver worker to begin running CPLEX routine. Makes 
+    relevant connections for printing output to the log tab.
+   */
+  void solveGame();
+
+signals:
+
+  void startSolveRoutine();
 
 };
 

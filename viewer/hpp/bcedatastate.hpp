@@ -170,6 +170,9 @@ public:
   int resWidth = 1920;
   int resHeight = 1080;
 
+  //! Sets the solution data to the newly loaded solution.
+  void setSolutionData(BCESolution &solution);
+
   //! Layout Holding Sliders and Other Data Controls
   QGridLayout *controlsLayout;
 

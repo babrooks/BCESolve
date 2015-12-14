@@ -94,9 +94,6 @@ BCEGameHandler::BCEGameHandler():
   priorModel = NULL;
   conditionalModel = NULL;
 
-  QVBoxLayout* probabilityTableLayout = new QVBoxLayout();
-  probabilityTableLayout->addWidget(priorTableView);
-
   initializeModels();
 
   currentStateCombo = new QComboBox();
@@ -197,15 +194,13 @@ BCEGameHandler::BCEGameHandler():
   controlLayout->addLayout(centerControlLayout);
   controlLayout->addLayout(rightControlLayout);
 
-  payoffLayout->addWidget(new QLabel(tr("Stage payoffs:")));
-  payoffLayout->addWidget(payoffTableView);
-
-  conditionalLayout->addWidget(new QLabel(tr("Conditional Distn of Types:")));
-  conditionalLayout->addWidget(conditionalTableView);
+  // Scroll Area for Prior
 
   QScrollArea * probabilityScrollArea = new QScrollArea();
   QWidget * probabilityWidget = new QWidget();
 
+  QVBoxLayout* probabilityTableLayout = new QVBoxLayout();
+  probabilityTableLayout->addWidget(priorTableView);
   probabilityWidget->setLayout(probabilityTableLayout);
   probabilityScrollArea->setWidget(probabilityWidget);
 
@@ -216,6 +211,42 @@ BCEGameHandler::BCEGameHandler():
 
   probabilityLayout->addWidget(new QLabel(tr("Prior Distribution of States:")));
   probabilityLayout->addWidget(probabilityScrollArea);
+
+  // Scroll Area for Conditional Distribution of Types
+
+  QScrollArea * payoffScrollArea = new QScrollArea();
+  QWidget * payoffWidget = new QWidget();
+
+  QVBoxLayout* payoffTableLayout = new QVBoxLayout();
+  payoffTableLayout->addWidget(payoffTableView);
+  payoffWidget->setLayout(payoffTableLayout);
+  payoffScrollArea->setWidget(payoffWidget);
+
+  payoffScrollArea->setWidgetResizable(true);
+  payoffScrollArea->setSizePolicy(QSizePolicy::Expanding,
+  				       QSizePolicy::Expanding);
+  payoffScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+
+  payoffLayout->addWidget(new QLabel(tr("Player Payoffs:")));
+  payoffLayout->addWidget(payoffScrollArea);
+
+  // Scroll Area for Payoff Matrix
+
+  QScrollArea * conditionalScrollArea = new QScrollArea();
+  QWidget * conditionalWidget = new QWidget();
+
+  QVBoxLayout* conditionalTableLayout = new QVBoxLayout();
+  conditionalTableLayout->addWidget(conditionalTableView);
+  conditionalWidget->setLayout(conditionalTableLayout);
+  conditionalScrollArea->setWidget(conditionalWidget);
+
+  conditionalScrollArea->setWidgetResizable(true);
+  conditionalScrollArea->setSizePolicy(QSizePolicy::Expanding,
+  				       QSizePolicy::Expanding);
+  conditionalScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+
+  conditionalLayout->addWidget(new QLabel(tr("Conditional Distribution of Types:")));
+  conditionalLayout->addWidget(conditionalScrollArea);
 
   tableLayout->addLayout(payoffLayout);
   tableLayout->addLayout(probabilityLayout);
@@ -535,3 +566,37 @@ void BCEGameHandler::stateRemoved()
   setState(newState);
   
 } // stateRemoved
+
+void BCEGameHandler::solveGame()
+{
+  try
+    {
+      logTextEdit->append(QString(""));
+      logTextEdit->append(QString("Starting a new computation..."));
+      logTextEdit->append(QString(""));
+      
+      // Reimplement when adding cancelGame()
+      // cancelSolveFlag = false;
+      
+      solverWorker = new BCESolverWorker(&game);
+
+      solverWorker->moveToThread(&solverThread);
+      connect(this,SIGNAL(startSolveRoutine()),
+	      solverWorker,SLOT(startSolve()));
+      // connect(solverWorker,SIGNAL(resultReady(bool)),
+      // 	      this,SLOT(iterationFinished(bool)));
+      // connect(solverWorker,SIGNAL(exceptionCaught()),
+      // 	      this,SLOT(solverException()));
+      solverThread.start();
+      
+      timer.restart();
+      
+      emit startIteration();
+    }
+  catch (exception & e)
+    {
+      QMessageBox::critical(this,tr("Solver failed"),
+			    tr("CPLEX was not able to solve your game."),
+			    QMessageBox::Ok);
+    }
+} // solveGame

@@ -47,7 +47,7 @@ public:
     if (index == 0)
       return game->getNumActions()[1];
     if (index == 1)
-      return game->getNumTypes()[0];
+      return game->getNumTypes()[1];
   }
 
   //! Emits layoutChanged signal.

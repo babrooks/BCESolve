@@ -193,8 +193,11 @@ void BCESolver::populate ()
   nonZeroVariableLocations.clear();
   probabilityConstraintLocations = vector<int>(numStates*numTypes_total,-1);
 
-  if (displayLevel)
-    cout << "Starting populate routine" << endl;
+  if (displayLevel) {
+    String printStr = "Starting populate routine";
+    cout << printStr << endl;
+    emit(updateLog(printStr));
+  }
 
   // Probability variables are conditional on the state and type. 
 

@@ -25,16 +25,12 @@ int BCEDataState::shareDataProperties(BCESliderType st,int player) {
     }
   }
 
+void BCEDataState::setSolutionData(BCESolution &solution) {
+  solutionData = BCESolution(solution);
+  gameData = BCEGame(solutionData.getGame());
+}
+
 void BCEDataState::setData(QString dataPath) {
-
-    QByteArray ba = dataPath.toLocal8Bit();
-    const char* newPath_c = ba.data();
-
-    cout << dataPath.toStdString() << endl;
-
-    // Load New Data on Path
-    BCESolution::load(solutionData,newPath_c);
-    gameData = BCEGame(solutionData.getGame());
 
     // Get File Name for GUI's Title
     string filePath = dataPath.toStdString();
@@ -44,6 +40,7 @@ void BCEDataState::setData(QString dataPath) {
     isPrivateVals = gameData.hasProductStructure();
     cout << isPrivateVals << endl;
 
+    // Reset Initial Parameters
     currentEqmIndex = 0;
     actions = vector<int>(2,0);
     types = vector<int>(2,0);
@@ -59,12 +56,13 @@ void BCEDataState::setData(QString dataPath) {
     cout << "prob: " << equilibriumMatrix[0][0] << endl;
 
     vector<int> numActions = gameData.getNumActions();
-    cout << numActions[0] << endl;
+    cout << "NumActions[0] = " << numActions[0] << endl;
     vector<int> numTypes = gameData.getNumTypes();
     cout << numTypes[0] << endl;
     int numStates = gameData.getNumStates();
     cout << numStates << endl;
 
+    // Set Slider Ranges 
     for (int player = 0; player < 2; player++) {
       sliderGroup[3*player]->setRange(0,numActions[player]-1);
       sliderGroup[3*player+1]->setRange(0,numTypes[player]-1);
@@ -75,6 +73,7 @@ void BCEDataState::setData(QString dataPath) {
       cout << "Slider setting completed." << endl;
     }
 
+    // Set Sliders to 0
     for (int i = 0; i < 6; i++) {
       sliderGroup[i]->setSliderPosition(0);
       sliderGroup[i]->setSingleStep(1);
@@ -163,8 +162,8 @@ void BCEDataState::setupControlsLayout() {
       subLayoutWithLabels[3*i+j]->addWidget(sliderLabels[3*i+j]);
       subLayoutWithLabels[3*i+j]->addLayout(gridSubLayouts[3*i+j]);
       controlsGrid->addLayout(subLayoutWithLabels[3*i+j],j,i); // Layout Matrix
-    } // Rows
-  } // Columns
+    } 
+  }
 
   controlsLayout = controlsGrid;
 

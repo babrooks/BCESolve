@@ -33,6 +33,15 @@ class BCEPlotHandler : public QMainWindow
 public:
   //! Constructor
   BCEPlotHandler();
+  //! Returns Layout of the Plot Handler
+  QHBoxLayout * getLayout() const {
+    return mainTab;
+  }
+  void setSolution(BCESolution &solution);
+
+signals:
+  //! Sends data path to BCEDataState
+  void sendingDataPath(QString location);
 
 public slots:
 
@@ -66,18 +75,24 @@ public slots:
     << getGUITitle_output
   */
   void setGUITitle();
-
-signals:
-
-  //! Sends path to example to BCEDataState.
-  /*! Gets path to example data from user interaction.
-    Sends that path to BCEDataState in order to load
-    new data.
+  //! Toggles colorScale between linear and log scales.
+  void toggleLinearScale(bool checked);
+  //! Toggles color gradient between blue and gpSpectrum themes.
+  void toggleColorfulTheme(bool checked);
+  //! Takes a screenshot and opens a save file menu.
+  /* The .png file name ending must be entered manually
+     upon saving for proper save action functionality.
   */
-  void dataPathChanged(QString path);
+  void screenShot();
+  //! Receives location of new data from BCEWindow
+  void loadData(QString location) {
+    emit(sendingDataPath(location));
+  }
 
 private:
 
+  //! Layout for the Plot Handler
+  QHBoxLayout *mainTab;
   //! Screen Resolution Width.
   int resWidth;
   //! Screen Resolution Height.
@@ -98,17 +113,12 @@ private:
     functions.
   */
   BCEDataState guiData;
-  BCEGameHandler gameTab;
   //! Not currently implemented.
   /*! Checkboxes are displayed in the GUI but
     are not fully implemented. Using them in the
     GUI will cause the program to crash.
   */
   QVector<BCECheckBox*> checkBoxGroup;
-  //! Default path to saved *.bce files.
-  /*! Currently set as ../examples
-   */
-  QString path;
   //! Default path to gui screenshots (*.png files).
   /*! Currently set as ../examples/screenshots/
    */
@@ -140,25 +150,6 @@ private:
   //! Bar Graphs.
   QVector<QCustomPlot*> deviationBarGraphs;
   QVector<BCELabel*> devPlotTitles;
-
-private slots:
-
-  //! Interacts with BCEDataState to load new data.
-  /*! Sends the new data path to BCEDataState to load
-    the new data. Resets sliders and line-edits to 0.
-    Sets range of sliders according to the number of
-    actions, types, and states in the new data.
-  */
-  void loadSolution();
-  //! Toggles colorScale between linear and log scales.
-  void toggleLinearScale(bool checked);
-  //! Toggles color gradient between blue and gpSpectrum themes.
-  void toggleColorfulTheme(bool checked);
-  //! Takes a screenshot and opens a save file menu.
-  /* The .png file name ending must be entered manually
-     upon saving for proper save action functionality.
-  */
-  void screenShot();
 
 };
 

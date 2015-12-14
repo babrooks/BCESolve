@@ -1,10 +1,10 @@
-#include "bceplothandler.hpp"
+#include "bcewindow.hpp"
 
 int main(int argc, char ** args)
 {
   QApplication app(argc,args);
 
-  BCEPlotHandler window;
+  BCEWindow window;
 
   window.show();
 
