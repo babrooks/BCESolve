@@ -24,6 +24,7 @@ VPATH += ../src/cpp
 VPATH += ../src/hpp
 VPATH += /usr/local/include
 VPATH += /usr/local/lib 
+VPATH += /usr/lib/x86_64-linux-gnu
 VPATH += ../viewer/cpp
 VPATH += ../viewer/hpp
 
@@ -62,7 +63,7 @@ bceconditionaltablemodel.cpp \
 bcewindow.cpp
 LIBS += ../lib/libbce.a
 
-LIBS += -L../lib/ -L/usr/local/lib/ /usr/lib/x86_64-linux-gnu/libboost_serialization.a /usr/lib/x86_64-linux-gnu/libboost_system.a /usr/lib/x86_64-linux-gnu/libboost_filesystem.a 
+LIBS += -L../lib/ -L/usr/local/lib/ -L/usr/lib/x86_64-linux-gnu
 linux-g++ {
 LIBS +=  -Bstatic -L../lib -Wl,-Bstatic  -L/usr/lib/x86_64-linux-gnu/ -lboost_filesystem -lboost_serialization -lboost_system -Wl,-Bdynamic
 }
