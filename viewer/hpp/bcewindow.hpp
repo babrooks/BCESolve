@@ -39,7 +39,7 @@ private:
   BCEGameHandler gameTab;
   //! Contains all information for the solution tab.
   BCEPlotHandler solutionTab;
-  //! Contains all information for the log tab.
+  //! Contains all information fot the log tab.
   BCELogHandler logTab;
   //! Default Path to data
   QString path;

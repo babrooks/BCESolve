@@ -2,9 +2,11 @@
 #include "bcegame.hpp"
 #include <QtWidgets>
 #include "bcesolverworker.hpp"
+#include "bcelogstream.hpp"
 
 BCEWindow::BCEWindow() {
 
+  // Set the default path for loading examples.
   path=QString("../examples/");
 
   // Menu Bar
@@ -64,7 +66,7 @@ BCEWindow::BCEWindow() {
 
   tabWidget->addTab(solutionTabWidget,"Solution");
   tabWidget->addTab(gameTabWidget,"Game");
-  tabWidget->addTab(logTabWidget,"Log File");
+  tabWidget->addTab(logTabWidget,"Log");
 
   QHBoxLayout *mainLayout = new QHBoxLayout();
   mainLayout->addWidget(tabWidget);
@@ -139,11 +141,10 @@ void BCEWindow::loadGame() {
 
     gameTab.setGame(loadedGame);
 
-    // Blank Solution
-    BCESolution defaultSolution(loadedGame);
-    solutionTab.setSolution(defaultSolution);
-
     emit(dataPathChanged(newPath));
+
+    /* Note that the solution remains the same and isn't
+       necessarily associated with the game. */
 
     }
   catch (std::exception & e)
@@ -153,67 +154,69 @@ void BCEWindow::loadGame() {
 
 }
 
-// void BCEWindow::saveSolution() {
+void BCEWindow::saveSolution() {
 
-//   QString newPath = QFileDialog::getSaveFileName(this,tr("Select a solution file"),
-// 						 "./",
-// 						 tr("BCEViewer solution files (*.bce)"));
+  QString newPath = QFileDialog::getSaveFileName(this,tr("Select a solution file"),
+						 "./",
+						 tr("BCEViewer solution files (*.bce)"));
 
-//   if (newPath.isEmpty())
-//     return;
+  if (newPath.isEmpty())
+    return;
 
-//   QFileInfo fi(newPath);
-//   path = fi.canonicalPath();
+  QFileInfo fi(newPath);
+  path = fi.canonicalPath();
 
-//   try
-//     {
-//       QByteArray ba = newPath.toLocal8Bit();
-//       const char * newPath_c = ba.data();
+  try
+    {
+      QByteArray ba = newPath.toLocal8Bit();
+      const char * newPath_c = ba.data();
 
-//       BCESolution::save(solutionTab.getSolution(),
-// 		       newPath_c);
-//     }
-//   catch (std::exception & e)
-//     {
-//       qDebug() << "Save solution didnt work :(" << endl;
-//     }
-// } // saveSolution
+      BCESolution::save(solutionTab.getSolutionData(),
+		       newPath_c);
+    }
+  catch (std::exception & e)
+    {
+      qDebug() << "Save solution didnt work :(" << endl;
+    }
+} // saveSolution
 
-void BCEWindow::saveSolution() {} //Dummy
-void BCEWindow::saveGame() {} //Dummy
+void BCEWindow::saveGame() {
 
-// void BCEWindow::saveGame() {
+  QString newPath = QFileDialog::getSaveFileName(this,tr("Select a game file"),
+						 "./",
+						 tr("BCEViewer game files (*.bce)"));
 
-//   QString newPath = QFileDialog::getSaveFileName(this,tr("Select a game file"),
-// 						 "./",
-// 						 tr("BCEViewer game files (*.bce)"));
+  if (newPath.isEmpty())
+    return;
 
-//   if (newPath.isEmpty())
-//     return;
+  QFileInfo fi(newPath);
+  path = fi.canonicalPath();
 
-//   QFileInfo fi(newPath);
-//   path = fi.canonicalPath();
+  try
+    {
+      QByteArray ba = newPath.toLocal8Bit();
+      const char * newPath_c = ba.data();
 
-//   try
-//     {
-//       QByteArray ba = newPath.toLocal8Bit();
-//       const char * newPath_c = ba.data();
-
-//       BCEGame::save(gameTab.getGame(),
-// 		   newPath_c);
-//     }
-//   catch (std::exception & e)
-//     {
-//       qDebug() << "Save game didnt work :(" << endl;
-//     }
-// } // saveGame
+      BCEGame::save(gameTab.getGame(),
+		   newPath_c);
+    }
+  catch (std::exception & e)
+    {
+      qDebug() << "Save game didnt work :(" << endl;
+    }
+} // saveGame
 
 void BCEWindow::runSolve() {
   try
     {
+      // Redirect all subsequent cout to the BCELogHandler.
+      BCELogStream qout(std::cout,logTab.logText);
+
       logTab.logText->append(QString(""));
-      logTab.logText->append(QString("Starting a new computation..."));
+      logTab.logText->append(QString("..........STARTING A NEW COMPUTATION.........."));
       logTab.logText->append(QString(""));
+
+      // std::cout << "Testing cout Redirect from runSolve()" << std::endl;
       
       // Reimplement when adding cancelGame()
       // cancelSolveFlag = false;
@@ -226,6 +229,8 @@ void BCEWindow::runSolve() {
       // 	      this,SLOT(iterationFinished(bool)));
       // connect(solverWorker,SIGNAL(exceptionCaught()),
       // 	      this,SLOT(solverException()));
+      connect(&solverWorkerThread,SIGNAL(finished()),
+	      &solverWorkerThread,SLOT(deleteLater()));
       solverWorkerThread.start();
       
       // timer.restart();

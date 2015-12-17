@@ -3,7 +3,6 @@
 
 #include<QTextEdit>
 #include<QVBoxLayout>
-#include "bcelogstream.hpp"
 #include <QObject>
 
 class BCELogHandler : public QObject {
@@ -19,11 +18,10 @@ public:
 
   BCELogHandler() {
 
-    logText = new QTextEdit(tr("Solver Log Tab"));
+    logText = new QTextEdit();
     layout = new QVBoxLayout();
 
     // logText->setTextFormat(Qt::LogText);
-    BCELogStream qout(std::cout, logText);
 
     layout->addWidget(logText);
   }
