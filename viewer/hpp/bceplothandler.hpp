@@ -16,13 +16,11 @@
 using namespace std;
 
 //! Viewer Window Class
-/*! Handles plotting and layout of the GUI. 
-  Interacts with every viewer header file. Connects
+/*! Handles plotting and layout of the GUI. Connects
   user interaction in the GUI with BCEDataState to
   modify data elements for plotting. Gets data from
   BCEDataState for plotting. Connects data change signals
   in BCEDataState with slots to change plot titles.
-  Handles file menu actions.
 
   \ingroup viewer
 */
@@ -33,11 +31,6 @@ class BCEPlotHandler : public QMainWindow
 public:
   //! Constructor
   BCEPlotHandler();
-  //! Returns Layout of the Plot Handler
-  QHBoxLayout * getLayout() const {
-    return mainTab;
-  }
-  void setSolution(BCESolution &solution);
 
 signals:
   //! Sends data path to BCEDataState
@@ -150,6 +143,19 @@ private:
   //! Bar Graphs.
   QVector<QCustomPlot*> deviationBarGraphs;
   QVector<BCELabel*> devPlotTitles;
+
+public:
+  //! Returns Layout of the Plot Handler
+  QHBoxLayout * getLayout() const {
+    return mainTab;
+  }
+  //! Sets the current BCESolution in BCEDataState
+  void setSolution(BCESolution &solution);
+
+  //! Returns the current BCESolution in BCEDataState
+  const BCESolution& getSolutionData() const {
+    return guiData.getSolution();
+  }
 
 };
 

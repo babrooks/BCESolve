@@ -12,27 +12,35 @@ CONFIG += debug
 
 QMAKE_CXXFLAGS += -std=c++11
  
-INCLUDEPATH += /usr/local/include
-INCLUDEPATH += /usr/local/lib
-INCLUDEPATH += ../src/cpp
-INCLUDEPATH += ../src/hpp
-INCLUDEPATH += ../viewer/cpp
-INCLUDEPATH += ../viewer/hpp
-INCLUDEPATH += /opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/concert/include
-INCLUDEPATH += /opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex/include
-VPATH += ../src/cpp
-VPATH += ../src/hpp
-VPATH += /usr/local/include
-VPATH += /usr/local/lib 
-VPATH += /usr/lib/x86_64-linux-gnu
-VPATH += ../viewer/cpp
-VPATH += ../viewer/hpp
+INCLUDEPATH += /usr/local/include \
+/usr/local/lib \
+../src/cpp \
+../src/hpp \
+../viewer/cpp \
+../viewer/hpp \
+/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/concert/include \
+/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex/include \
+/usr/include/boost
+
+VPATH += ../src/cpp \
+../src/hpp \
+/usr/local/include \
+/usr/local/lib \
+/usr/lib/x86_64-linux-gnu \
+../viewer/cpp \
+../viewer/hpp \
+/usr/include/boost \
+/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/concert/include \
+/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex/include 
 
 HEADERS += bcedatastate.hpp \
 bceplothandler.hpp \
 qcustomplot.h \
 bcesolution.hpp \
 bcegame.hpp \
+bce.hpp \
+bcesolver.hpp \
+bcedistr.hpp \
 bceabstractgame.hpp \
 bceslider.hpp \
 bcelineedit.hpp \
@@ -47,7 +55,10 @@ bcetablemodel.hpp \
 bcepriortablemodel.hpp \
 bceconditionaltablemodel.hpp \
 bcepushbutton.hpp \
-bcewindow.hpp
+bcewindow.hpp \
+bcelogstream.hpp \
+bceloghandler.hpp \
+bcesolverworker.hpp
 
 SOURCES += main.cpp \
 bceplothandler.cpp \
@@ -60,16 +71,24 @@ bcegamehandler.cpp \
 bcepayofftablemodel.cpp \
 bcepriortablemodel.cpp \
 bceconditionaltablemodel.cpp \
-bcewindow.cpp
+bcewindow.cpp \
+bcesolver.cpp \
+
 LIBS += ../lib/libbce.a
+LIBS += -L/usr/lib/x86_64-linux-gnu/ -lboost_serialization -lboost_system
+LIBS += -L/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex/lib/x86-64_linux/static_pic -L/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/concert/lib/x86-64_linux/static_pic -lilocplex -lconcert -L/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex/bin/x86-64_linux -lcplex1262
 
 LIBS += -L../lib/ -L/usr/local/lib/ -L/usr/lib/x86_64-linux-gnu
 linux-g++ {
-LIBS +=  -Bstatic -L../lib -Wl,-Bstatic  -L/usr/lib/x86_64-linux-gnu/ -lboost_filesystem -lboost_serialization -lboost_system -Wl,-Bdynamic
+LIBS +=  -Bstatic -L../lib -Wl,-Bstatic  -L/usr/lib/x86_64-linux-gnu/ -lboost_serialization -lboost_system -Wl,-Bdynamic
 }
 macx {
 LIBS += -lc++ /usr/local/lib/libboost_serialization.a 
 }
+
+MOC_DIR = ./tmp
+OBJECTS_DIR = ./tmp
+
 TEMPLATE = app
 TARGET = bceviewer
 

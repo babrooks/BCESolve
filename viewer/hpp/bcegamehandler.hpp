@@ -31,7 +31,8 @@ private:
   //! The game object.
   /*! This is the game that is represented in the game tab. Note that
       this can be a different game than the one that is associated
-      with the solution in the solution tab. 
+      with the solution in the solution tab. Alterations to the game
+      can be saved using options in the file menu.
 
       \ingroup viewer
   */
@@ -51,8 +52,6 @@ private:
   QPushButton * solveButton;
   //! Button that cancels solve.
   QPushButton * cancelButton;
-  //! Thread for solverWorker
-  QThread solverWorker;
 
   // Edits
   //! Edits for number of actions
@@ -92,7 +91,7 @@ public:
   void setGame(const BCEGame & _game);
 
   //! Returns constant reference to the current game.
-  const BCEGame & getGame() const
+  BCEGame & getGame() 
   { return game; }
 
   //! Returns the layout
@@ -141,12 +140,6 @@ private slots:
   void nextState();
   //! Decreases currentState to the previous state.
   void prevState();
-  //! Slot called when user presses the solve button.
-  /*! Initiates a new thread for the solver worker. Signals to 
-    solver worker to begin running CPLEX routine. Makes 
-    relevant connections for printing output to the log tab.
-   */
-  void solveGame();
 
 signals:
 

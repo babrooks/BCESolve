@@ -219,7 +219,7 @@ public:
     }
   }
 
-  //! Shares memory location of equilibriumMatrix with BCEWindow.
+  //! Shares memory location of equilibriumMatrix with BCEPlotHandler.
   /*! BCEWindow cannot edit BCEDataState's private member
     equilibriumMatrix but needs read access to plot the 
     GUI's heatmap.
@@ -228,7 +228,7 @@ public:
     return equilibriumMatrix;
   }
 
-  //! Shares memory location of objectiveValues with BCEWindow.
+  //! Shares memory location of objectiveValues with BCEPlotHandler.
   /*! BCEWindow cannot edit BCEDataState's private member
     objectiveValues but needs read access to plot the GUI's
     bar plots of player's deviation objectives.
@@ -237,13 +237,22 @@ public:
     return objectiveValues;
   }
 
-  //! Shares memory location of allEqm with BCEWindow.
+  //! Shares memory location of allEqm with BCEPlotHandler.
   /*! BCEWindow cannot edit BCEDataState's private member
     allEqm but needs read access to plot the GUI's
     BCE Value Set Plot.
   */
   const vector<vector<double>>& getAllEqm() const {
     return allEqm;
+  }
+
+  //! Shares the current BCESolution by reference.
+  /*! Used to save the current solution. saveGame() in 
+    BCEWindow calls this function to serialize and save
+    a BCESolution.
+  */
+  const BCESolution& getSolution() const {
+    return solutionData;
   }
 
   //! Shares file name of currently loaded file with BCEWindow.

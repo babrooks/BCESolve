@@ -66,7 +66,7 @@ BCEGameHandler::BCEGameHandler():
       numTypesEdits[player] = new QLineEdit("1");
       numTypesEdits[player]->setReadOnly(true);
       numTypesEdits[player]->setSizePolicy(QSizePolicy::Preferred,
-					     QSizePolicy::Preferred);
+					   QSizePolicy::Preferred);
 
       addTypeButtons[player] = new BCEPushButton(player,"+");
       removeTypeButtons[player] = new BCEPushButton(player," -");
@@ -78,9 +78,9 @@ BCEGameHandler::BCEGameHandler():
       removeTypeButtons[player]->setMinimumWidth(buttonSize.width());
 
       addTypeButtons[player]->setSizePolicy(QSizePolicy::Fixed,
-					      QSizePolicy::Preferred);
+					    QSizePolicy::Preferred);
       removeTypeButtons[player]->setSizePolicy(QSizePolicy::Fixed,
-						 QSizePolicy::Preferred);
+					       QSizePolicy::Preferred);
     }
   
   payoffTableView = new BCETableView();
@@ -183,9 +183,9 @@ BCEGameHandler::BCEGameHandler():
   numStatesLayout->addWidget(removeStateButton);
   numStatesLayout->addWidget(addStateButton);
   numStatesLayout->setSpacing(5);
-  leftControlLayout->addRow(new QLabel(tr("Number of states:")),
-			    numStatesLayout);
-  leftControlLayout->setSpacing(5);
+  rightControlLayout->addRow(new QLabel(tr("Number of states:")),
+			     numStatesLayout);
+  rightControlLayout->setSpacing(5);
 
   rightControlLayout->addRow(solveButton);
   rightControlLayout->addRow(cancelButton);
@@ -224,7 +224,7 @@ BCEGameHandler::BCEGameHandler():
 
   payoffScrollArea->setWidgetResizable(true);
   payoffScrollArea->setSizePolicy(QSizePolicy::Expanding,
-  				       QSizePolicy::Expanding);
+				  QSizePolicy::Expanding);
   payoffScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
   payoffLayout->addWidget(new QLabel(tr("Player Payoffs:")));
@@ -263,28 +263,31 @@ BCEGameHandler::BCEGameHandler():
   connect(currentStateCombo,SIGNAL(currentIndexChanged(int)),
 	  this,SLOT(currentStateChanged(int)));
 
-  for (int player = 0; player < 2; player++) {
-    connect(addActionButtons[player],SIGNAL(clickedForPlayer(int)),
-	    this,SLOT(actionAdded(int)));
-    connect(addTypeButtons[player],SIGNAL(clickedForPlayer(int)),
-	    this,SLOT(typeAdded(int)));
-    connect(removeActionButtons[player],SIGNAL(clickedForPlayer(int)),
-	    this,SLOT(actionRemoved(int)));
-    connect(removeTypeButtons[player],SIGNAL(clickedForPlayer(int)),
-	    this,SLOT(typeRemoved(int)));
-  }
+for (int player = 0; player < 2; player++) {
+  connect(addActionButtons[player],SIGNAL(clickedForPlayer(int)),
+	  this,SLOT(actionAdded(int)));
+  connect(addTypeButtons[player],SIGNAL(clickedForPlayer(int)),
+	  this,SLOT(typeAdded(int)));
+  connect(removeActionButtons[player],SIGNAL(clickedForPlayer(int)),
+	  this,SLOT(actionRemoved(int)));
+  connect(removeTypeButtons[player],SIGNAL(clickedForPlayer(int)),
+	  this,SLOT(typeRemoved(int)));
+ }
 
-  connect(addStateButton,SIGNAL(clicked()),
-	  this,SLOT(stateAdded()));
-  connect(removeStateButton,SIGNAL(clicked()),
-	  this,SLOT(stateRemoved()));
+connect(addStateButton,SIGNAL(clicked()),
+	this,SLOT(stateAdded()));
+connect(removeStateButton,SIGNAL(clicked()),
+	this,SLOT(stateRemoved()));
 
-  connect(nextStateButton,SIGNAL(clicked()),
-	  this,SLOT(nextState()));
-  connect(prevStateButton,SIGNAL(clicked()),
-	  this,SLOT(prevState()));
+connect(nextStateButton,SIGNAL(clicked()),
+	this,SLOT(nextState()));
+connect(prevStateButton,SIGNAL(clicked()),
+	this,SLOT(prevState()));
 
-  // qDebug() << "Finished sggamehandler constructor" << endl;
+connect(solveButton,SIGNAL(clicked()),
+	this,SIGNAL(startSolveRoutine()));
+
+qDebug() << "Finished sggamehandler constructor" << endl;
 
 }
 
@@ -296,8 +299,6 @@ BCEGameHandler::~BCEGameHandler()
     delete priorModel;
   if (conditionalModel != NULL)
     delete conditionalModel;
-  // for (int state = 0; state < game.getNumStates(); state++)
-  //   delete probabilityModels[state];
 }
 
 void BCEGameHandler::setGame(const BCEGame & _game)
@@ -567,36 +568,8 @@ void BCEGameHandler::stateRemoved()
   
 } // stateRemoved
 
-void BCEGameHandler::solveGame()
-{
-  try
-    {
-      logTextEdit->append(QString(""));
-      logTextEdit->append(QString("Starting a new computation..."));
-      logTextEdit->append(QString(""));
-      
-      // Reimplement when adding cancelGame()
-      // cancelSolveFlag = false;
-      
-      solverWorker = new BCESolverWorker(&game);
+// void BCEGameHandler::solveGame() {
+  
+//   emit(solvePressed());
 
-      solverWorker->moveToThread(&solverThread);
-      connect(this,SIGNAL(startSolveRoutine()),
-	      solverWorker,SLOT(startSolve()));
-      // connect(solverWorker,SIGNAL(resultReady(bool)),
-      // 	      this,SLOT(iterationFinished(bool)));
-      // connect(solverWorker,SIGNAL(exceptionCaught()),
-      // 	      this,SLOT(solverException()));
-      solverThread.start();
-      
-      timer.restart();
-      
-      emit startIteration();
-    }
-  catch (exception & e)
-    {
-      QMessageBox::critical(this,tr("Solver failed"),
-			    tr("CPLEX was not able to solve your game."),
-			    QMessageBox::Ok);
-    }
-} // solveGame
+// } // solveGame
