@@ -93,7 +93,7 @@ public slots:
 		  int type,
 		  double objectiveValue) {
 
-    if (labelType == LabelType::DeviationPlot) {
+    if (labelType == DeviationPlot) {
       if (player == emittedPlayer) {
 	dynamicString.str(std::string());
 	dynamicString << "Player " << emittedPlayer << "'s Deviation Objectives, "
@@ -106,7 +106,7 @@ public slots:
 
   void changeProbability(int emittedPlayer,double probability) {
 
-    if (labelType == LabelType::DeviationPlot 
+    if (labelType == DeviationPlot 
 	&& player == emittedPlayer) {
 
       std::stringstream titleName;
@@ -124,7 +124,7 @@ public slots:
 
   void displayStateOrValues(bool isPrivateVals,
 			    int emittedPlayer) {
-    if (labelType = LabelType::SliderLabel) {
+    if (labelType = SliderLabel) {
       if (isPrivateVals) {
 	if (sliderType == State) {
 
@@ -150,7 +150,7 @@ public slots:
 
   void changeDisplayedCoords(double x,double y) {
 
-    if (labelType == LabelType::ValueSetPlot) {
+    if (labelType == ValueSetPlot) {
 
       std::string staticString = "Set of BCE, Currently Selected at: ";
 
@@ -172,7 +172,7 @@ public slots:
 			    int state,
 			    bool isPrivateVals) {
 
-    if (labelType == LabelType::HeatMap) {
+    if (labelType == HeatMap) {
 
       std::string staticString = "Bayes Correlated Equilibrium";
 

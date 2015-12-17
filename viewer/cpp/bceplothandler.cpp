@@ -165,7 +165,7 @@ BCEPlotHandler::BCEPlotHandler()
 
 void BCEPlotHandler::plotEqm() {
 
-  vector<vector<double>> eqmMatrix = guiData.getEqmMatrix();
+  vector< vector<double> > eqmMatrix = guiData.getEqmMatrix();
 
   colorMap->clearData();
   int nx = eqmMatrix.size();
@@ -208,7 +208,7 @@ void BCEPlotHandler::plotBCEValueSet() {
 
   // Getting Data
 
-  vector<vector<double>> allEqm = guiData.getAllEqm();
+  vector< vector<double> > allEqm = guiData.getAllEqm();
   QVector<double> objective0Payoffs;
   QVector<double> objective1Payoffs;
   vector<int> playerObjectives;
@@ -279,7 +279,7 @@ void BCEPlotHandler::plotDeviationObjectives(int player) {
   deviationBarGraphs[player]->addPlottable(barGraph);
   barGraph->setName("Expected Payoffs from Deviation");
 
-  vector<vector<double>> objectiveValues = guiData.getObjectiveValues();
+  vector< vector<double> > objectiveValues = guiData.getObjectiveValues();
 
   QVector<double> yData;
 

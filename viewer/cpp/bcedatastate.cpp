@@ -283,11 +283,11 @@ void BCEDataState::setEqmMatrix() {
 
   // Action Conditions
 
-  vector<vector<int>> actionConditions(2, vector<int>(0));
+  vector< vector<int> > actionConditions(2, vector<int>(0));
 
   // Type Conditions
 
-  vector<vector<int>> typeConditions(2,vector<int>(0));
+  vector< vector<int> > typeConditions(2,vector<int>(0));
 
   double prob
     = solutionData.getConditionalMarginal(stateConditions,
@@ -302,7 +302,7 @@ void BCEDataState::setEqmMatrix() {
 
   vector<int> numActions = gameData.getNumActions();
 
-  equilibriumMatrix = vector<vector<double>>(numActions[1],
+  equilibriumMatrix = vector< vector<double> >(numActions[1],
 					     vector<double>(numActions[0],0));
 
   for (int a1 = 0; a1 < numActions[1]; a1++)

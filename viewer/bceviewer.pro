@@ -11,6 +11,7 @@ CONFIG += WARN_OFF
 CONFIG += debug
 
 QMAKE_CXXFLAGS += -std=c++11
+QMAKE_CXXFLAGS += -DIL_STD
  
 INCLUDEPATH += /usr/local/include \
 /usr/local/lib \
@@ -20,6 +21,8 @@ INCLUDEPATH += /usr/local/include \
 ../viewer/hpp \
 /opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/concert/include \
 /opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex/include \
+/opt/ibm/ILOG/CPLEX_Studio1251/concert/include \
+/opt/ibm/ILOG/CPLEX_Studio1251/cplex/include \
 /usr/include/boost
 
 VPATH += ../src/cpp \
@@ -31,7 +34,9 @@ VPATH += ../src/cpp \
 ../viewer/hpp \
 /usr/include/boost \
 /opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/concert/include \
-/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex/include 
+/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex/include \
+/opt/ibm/ILOG/CPLEX_Studio1251/concert/include \
+/opt/ibm/ILOG/CPLEX_Studio1251/cplex/include
 
 HEADERS += bcedatastate.hpp \
 bceplothandler.hpp \
@@ -76,7 +81,10 @@ bcesolver.cpp \
 
 LIBS += ../lib/libbce.a
 LIBS += -L/usr/lib/x86_64-linux-gnu/ -lboost_serialization -lboost_system
-LIBS += -L/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex/lib/x86-64_linux/static_pic -L/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/concert/lib/x86-64_linux/static_pic -lilocplex -lconcert -L/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex/bin/x86-64_linux -lcplex1262
+# LIBS += -L/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex/lib/x86-64_linux/static_pic -L/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/concert/lib/x86-64_linux/static_pic -lilocplex -lconcert -L/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex/bin/x86-64_linux -lcplex1262
+LIBS += -L/opt/ibm/ILOG/CPLEX_Studio1251/cplex/lib/x86-64_sles10_4.1/static_pic \
+-L/opt/ibm/ILOG/CPLEX_Studio1251/concert/lib/x86-64_sles10_4.1/static_pic \
+-lilocplex -lconcert -L/opt/ibm/ILOG/CPLEX_Studio1251/cplex/bin/x86-64_sles10_4.1/ -lcplex1251
 
 LIBS += -L../lib/ -L/usr/local/lib/ -L/usr/lib/x86_64-linux-gnu
 linux-g++ {

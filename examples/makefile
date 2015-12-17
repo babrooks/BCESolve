@@ -8,7 +8,7 @@ CSYSFLAGS  = -fPIC -DIL_STD
 LDSYSFLAGS = 
 # Compilation and linking flags enabling Multi-threading
 CMTFLAGS = -DILOUSEMT -D_REENTRANT
-LDMTFLAGS = -lpthread -framework CoreFoundation
+LDMTFLAGS = -lpthread 
 # Code optimization/debugging options
 #DEBUG = 
 # DEBUG = -O1 -DNDEBUG
