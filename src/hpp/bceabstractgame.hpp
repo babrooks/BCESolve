@@ -1,4 +1,4 @@
-#ifndef BCEABSTRACTGAME_HPP
+ifndef BCEABSTRACTGAME_HPP
 #define BCEABSTRACTGAME_HPP
 
 #include "bcecommon.hpp"

@@ -1,6 +1,7 @@
 #ifndef BCESOLVERWORKER_HPP
 #define BCESOLVERWORKER_HPP
 
+#include "bceabstractgame.hpp"
 #include "bcegame.hpp"
 #include "bce.hpp"
 #include <QObject>
@@ -34,17 +35,48 @@ public slots:
 
   void startSolve() {
 
+    double minAngleIncrement = 0.05;
+
     BCESolver solver(game);
+
+    solver.setParameter(BCESolver::MinAngleIncrement,minAngleIncrement);
+    solver.setParameter(BCESolver::DisplayLevel,1);
 
     solver.populate();
 
+    solver.setParameter(BCESolver::BoundaryObjective1,0);
+    solver.setParameter(BCESolver::BoundaryObjective2,1);
+
     IloCplex cplex = solver.getCplex();
     cplex.setOut(std::cout);
-  
-    cplex.getObjective().setSense(IloObjective::Minimize);
-    cplex.getObjective().setExpr(solver.getObjectiveFunction(2));
+ 
+    for (int player = 0; player < 2; player++)
+      {
+	for (int val = 0; val < 2; val++)
+	  {
+	    cplex.getModel()
+	      .add(solver.getObjectiveFunction(5+val+player*2)>=0.0);
+	  } // val
+      }
+
+    cplex.setParam(IloCplex::RootAlg,IloCplex::Barrier);
+    cplex.setParam(IloCplex::SimDisplay,0);
+    solver.setParameter(BCESolver::DisplayLevel,1);
+
+    cplex.getObjective().setSense(IloObjective::Maximize);
+    cplex.getObjective().setExpr(-1.0*(solver.getObjectiveFunction(2)));
+    cplex.setParam(IloCplex::Threads,4);
   
     solver.solve();
+
+    cout << "Bidder 1's surplus: " 
+	 << cplex.getValue(solver.getObjectiveFunction(0)) << endl;
+    cout << "Bidder 2's surplus: "
+	 << cplex.getValue(solver.getObjectiveFunction(1)) << endl;
+    cout << "Revenue: " 
+	 << cplex.getValue(solver.getObjectiveFunction(2)) << endl;
+    cout << "Total surplus: " 
+	 << cplex.getValue(solver.getObjectiveFunction(3)) << endl;
 
     solver.getSolution(solution);
 
