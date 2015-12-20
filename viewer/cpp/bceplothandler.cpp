@@ -10,41 +10,12 @@
 
 BCEPlotHandler::BCEPlotHandler() 
 {
-  path=QString("../examples/");
   screenShotPath=QString("../examples/screenshots/");
 
   // Resolution Settings
 
   int resWidth = guiData.resWidth;
   int resHeight = guiData.resHeight;
-
-  // Menu Bar
-  QMenu * fileMenu = menuBar()->addMenu(tr("&File"));
-  QMenu * viewMenu = menuBar()->addMenu(tr("&View"));
-  QAction * loadSolutionAction = new QAction(tr("&Load solution"),this);
-  QAction * linearScale = new QAction(tr("&Linear/Log Color Scale Toggle"),this);
-  QAction * colorfulDistn = new QAction(tr("&Colorful/Blue Theme Toggle"),this);
-  QAction * screenShotAction = new QAction(tr("&Save a screen shot"),this);
-  QAction * quitAction = new QAction(tr("&Quit GUI"),this);
-  fileMenu->addAction(loadSolutionAction);
-  fileMenu->addAction(quitAction);
-  viewMenu->addAction(linearScale);
-  linearScale->setCheckable(true);
-  linearScale->setChecked(true);
-  viewMenu->addAction(colorfulDistn);
-  colorfulDistn->setCheckable(true);
-  colorfulDistn->setChecked(true);
-  viewMenu->addAction(screenShotAction);
-  loadSolutionAction->setShortcut(tr("Ctrl+L"));
-  screenShotAction->setShortcut(tr("Ctrl+P"));
-  quitAction->setShortcut(tr("Ctrl+W"));
-
-  // Menu Connections
-  connect(loadSolutionAction,SIGNAL(triggered()),this,SLOT(loadSolution()));
-  connect(quitAction,SIGNAL(triggered()),this,SLOT(close()));
-  connect(linearScale,SIGNAL(toggled(bool)),this,SLOT(toggleLinearScale(bool)));
-  connect(colorfulDistn,SIGNAL(toggled(bool)),this,SLOT(toggleColorfulTheme(bool)));
-  connect(screenShotAction,SIGNAL(triggered()),this,SLOT(screenShot()));
 
   // BCEDataState Connections to BCEWindow
 
@@ -54,10 +25,10 @@ BCEPlotHandler::BCEPlotHandler()
 	  this,SLOT(plotDeviationObjectives(int)));
   connect(&guiData,SIGNAL(equilibriumMatrixChanged()),
 	  this,SLOT(plotEqm()));
-  connect(this,SIGNAL(dataPathChanged(QString)),
-  	  &guiData,SLOT(setData(QString)));
   connect(&guiData,SIGNAL(newDataLoaded()),
 	  this,SLOT(setGUITitle()));
+  connect(this,SIGNAL(sendingDataPath(QString)),
+	  &guiData,SLOT(setData(QString)));
 
   // End Data Connections
   /////////////////////////////////////////
@@ -153,73 +124,48 @@ BCEPlotHandler::BCEPlotHandler()
   QVBoxLayout *colorMapWithTitle = new QVBoxLayout();
   colorMapWithTitle->addWidget(colorMapTitle);
   colorMapWithTitle->addWidget(conditionalMarginalPlot);
-  QHBoxLayout *mainTab = new QHBoxLayout();
+  mainTab = new QHBoxLayout();
   mainTab->addLayout(leftSectorDivide);
   mainTab->addLayout(colorMapWithTitle);
 
   // End Plot Initializations and Organization
   /////////////////////////////////////////////// 
 
-  // Graph Tab Setup and Main Panel Initialization
-  QWidget * mainPanel = new QWidget();
-  QHBoxLayout * mainLayout = new QHBoxLayout();
-  QWidget * graphTab = new QWidget();
+  // // Graph Tab Setup and Main Panel Initialization
+  // QWidget * mainPanel = new QWidget();
+  // QHBoxLayout * mainLayout = new QHBoxLayout();
+  // QWidget * graphTab = new QWidget();
 
-  graphTab->setLayout(mainTab);
+  // graphTab->setLayout(mainTab);
 
-  // Main Widget
-  QTabWidget *tabWidget = new QTabWidget();
-  tabWidget->addTab(graphTab,"Solution");
-  QWidget *gameWidget = new QWidget();
-  gameWidget->setLayout(gameTab.getLayout());
-  tabWidget->addTab(gameWidget,"Game");
-  mainLayout->addWidget(tabWidget);
+  // // Main Widget
+  // QTabWidget *tabWidget = new QTabWidget();
+  // tabWidget->addTab(graphTab,"Solution");
+  // QWidget *gameWidget = new QWidget();
+  // gameWidget->setLayout(gameTab.getLayout());
+  // tabWidget->addTab(gameWidget,"Game");
+  // mainLayout->addWidget(tabWidget);
 
-  mainPanel->setLayout(mainLayout);
+  // mainPanel->setLayout(mainLayout);
 
-  // Set Default Tab 
-  setCentralWidget(mainPanel);
+  // // Set Default Tab 
+  // setCentralWidget(mainPanel);
 
-  // Maximize Window by Default
-  setWindowState(Qt::WindowMaximized);
+  // // Maximize Window by Default
+  // setWindowState(Qt::WindowMaximized);
 
-  // Window Title
-  setWindowTitle(QApplication::translate("bceviewer","BCE Solution Viewer"));
+  // // Window Title
+  // setWindowTitle(QApplication::translate("bceviewer","BCE Solution Viewer"));
 
 
 } // constructor
-
-/////////////////////////////////////////////
-// Load Solution Slot
-
-void BCEPlotHandler::loadSolution() {
-
-  QString newPath = QFileDialog::getOpenFileName(this,tr("Select a solution file"),
-						 path,
-						 tr("BCESolve solution files (*.bce)"));
-
-
-  if (newPath.isEmpty()) {
-    cout << "isEmpty" << endl;
-    return;
-  }
-
-  try
-    {
-      emit(dataPathChanged(newPath));
-    }
-  catch (std::exception & e)
-    {
-      qDebug() << "Load solution didnt work :( from BCEPlotHandler" << endl;
-    }
-} // slot for loading a solution
 
 /////////////////////////////////////////////
 // Plot Conditional-Marginal Distribution
 
 void BCEPlotHandler::plotEqm() {
 
-  vector<vector<double>> eqmMatrix = guiData.getEqmMatrix();
+  vector< vector<double> > eqmMatrix = guiData.getEqmMatrix();
 
   colorMap->clearData();
   int nx = eqmMatrix.size();
@@ -262,7 +208,7 @@ void BCEPlotHandler::plotBCEValueSet() {
 
   // Getting Data
 
-  vector<vector<double>> allEqm = guiData.getAllEqm();
+  vector< vector<double> > allEqm = guiData.getAllEqm();
   QVector<double> objective0Payoffs;
   QVector<double> objective1Payoffs;
   vector<int> playerObjectives;
@@ -333,7 +279,7 @@ void BCEPlotHandler::plotDeviationObjectives(int player) {
   deviationBarGraphs[player]->addPlottable(barGraph);
   barGraph->setName("Expected Payoffs from Deviation");
 
-  vector<vector<double>> objectiveValues = guiData.getObjectiveValues();
+  vector< vector<double> > objectiveValues = guiData.getObjectiveValues();
 
   QVector<double> yData;
 
@@ -439,3 +385,6 @@ void BCEPlotHandler::setGUITitle() {
   this->setWindowTitle(newTitle);
 }
 
+void BCEPlotHandler::setSolution(BCESolution &solution) {
+  guiData.setSolutionData(solution);
+}

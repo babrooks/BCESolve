@@ -128,16 +128,16 @@ private: // Private Properties. Private Functions near EOF.
   //! Index of equilibrium currently displayed in the GUI.
   int currentEqmIndex;
   //! Data displayed in the GUI's heatmap.
-  vector<vector<double>> equilibriumMatrix;
+  vector< vector<double> > equilibriumMatrix;
   //! Data displayed in the GUI's bar plots.
-  vector<vector<double>> objectiveValues;
+  vector< vector<double> > objectiveValues;
   //! Data displayed in the GUI's BCE Value Set Plot.
   /*! Holds information about all the equilibria in a saved
     example file. If allEqm contains more than one
     equilibrium, BCEGame's mapBoundary function has been
     called in the example .cpp file.
   */
-  vector<vector<double>> allEqm;
+  vector< vector<double> > allEqm;
   //! Vector of Controls Check Boxes
   QVector<BCECheckBox*> checkBoxGroup;
   //! Vector of Controls Sliders
@@ -169,6 +169,9 @@ public:
 
   int resWidth = 1920;
   int resHeight = 1080;
+
+  //! Sets the solution data to the newly loaded solution.
+  void setSolutionData(BCESolution &solution);
 
   //! Layout Holding Sliders and Other Data Controls
   QGridLayout *controlsLayout;
@@ -216,31 +219,40 @@ public:
     }
   }
 
-  //! Shares memory location of equilibriumMatrix with BCEWindow.
+  //! Shares memory location of equilibriumMatrix with BCEPlotHandler.
   /*! BCEWindow cannot edit BCEDataState's private member
     equilibriumMatrix but needs read access to plot the 
     GUI's heatmap.
   */
-  const vector<vector<double>>& getEqmMatrix() const {
+  const vector< vector<double> >& getEqmMatrix() const {
     return equilibriumMatrix;
   }
 
-  //! Shares memory location of objectiveValues with BCEWindow.
+  //! Shares memory location of objectiveValues with BCEPlotHandler.
   /*! BCEWindow cannot edit BCEDataState's private member
     objectiveValues but needs read access to plot the GUI's
     bar plots of player's deviation objectives.
   */
-  const vector<vector<double>>& getObjectiveValues() const {
+  const vector< vector<double> >& getObjectiveValues() const {
     return objectiveValues;
   }
 
-  //! Shares memory location of allEqm with BCEWindow.
+  //! Shares memory location of allEqm with BCEPlotHandler.
   /*! BCEWindow cannot edit BCEDataState's private member
     allEqm but needs read access to plot the GUI's
     BCE Value Set Plot.
   */
-  const vector<vector<double>>& getAllEqm() const {
+  const vector< vector<double> >& getAllEqm() const {
     return allEqm;
+  }
+
+  //! Shares the current BCESolution by reference.
+  /*! Used to save the current solution. saveGame() in 
+    BCEWindow calls this function to serialize and save
+    a BCESolution.
+  */
+  const BCESolution& getSolution() const {
+    return solutionData;
   }
 
   //! Shares file name of currently loaded file with BCEWindow.

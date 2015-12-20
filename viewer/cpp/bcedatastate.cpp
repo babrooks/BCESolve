@@ -25,25 +25,24 @@ int BCEDataState::shareDataProperties(BCESliderType st,int player) {
     }
   }
 
+void BCEDataState::setSolutionData(BCESolution &solution) {
+  solutionData = BCESolution(solution);
+  gameData = BCEGame(solutionData.getGame());
+}
+
 void BCEDataState::setData(QString dataPath) {
-
-    QByteArray ba = dataPath.toLocal8Bit();
-    const char* newPath_c = ba.data();
-
-    cout << dataPath.toStdString() << endl;
-
-    // Load New Data on Path
-    BCESolution::load(solutionData,newPath_c);
-    gameData = BCEGame(solutionData.getGame());
 
     // Get File Name for GUI's Title
     string filePath = dataPath.toStdString();
-    boost::filesystem::path boostPath(filePath);
-    guiTitle = boostPath.filename().string();
+    // boost::filesystem::path boostPath(filePath);
+    // guiTitle = boostPath.filename().string();
+    QFileInfo info(dataPath);
+    guiTitle = info.fileName().toStdString();
 		
     isPrivateVals = gameData.hasProductStructure();
     cout << isPrivateVals << endl;
 
+    // Reset Initial Parameters
     currentEqmIndex = 0;
     actions = vector<int>(2,0);
     types = vector<int>(2,0);
@@ -59,12 +58,13 @@ void BCEDataState::setData(QString dataPath) {
     cout << "prob: " << equilibriumMatrix[0][0] << endl;
 
     vector<int> numActions = gameData.getNumActions();
-    cout << numActions[0] << endl;
+    cout << "NumActions[0] = " << numActions[0] << endl;
     vector<int> numTypes = gameData.getNumTypes();
     cout << numTypes[0] << endl;
     int numStates = gameData.getNumStates();
     cout << numStates << endl;
 
+    // Set Slider Ranges 
     for (int player = 0; player < 2; player++) {
       sliderGroup[3*player]->setRange(0,numActions[player]-1);
       sliderGroup[3*player+1]->setRange(0,numTypes[player]-1);
@@ -75,6 +75,7 @@ void BCEDataState::setData(QString dataPath) {
       cout << "Slider setting completed." << endl;
     }
 
+    // Set Sliders to 0
     for (int i = 0; i < 6; i++) {
       sliderGroup[i]->setSliderPosition(0);
       sliderGroup[i]->setSingleStep(1);
@@ -163,8 +164,8 @@ void BCEDataState::setupControlsLayout() {
       subLayoutWithLabels[3*i+j]->addWidget(sliderLabels[3*i+j]);
       subLayoutWithLabels[3*i+j]->addLayout(gridSubLayouts[3*i+j]);
       controlsGrid->addLayout(subLayoutWithLabels[3*i+j],j,i); // Layout Matrix
-    } // Rows
-  } // Columns
+    } 
+  }
 
   controlsLayout = controlsGrid;
 
@@ -200,7 +201,7 @@ void BCEDataState::setSliderValue(int value,
   else 
     emit(valueChanged(value,st,player));
 
-  // Signals that manipulated data in the gui must be changed.
+  // Changes data in the gui must be changed.
   resetManipulatedData(st,player);
 }
 
@@ -282,11 +283,11 @@ void BCEDataState::setEqmMatrix() {
 
   // Action Conditions
 
-  vector<vector<int>> actionConditions(2, vector<int>(0));
+  vector< vector<int> > actionConditions(2, vector<int>(0));
 
   // Type Conditions
 
-  vector<vector<int>> typeConditions(2,vector<int>(0));
+  vector< vector<int> > typeConditions(2,vector<int>(0));
 
   double prob
     = solutionData.getConditionalMarginal(stateConditions,
@@ -301,7 +302,7 @@ void BCEDataState::setEqmMatrix() {
 
   vector<int> numActions = gameData.getNumActions();
 
-  equilibriumMatrix = vector<vector<double>>(numActions[1],
+  equilibriumMatrix = vector< vector<double> >(numActions[1],
 					     vector<double>(numActions[0],0));
 
   for (int a1 = 0; a1 < numActions[1]; a1++)

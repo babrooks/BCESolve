@@ -8,6 +8,8 @@
 #include "bcepayofftablemodel.hpp"
 // #include "bceprobabilitytablemodel.hpp"
 #include "bcetableview.hpp"
+#include "bcepriortablemodel.hpp"
+#include "bceconditionaltablemodel.hpp"
 
 //! This class handles the widgets for editing/displaying the game.
 /*! All of the widgets in the game tab and their slots are members of
@@ -29,13 +31,19 @@ private:
   //! The game object.
   /*! This is the game that is represented in the game tab. Note that
       this can be a different game than the one that is associated
-      with the solution in the solution tab. */
+      with the solution in the solution tab. Alterations to the game
+      can be saved using options in the file menu.
+
+      \ingroup viewer
+  */
   BCEGame game;
 
   //! The model for interfacing with payoffs
   BCEPayoffTableModel* payoffModel;
-  // //! Vector of models for interfacing with transition probabilities
-  // vector<BCEProbabilityTableModel*> probabilityModels;
+  //! Model for interfacing with prior
+  BCEPriorTableModel* priorModel;
+  //! Model for interfacing with conditional distn of types
+  BCEConditionalTableModel * conditionalModel;
 
   //! Layout for the game tab.
   QVBoxLayout * layout;
@@ -47,11 +55,11 @@ private:
 
   // Edits
   //! Edits for number of actions
-  QLineEdit * numActionsEdit;
+  vector<QLineEdit*> numActionsEdits;
   //! Edit for number of states.
   QLineEdit * numStatesEdit;
   //! Edit for number of states.
-  QLineEdit * numTypesEdit;
+  vector<QLineEdit*> numTypesEdits;
 
   // Combo box
   //! Drop down menu for selecting a state.
@@ -59,8 +67,11 @@ private:
   
   // Tables
   //! Table for displaying stage payoffs
-  QTableView * payoffTableView;
-  // //! Vector of tables for displaying transition probabilities.
+  BCETableView * payoffTableView;
+  //! Table for displaying prior
+  BCETableView* priorTableView;
+  //! Table for displaying conditional distn of types
+  BCETableView* conditionalTableView;
   // vector<BCETableView *> probabilityTableViews;
   // //! Layout for holding transition probability tables.
   // QVBoxLayout * probabilityTableLayout;
@@ -80,7 +91,7 @@ public:
   void setGame(const BCEGame & _game);
 
   //! Returns constant reference to the current game.
-  const BCEGame & getGame() const
+  BCEGame & getGame() 
   { return game; }
 
   //! Returns the layout
@@ -104,10 +115,6 @@ private:
   //! Delete old data models and create new ones.
   /*! Called in constructor and whenever game changes. */
   void initializeModels();
-  //! Adds a new probability table model
-  void pushBackProbabilityTable(int newS);
-  //! Removes last probability table model
-  void popBackProbabilityTable();
   //! Adds/removes models to achieve correct number of states.
   void changeNumberOfStates(int newS);
 				     
@@ -116,19 +123,14 @@ private slots:
   void currentStateChanged(int newS);
   //! Adds a new state. Calls changeNumberOfStates.
   void stateAdded();
-  //! Action added for player 1. Calls actionAdded.
-  void action1Added();
-  //! Action added for player 2. Calls actionAdded.
-  void action2Added();
   //! Adds a new action for the indicated player.
   void actionAdded(int player);
-
+  //! Adds a new type for the indicated player.
+  void typeAdded(int player);
+  //! Removes a type for the indicated player.
+  void typeRemoved(int player);
   //! Removes the current state.
   void stateRemoved();
-  //! Action removed for player 1. Calls actionRemoved.
-  void action1Removed();
-  //! Action removed for player 2. Calls actionRemoved.
-  void action2Removed();
   //! Removes action for the given player. 
   /*! Will remove the action that is currently selected in the payoff
       table, if one is selected. */
@@ -138,6 +140,10 @@ private slots:
   void nextState();
   //! Decreases currentState to the previous state.
   void prevState();
+
+signals:
+
+  void startSolveRoutine();
 
 };
 

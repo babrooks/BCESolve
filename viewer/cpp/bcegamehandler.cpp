@@ -1,10 +1,10 @@
 #include <QtWidgets>
 #include "bcegamehandler.hpp"
+#include "bcepushbutton.hpp"
 
-BCEGameHandler::BCEGameHandler()
+BCEGameHandler::BCEGameHandler():
+  game(BCEGame())
 {
-  game = BCEGame();
-
   numStatesEdit = new QLineEdit("1");
   numStatesEdit->setSizePolicy(QSizePolicy::Preferred,
 			       QSizePolicy::Preferred);
@@ -13,7 +13,6 @@ BCEGameHandler::BCEGameHandler()
   QPushButton * removeStateButton = new QPushButton(" -");
   QPushButton * nextStateButton = new QPushButton("->");
   QPushButton * prevStateButton = new QPushButton("<-");
-
   QSize buttonSize(50,addStateButton->height());
   addStateButton->resize(buttonSize);
   removeStateButton->resize(buttonSize);
@@ -34,35 +33,66 @@ BCEGameHandler::BCEGameHandler()
   prevStateButton->setSizePolicy(QSizePolicy::Fixed,
 				 QSizePolicy::Preferred);
 
-  numActionsEdit = new QLineEdit("1");
-  numActionsEdit->setReadOnly(true);
-  numActionsEdit->setSizePolicy(QSizePolicy::Preferred,
-				 QSizePolicy::Preferred);
+  numActionsEdits = vector<QLineEdit*>(2);
+  vector<BCEPushButton *> addActionButtons = vector<BCEPushButton*>(2);
+  vector<BCEPushButton *> removeActionButtons = vector<BCEPushButton*>(2);
+  for (int player = 0; player < 2; player++)
+    {
+      numActionsEdits[player] = new QLineEdit("1");
+      numActionsEdits[player]->setReadOnly(true);
+      numActionsEdits[player]->setSizePolicy(QSizePolicy::Preferred,
+					     QSizePolicy::Preferred);
 
-  QPushButton * addActionButton = new QPushButton("+");
-  QPushButton * removeActionButton = new QPushButton(" -");
+      addActionButtons[player] = new BCEPushButton(player,"+");
+      removeActionButtons[player] = new BCEPushButton(player," -");
 
-  addActionButton->resize(buttonSize);
-  removeActionButton->resize(buttonSize);
+      addActionButtons[player]->resize(buttonSize);
+      removeActionButtons[player]->resize(buttonSize);
 
-  addActionButton->setMinimumWidth(buttonSize.width());
-  removeActionButton->setMinimumWidth(buttonSize.width());
+      addActionButtons[player]->setMinimumWidth(buttonSize.width());
+      removeActionButtons[player]->setMinimumWidth(buttonSize.width());
 
-  addActionButton->setSizePolicy(QSizePolicy::Fixed,
-				 QSizePolicy::Preferred);
-  removeActionButton->setSizePolicy(QSizePolicy::Fixed,
-				    QSizePolicy::Preferred);
+      addActionButtons[player]->setSizePolicy(QSizePolicy::Fixed,
+					      QSizePolicy::Preferred);
+      removeActionButtons[player]->setSizePolicy(QSizePolicy::Fixed,
+						 QSizePolicy::Preferred);
+    }
 
+  numTypesEdits = vector<QLineEdit*>(2);
+  vector<BCEPushButton *> addTypeButtons = vector<BCEPushButton*>(2);
+  vector<BCEPushButton *> removeTypeButtons = vector<BCEPushButton*>(2);
+  for (int player = 0; player < 2; player++)
+    {
+      numTypesEdits[player] = new QLineEdit("1");
+      numTypesEdits[player]->setReadOnly(true);
+      numTypesEdits[player]->setSizePolicy(QSizePolicy::Preferred,
+					   QSizePolicy::Preferred);
 
+      addTypeButtons[player] = new BCEPushButton(player,"+");
+      removeTypeButtons[player] = new BCEPushButton(player," -");
+
+      addTypeButtons[player]->resize(buttonSize);
+      removeTypeButtons[player]->resize(buttonSize);
+
+      addTypeButtons[player]->setMinimumWidth(buttonSize.width());
+      removeTypeButtons[player]->setMinimumWidth(buttonSize.width());
+
+      addTypeButtons[player]->setSizePolicy(QSizePolicy::Fixed,
+					    QSizePolicy::Preferred);
+      removeTypeButtons[player]->setSizePolicy(QSizePolicy::Fixed,
+					       QSizePolicy::Preferred);
+    }
+  
   payoffTableView = new BCETableView();
   payoffTableView->setSelectionMode(QAbstractItemView::ContiguousSelection);
-  // probabilityTableViews = vector<BCETableView*>(1);
-  // probabilityTableViews[0] = new BCETableView();
+  priorTableView = new BCETableView();
+  priorTableView->setSelectionMode(QAbstractItemView::ContiguousSelection);
+  conditionalTableView = new BCETableView();
+  conditionalTableView->setSelectionMode(QAbstractItemView::ContiguousSelection);
 
   payoffModel = NULL;
-
-  // probabilityTableLayout = new QVBoxLayout();
-  // probabilityTableLayout->addWidget(probabilityTableViews[0]);
+  priorModel = NULL;
+  conditionalModel = NULL;
 
   initializeModels();
 
@@ -70,8 +100,6 @@ BCEGameHandler::BCEGameHandler()
   currentStateCombo->addItem("0");
   currentStateCombo->setSizePolicy(QSizePolicy::Preferred,
 				   QSizePolicy::Preferred);
-
-  // feasibleCheckBox = new QCheckBox(QString("Only calculate feasible set"));
 
   // Construct layout
   layout = new QVBoxLayout();
@@ -81,7 +109,8 @@ BCEGameHandler::BCEGameHandler()
   QFormLayout * rightControlLayout = new QFormLayout();
   QHBoxLayout * tableLayout = new QHBoxLayout();
   QVBoxLayout * payoffLayout = new QVBoxLayout();
-  // QVBoxLayout * probabilityLayout = new QVBoxLayout();
+  QVBoxLayout * probabilityLayout = new QVBoxLayout();
+  QVBoxLayout * conditionalLayout = new QVBoxLayout();
   
   solveButton = new QPushButton(tr("Solve"));
   solveButton->setSizePolicy(QSizePolicy::Fixed,
@@ -107,28 +136,57 @@ BCEGameHandler::BCEGameHandler()
   // 			    addStateButton);
   // leftControlLayout->setSpacing(0);
 
-  QHBoxLayout * numActionsLayout = new QHBoxLayout();
-  numActionsLayout->addWidget(numActionsEdit);
-  numActionsLayout->addWidget(removeActionButton);
-  numActionsLayout->addWidget(addActionButton);
-  numActionsLayout->setSpacing(5);
+  for (int player = 0; player < 2; player ++)
+    {
+      QHBoxLayout * numActionsLayout = new QHBoxLayout();
+      numActionsLayout->addWidget(numActionsEdits[player]);
+      numActionsLayout->addWidget(removeActionButtons[player]);
+      numActionsLayout->addWidget(addActionButtons[player]);
+      numActionsLayout->setSpacing(5);
 
-  QString numActionsLabel = QString(tr("Number of Actions:"));
+      QString numActionsLabel = QString(tr("Player "))
+	+QString::number(player+1)
+	+QString(tr("'s number of actions ("));
+      if (player == 0)
+	numActionsLabel += QString(tr("row"));
+      else
+	numActionsLabel += QString(tr("column"));
+      numActionsLabel += QString(tr("):"));
       
-  leftControlLayout->addRow(numActionsLabel,
-			    numActionsLayout);
+      leftControlLayout->addRow(numActionsLabel,
+				numActionsLayout);      
+    }
 
+  for (int player = 0; player < 2; player ++)
+    {
+      QHBoxLayout * numTypesLayout = new QHBoxLayout();
+      numTypesLayout->addWidget(numTypesEdits[player]);
+      numTypesLayout->addWidget(removeTypeButtons[player]);
+      numTypesLayout->addWidget(addTypeButtons[player]);
+      numTypesLayout->setSpacing(5);
+
+      QString numTypesLabel = QString(tr("Player "))
+	+QString::number(player+1)
+	+QString(tr("'s number of types ("));
+      if (player == 0)
+	numTypesLabel += QString(tr("row"));
+      else
+	numTypesLabel += QString(tr("column"));
+      numTypesLabel += QString(tr("):"));
+      
+      leftControlLayout->addRow(numTypesLabel,
+				numTypesLayout);      
+    }
 
   QHBoxLayout * numStatesLayout = new QHBoxLayout();
   numStatesLayout->addWidget(numStatesEdit);
   numStatesLayout->addWidget(removeStateButton);
   numStatesLayout->addWidget(addStateButton);
   numStatesLayout->setSpacing(5);
-  leftControlLayout->addRow(new QLabel(tr("Number of states:")),
-			    numStatesLayout);
-  leftControlLayout->setSpacing(5);
-  
-  // rightControlLayout->addRow(feasibleCheckBox);
+  rightControlLayout->addRow(new QLabel(tr("Number of states:")),
+			     numStatesLayout);
+  rightControlLayout->setSpacing(5);
+
   rightControlLayout->addRow(solveButton);
   rightControlLayout->addRow(cancelButton);
   
@@ -136,25 +194,63 @@ BCEGameHandler::BCEGameHandler()
   controlLayout->addLayout(centerControlLayout);
   controlLayout->addLayout(rightControlLayout);
 
-  payoffLayout->addWidget(new QLabel(tr("Stage payoffs:")));
-  payoffLayout->addWidget(payoffTableView);
+  // Scroll Area for Prior
 
-  // QScrollArea * probabilityScrollArea = new QScrollArea();
-  // QWidget * probabilityWidget = new QWidget();
+  QScrollArea * probabilityScrollArea = new QScrollArea();
+  QWidget * probabilityWidget = new QWidget();
 
-  // probabilityWidget->setLayout(probabilityTableLayout);
-  // probabilityScrollArea->setWidget(probabilityWidget);
+  QVBoxLayout* probabilityTableLayout = new QVBoxLayout();
+  probabilityTableLayout->addWidget(priorTableView);
+  probabilityWidget->setLayout(probabilityTableLayout);
+  probabilityScrollArea->setWidget(probabilityWidget);
 
-  // probabilityScrollArea->setWidgetResizable(true);
-  // probabilityScrollArea->setSizePolicy(QSizePolicy::Expanding,
-  // 				       QSizePolicy::Expanding);
-  // probabilityScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+  probabilityScrollArea->setWidgetResizable(true);
+  probabilityScrollArea->setSizePolicy(QSizePolicy::Expanding,
+  				       QSizePolicy::Expanding);
+  probabilityScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
-  // probabilityLayout->addWidget(new QLabel(tr("Transition probabilities:")));
-  // probabilityLayout->addWidget(probabilityScrollArea);
+  probabilityLayout->addWidget(new QLabel(tr("Prior Distribution of States:")));
+  probabilityLayout->addWidget(probabilityScrollArea);
+
+  // Scroll Area for Conditional Distribution of Types
+
+  QScrollArea * payoffScrollArea = new QScrollArea();
+  QWidget * payoffWidget = new QWidget();
+
+  QVBoxLayout* payoffTableLayout = new QVBoxLayout();
+  payoffTableLayout->addWidget(payoffTableView);
+  payoffWidget->setLayout(payoffTableLayout);
+  payoffScrollArea->setWidget(payoffWidget);
+
+  payoffScrollArea->setWidgetResizable(true);
+  payoffScrollArea->setSizePolicy(QSizePolicy::Expanding,
+				  QSizePolicy::Expanding);
+  payoffScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+
+  payoffLayout->addWidget(new QLabel(tr("Player Payoffs:")));
+  payoffLayout->addWidget(payoffScrollArea);
+
+  // Scroll Area for Payoff Matrix
+
+  QScrollArea * conditionalScrollArea = new QScrollArea();
+  QWidget * conditionalWidget = new QWidget();
+
+  QVBoxLayout* conditionalTableLayout = new QVBoxLayout();
+  conditionalTableLayout->addWidget(conditionalTableView);
+  conditionalWidget->setLayout(conditionalTableLayout);
+  conditionalScrollArea->setWidget(conditionalWidget);
+
+  conditionalScrollArea->setWidgetResizable(true);
+  conditionalScrollArea->setSizePolicy(QSizePolicy::Expanding,
+  				       QSizePolicy::Expanding);
+  conditionalScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+
+  conditionalLayout->addWidget(new QLabel(tr("Conditional Distribution of Types:")));
+  conditionalLayout->addWidget(conditionalScrollArea);
 
   tableLayout->addLayout(payoffLayout);
-  // tableLayout->addLayout(probabilityLayout);
+  tableLayout->addLayout(probabilityLayout);
+  tableLayout->addLayout(conditionalLayout);
 
   // resizePayoffTable(0,2,0,2);
   // resizeProbabilityTable(0,2,0,2,0,1);
@@ -163,32 +259,35 @@ BCEGameHandler::BCEGameHandler()
   layout->addLayout(tableLayout);
 
   // Connect slots
+
   connect(currentStateCombo,SIGNAL(currentIndexChanged(int)),
 	  this,SLOT(currentStateChanged(int)));
-  connect(addActionButton,SIGNAL(clicked()),
-	  this,SLOT(action1Added()));
-  connect(addActionButton,SIGNAL(clicked()),
-	  this,SLOT(action2Added()));
-  connect(addStateButton,SIGNAL(clicked()),
-	  this,SLOT(stateAdded()));
 
-  connect(removeActionButton,SIGNAL(clicked()),
-	  this,SLOT(action1Removed()));
-  connect(removeActionButton,SIGNAL(clicked()),
-	  this,SLOT(action2Removed()));
-  connect(removeStateButton,SIGNAL(clicked()),
-	  this,SLOT(stateRemoved()));
+for (int player = 0; player < 2; player++) {
+  connect(addActionButtons[player],SIGNAL(clickedForPlayer(int)),
+	  this,SLOT(actionAdded(int)));
+  connect(addTypeButtons[player],SIGNAL(clickedForPlayer(int)),
+	  this,SLOT(typeAdded(int)));
+  connect(removeActionButtons[player],SIGNAL(clickedForPlayer(int)),
+	  this,SLOT(actionRemoved(int)));
+  connect(removeTypeButtons[player],SIGNAL(clickedForPlayer(int)),
+	  this,SLOT(typeRemoved(int)));
+ }
 
-  connect(nextStateButton,SIGNAL(clicked()),
-	  this,SLOT(nextState()));
-  connect(prevStateButton,SIGNAL(clicked()),
-	  this,SLOT(prevState()));
+connect(addStateButton,SIGNAL(clicked()),
+	this,SLOT(stateAdded()));
+connect(removeStateButton,SIGNAL(clicked()),
+	this,SLOT(stateRemoved()));
 
-  // connect(feasibleCheckBox,SIGNAL(stateChanged(int)),
-  // 	  this,SLOT(setConstrained(int)));
-    
+connect(nextStateButton,SIGNAL(clicked()),
+	this,SLOT(nextState()));
+connect(prevStateButton,SIGNAL(clicked()),
+	this,SLOT(prevState()));
 
-  qDebug() << "Finished sggamehandler constructor" << endl;
+connect(solveButton,SIGNAL(clicked()),
+	this,SIGNAL(startSolveRoutine()));
+
+qDebug() << "Finished sggamehandler constructor" << endl;
 
 }
 
@@ -196,8 +295,10 @@ BCEGameHandler::~BCEGameHandler()
 {
   if (payoffModel != NULL)
     delete payoffModel;
-  // for (int state = 0; state < game.getNumStates(); state++)
-  //   delete probabilityModels[state];
+  if (priorModel != NULL)
+    delete priorModel;
+  if (conditionalModel != NULL)
+    delete conditionalModel;
 }
 
 void BCEGameHandler::setGame(const BCEGame & _game)
@@ -205,8 +306,12 @@ void BCEGameHandler::setGame(const BCEGame & _game)
   game = _game;
 
   changeNumberOfStates(game.getNumStates());
-  numActionsEdit
-    ->setText(QString::number(game.getNumActions()[0]));
+  for (int player = 0; player < 2; player++) {
+    numActionsEdits[player]
+      ->setText(QString::number(game.getNumActions()[player]));
+    numTypesEdits[player]
+      ->setText(QString::number(game.getNumTypes()[player]));
+  }
   
   initializeModels();
 
@@ -218,7 +323,12 @@ void BCEGameHandler::changeNumberOfStates(int newS)
   disconnect(currentStateCombo,SIGNAL(currentIndexChanged(int)),
 	     this,SLOT(currentStateChanged(int)));
 
-  numStatesEdit->setText(QString::number(game.getNumStates()));
+  for (int player = 0; player < 2; player++) {
+    numActionsEdits[player]
+      ->setText(QString::number(game.getNumActions()[player]));
+    numTypesEdits[player]
+      ->setText(QString::number(game.getNumTypes()[player]));
+  }
   
   int state = currentStateCombo->count();
   // Remove items larger than the new number of states
@@ -227,7 +337,7 @@ void BCEGameHandler::changeNumberOfStates(int newS)
   // Add new states if number of states increased
   while (state < newS)
     currentStateCombo->addItem(QString::number(state++));
-  
+
   currentStateCombo->setCurrentIndex(0);
 
   connect(currentStateCombo,SIGNAL(currentIndexChanged(int)),
@@ -238,88 +348,45 @@ void BCEGameHandler::changeNumberOfStates(int newS)
 void BCEGameHandler::initializeModels()
 {
   // Create new payoffModel
-  if (payoffModel == NULL)
+  if (payoffModel != NULL)
     delete payoffModel;
+  if (priorModel != NULL)
+    delete priorModel;
+  if (conditionalModel != NULL)
+    delete conditionalModel;
 
   payoffModel = new BCEPayoffTableModel(&game,0);
   payoffTableView->setEditTriggers(QAbstractItemView::AllEditTriggers);
   payoffTableView->setModel(payoffModel);
   payoffTableView->resizeColumnsToContents();
 
-//   // Now create new probabilityModels
-//   for (int state = probabilityModels.size()-1;
-//        state >= 0;
-//        state --)
-//     delete probabilityModels[state];
+  priorModel = new BCEPriorTableModel(&game);
+  priorTableView->setEditTriggers(QAbstractItemView::AllEditTriggers);
+  priorTableView->setModel(priorModel);
+  priorTableView->resizeColumnsToContents();
 
-//   // Clear out probabilityTableLayout
-//   QLayoutItem * item;
-//   while (item = probabilityTableLayout->takeAt(0))
-//     delete item->widget();
-  
-//   probabilityModels.clear();
-//   probabilityTableViews.clear();
+  conditionalModel = new BCEConditionalTableModel(&game,0);
+  conditionalTableView->setEditTriggers(QAbstractItemView::AllEditTriggers);
+  conditionalTableView->setModel(conditionalModel);
+  conditionalTableView->resizeColumnsToContents();
 
-//   probabilityModels.reserve(game.getNumStates());
-//   probabilityTableViews.reserve(game.getNumStates());
-
-//   // Add new models/views
-//   for (int state = 0;
-//        state < game.getNumStates();
-//        state++)
-//     pushBackProbabilityTable(state);  
 } // initializeModels
 
-
-// void BCEGameHandler::pushBackProbabilityTable(int newState)
-// {
-//   probabilityTableViews.push_back(new SGTableView());
-//   probabilityTableViews.back()
-//     ->verticalScrollBar()->setDisabled(true);
-//   probabilityTableViews.back()
-//     ->horizontalScrollBar()->setDisabled(true);
-
-//   probabilityTableLayout->addWidget(new QLabel(QString("State ")
-// 					       +QString::number(newState)
-// 					       +QString(":")) );
-//   probabilityTableLayout->addWidget(probabilityTableViews.back());
-
-//   probabilityModels.push_back(new SGProbabilityTableModel(&game,0,newState));
-
-//   probabilityTableViews.back()->setModel(probabilityModels.back());
-
-//   probabilityTableViews.back()->resizeColumnsToContents();
-// } // pushBackProbabilityTable
-
-// void BCEGameHandler::popBackProbabilityTable()
-// {
-//   delete probabilityModels.back();
-//   probabilityModels.pop_back();
-
-//   delete probabilityTableLayout->takeAt(probabilityTableLayout->count()-1)->widget();
-//   delete probabilityTableLayout->takeAt(probabilityTableLayout->count()-1)->widget();
-//   probabilityTableViews.pop_back();
-// } // popBackProbabilityTable
-
-  void BCEGameHandler::setState(int state)
-  {
-    numActionsEdit
-      ->setText(QString::number(game.getNumActions()[0]));
+void BCEGameHandler::setState(int state)
+{
+  for (int player = 0; player < 2; player++) {
+    numActionsEdits[player]
+      ->setText(QString::number(game.getNumActions()[player]));
+    numTypesEdits[player]
+      ->setText(QString::number(game.getNumTypes()[player]));
+  }
   
-    payoffModel->setState(state);
-    payoffModel->emitLayoutChanged();
-    payoffTableView->resizeColumnsToContents();
-
-  // for (int nextState = 0; nextState < game.getNumStates(); nextState++)
-  //   {
-  //     probabilityModels[nextState]->setState(state);
-  //     probabilityModels[nextState]->emitLayoutChanged();
-
-  //     // sizeHint for the SGTableView objects has changed. Call
-  //     // updateGeometry.
-  //     probabilityTableViews[nextState]->resizeColumnsToContents();
-  //     probabilityTableViews[nextState]->updateGeometry();
-  //   }
+  payoffModel->setState(state);
+  payoffModel->emitLayoutChanged();
+  conditionalModel->setState(state);
+  conditionalModel->emitLayoutChanged();
+  payoffTableView->resizeColumnsToContents();
+  conditionalTableView->resizeColumnsToContents();
   
   disconnect(currentStateCombo,SIGNAL(currentIndexChanged(int)),
 	     this,SLOT(currentStateChanged(int)));
@@ -350,36 +417,11 @@ void BCEGameHandler::prevState()
     setState(state-1);
 }
 
-// void BCEGameHandler::discountFactorChanged(const QString & text)
-// {
-//   double newDelta = text.toDouble();
-//   if (newDelta > 0 && newDelta < 1)
-//     game.setDiscountFactor(newDelta);
-// }
-
-// void BCEGameHandler::errorTolChanged(const QString & text)
-// {
-//   double newErrorTol = text.toDouble();
-//   if (newErrorTol > 0 && newErrorTol < 1)
-//     errorTol = newErrorTol;
-// }
-
-void BCEGameHandler::action1Added()
-{
-  actionAdded(0);
-}
-
-void BCEGameHandler::action2Added()
-{
-  actionAdded(1);
-}
-
 void BCEGameHandler::actionAdded(int player)
 {
   if (player < 0 || player > 1)
     return;
   
-  int state = currentStateCombo->currentIndex();
   int newAction = game.getNumActions()[player];
   
   if (payoffTableView->selectionModel()->hasSelection())
@@ -393,40 +435,55 @@ void BCEGameHandler::actionAdded(int player)
     }
     
   game.addAction(player,newAction);
-  numActionsEdit
-    ->setText(QString::number(game.getNumActions()[0]));
+  numActionsEdits[player]
+    ->setText(QString::number(game.getNumActions()[player]));
 
   payoffModel->emitLayoutChanged();
   payoffTableView->resizeColumnToContents(newAction);
-  // payoffTableView->updateGeometry();
-  // for (int nextState = 0; nextState < game.getNumStates(); nextState++)
-  //   {
-  //     probabilityModels[nextState]->emitLayoutChanged();
-  //     probabilityTableViews[nextState]->resizeColumnToContents(newAction);
-  //     probabilityTableViews[nextState]->updateGeometry();
-  //   }
+
 }  // actionAdded
+
+void BCEGameHandler::typeAdded(int player)
+{
+  if (player < 0 || player > 1)
+    return;
+  
+  int newType = game.getNumTypes()[player];
+  
+  if (conditionalTableView->selectionModel()->hasSelection())
+    {
+      if (player==1)
+	newType = (conditionalTableView->selectionModel()
+		     ->selectedIndexes().front().column()+1);
+      else
+	newType = (conditionalTableView->selectionModel()
+		     ->selectedIndexes().front().row()+1);
+    }
+    
+  game.addType(player,newType);
+  numTypesEdits[player]
+    ->setText(QString::number(game.getNumTypes()[player]));
+
+  conditionalModel->emitLayoutChanged();
+  conditionalTableView->resizeColumnToContents(newType);
+
+}  // typeAdded
 
 void BCEGameHandler::stateAdded()
 {
   int newState = currentStateCombo->currentIndex()+1;
+  if (priorTableView->selectionModel()->hasSelection()) {
+    newState = (priorTableView->selectionModel()
+		->selectedIndexes().front().row()+1);
+  }
   game.addState(newState);
   changeNumberOfStates(game.getNumStates());
   numStatesEdit->setText(QString::number(game.getNumStates()));
-  // pushBackProbabilityTable(game.getNumStates()-1);
   
+  priorModel->emitLayoutChanged();
+  priorTableView->resizeColumnToContents(game.getNumStates());
   setState(newState);
 } // stateAdded
-
-void BCEGameHandler::action1Removed()
-{
-  actionRemoved(0);
-}
-
-void BCEGameHandler::action2Removed()
-{
-  actionRemoved(1);
-}
 
 void BCEGameHandler::actionRemoved(int player)
 {
@@ -446,15 +503,36 @@ void BCEGameHandler::actionRemoved(int player)
     }
 
   game.removeAction(player,action);
-  numActionsEdit->setText(QString::number(game.getNumActions()
-						   [0]));
+  numActionsEdits[player]->setText(QString::number(game.getNumActions()
+						   [player]));
 
   payoffModel->emitLayoutChanged();
-  //   for (int statep = 0; statep < game.getNumStates(); statep++)
-  //     {
-  //       probabilityModels[statep]->emitLayoutChanged();
-  //       probabilityTableViews[statep]->updateGeometry();
-  //     }
+
+}
+
+void BCEGameHandler::typeRemoved(int player)
+{
+  int state = currentStateCombo->currentIndex();
+  if (game.getNumTypes()[player] == 1)
+    return;
+  
+  int type = game.getNumTypes()[player]-1;
+  if (conditionalTableView->selectionModel()->hasSelection())
+    {
+      if (player == 1)
+	type = (conditionalTableView->selectionModel()
+		  ->selectedIndexes().front().column());
+      else
+	type = (conditionalTableView->selectionModel()
+		  ->selectedIndexes().front().row());
+    }
+
+  game.removeType(player,type);
+  numTypesEdits[player]->setText(QString::number(game.getNumTypes()
+						   [player]));
+
+  conditionalModel->emitLayoutChanged();
+
 }
 
 void BCEGameHandler::stateRemoved()
@@ -481,16 +559,17 @@ void BCEGameHandler::stateRemoved()
   
   game.removeState(state);
 
+  priorModel->emitLayoutChanged();
+  priorTableView->resizeColumnToContents(game.getNumStates());
+
   numStatesEdit->setText(QString::number(game.getNumStates()));
 
   setState(newState);
   
 } // stateRemoved
 
-// void BCEGameHandler::setConstrained(int newState)
-// {
-//   if (feasibleCheckBox->isChecked())
-//     game.setConstrained(vector<bool>(2,true));
-//   else
-//     game.setConstrained(vector<bool>(2,false));
-// }
+// void BCEGameHandler::solveGame() {
+  
+//   emit(solvePressed());
+
+// } // solveGame

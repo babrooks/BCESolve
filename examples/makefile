@@ -8,7 +8,7 @@ CSYSFLAGS  = -fPIC -DIL_STD
 LDSYSFLAGS = 
 # Compilation and linking flags enabling Multi-threading
 CMTFLAGS = -DILOUSEMT -D_REENTRANT
-LDMTFLAGS = -lpthread -framework CoreFoundation
+LDMTFLAGS = -lpthread 
 # Code optimization/debugging options
 #DEBUG = 
 # DEBUG = -O1 -DNDEBUG
@@ -28,7 +28,7 @@ LIBDIR=../lib
 BOOSTINCLDIR=/usr/include/boost
 BOOSTDIR=/usr/include/boost
 
-CFLAGS = -stdlib=libstdc++ -m64 -O -I$(CONCERTDIR)/include $(CSYSFLAGS) $(DEBUG) \
+CFLAGS =-std=gnu++11 -m64 -O -I$(CONCERTDIR)/include $(CSYSFLAGS) $(DEBUG) \
 	-I$(CPLEXDIR)/include \
 	-I$(CONCERTDIR)/include \
 	-I$(BOOSTDIR) \

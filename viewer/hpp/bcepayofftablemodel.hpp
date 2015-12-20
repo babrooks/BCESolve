@@ -25,7 +25,8 @@ public:
   //! Constructor
   BCEPayoffTableModel(BCEGame * _game,
 		     int _state):
-    BCETableModel(_game,_state)
+    // 0 is the index for a payoff table model
+    BCETableModel(_game,_state,0)
   {}
   
   //! Returns formatted data
@@ -44,7 +45,7 @@ public:
 
   //! Sets data
   /*! Parses the data in value to set a new pair of payoffs. Sets the
-      data using SGGame::setData. */
+      data using BCEGame::setData. */
   bool setData(const QModelIndex & index, const QVariant & value, int role);
   
 }; // BCEPayoffTableModel

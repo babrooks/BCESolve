@@ -1,5 +1,5 @@
-#ifndef BCETABLEMODEL_HPP
-#define BCETABLEMODEL_HPP
+#ifndef BCEPROBABILITYTABLEMODEL_HPP
+#define BCEPROBABILITYTABLEMODEL_HPP
 
 #include <QtWidgets>
 #include <QAbstractTableModel>
@@ -14,17 +14,15 @@
   
   \ingroup viewer
 */
-class BCETableModel : public QAbstractTableModel
+class BCEProbabilityTableModel : public QAbstractTableModel
 {
   Q_OBJECT
 
 public:
   //! Constructor
-  BCETableModel(BCEGame * _game,
-		int _state,
-		int _index):
-    game(_game), state(_state), index(_index)
-  {}
+  BCEProbabilityTableModel(BCEGame * _game):
+    game(_game)
+  { }
   
   //! Returns flags.
   /*! Returns flags that indicate the model is enabled, can be edited,
@@ -32,44 +30,20 @@ public:
   Qt::ItemFlags flags(const QModelIndex & index) const 
   { return Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable; }
 
-  //! Returns the number of row player actions or types.
+  //! Returns the number of row player actions.
   int rowCount(const QModelIndex & parent = QModelIndex()) const Q_DECL_OVERRIDE
-  {
-    if (index == 0)
-      return game->getNumActions()[0]; 
-    if (index == 1)
-      return game->getNumTypes()[0];
-  }
-
-  //! Returns the number of column player actions or types.
+  { return game->getNumStates(); }
+  //! Returns the number of column player actions.
   int columnCount(const QModelIndex & parent = QModelIndex()) const Q_DECL_OVERRIDE
-  { 
-    if (index == 0)
-      return game->getNumActions()[1];
-    if (index == 1)
-      return game->getNumTypes()[1];
-  }
+  { return 1; }
 
   //! Emits layoutChanged signal.
   void emitLayoutChanged()
   { emit layoutChanged(); }
-
-  //! Sets the state to newState.
-  bool setState(int newState)
-  {
-    if (newState < 0 || newState > game->getNumStates())
-      return false;
-    state = newState;
-    return true;
-  }
   
 protected:
-  //! The state that the model is associated with
-  int state;
   //! Pointer to the associated game.
   BCEGame * game;
-  //! Index, 0 = payoff model, 1 = conditional types model
-  int index;
   
 };
 

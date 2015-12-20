@@ -1,4 +1,3 @@
-#include "bce.hpp"
 #include "bcegame.hpp"
 
 BCEGame::BCEGame():
@@ -71,6 +70,12 @@ BCEGame::BCEGame(const BCEAbstractGame & game):
 	    }
 	  typeCounter++;
 	} // while types
+
+      if (priorData[state]>0)
+	{
+	  for (typeCounter = 0; typeCounter < numTypesTotal; typeCounter++)
+	    conditionalData[state][typeCounter] /= priorData[state];
+	}
     } // for state
   
   // Copy dominated and feasible data
