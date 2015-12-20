@@ -57,7 +57,7 @@ MAINS=exampleforrobbie \
 	loadingExample hybridentryreserve \
 	hybridauction allpayauction hybridreserve 
 
-MAINSGRB=revenuelb onesidedrestricted surplusbnd relaxed rcacommon
+MAINSGRB=revenuelb onesidedrestricted surplusbnd relaxed rcacommon roessler
 
 RCAMAINS=rcatest2
 
