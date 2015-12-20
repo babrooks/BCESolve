@@ -6,6 +6,7 @@
 #include "bcegamehandler.hpp"
 #include "bceplothandler.hpp"
 #include "bceloghandler.hpp"
+#include "bcesolverworker.hpp"
 
 //! Assembles BCEGameHandler, BCEPlotHandler, and BCESolverWorker into a Unified GUI.
 /*! Sets up a menu bar and assembles bcegamehandler, bceplothandler, 
@@ -22,7 +23,7 @@ class BCEWindow : public QMainWindow
 
 public:
   //! Constructor
-  BCEWindow();
+  BCEWindow(BCELogHandler &logHandler);
 
 signals:
 
@@ -39,12 +40,16 @@ private:
   BCEGameHandler gameTab;
   //! Contains all information for the solution tab.
   BCEPlotHandler solutionTab;
-  //! Contains all information fot the log tab.
-  BCELogHandler logTab;
+  //! Pointer to the logTab in main.cpp
+  QPointer<BCELogHandler> logTab;
+  //! Widget holding layouts for game, solution, and log tabs.
+  QTabWidget *tabWidget;
   //! Default Path to data
   QString path;
   //! Thread for solverWorker
-  QThread solverWorkerThread;
+  QThread *solverWorkerThread;
+  //! solverWorker Object for Solving Games
+  BCESolverWorker *solverWorker;
 
 private slots:
 
@@ -63,6 +68,8 @@ private slots:
   void saveGame();
   //! Interacts with BCEGameHandler and BCESolverWorker to solve a game.
   void runSolve();
+  //! Switches the current tab to the solution tab.
+  void tabToSolution(BCESolution *soln);
 
 };
 

@@ -287,7 +287,7 @@ connect(prevStateButton,SIGNAL(clicked()),
 connect(solveButton,SIGNAL(clicked()),
 	this,SIGNAL(startSolveRoutine()));
 
-qDebug() << "Finished sggamehandler constructor" << endl;
+// qDebug() << "Finished sggamehandler constructor" << endl;
 
 }
 

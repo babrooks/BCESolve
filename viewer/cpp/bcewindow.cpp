@@ -1,10 +1,12 @@
 #include "bcewindow.hpp"
 #include "bcegame.hpp"
 #include <QtWidgets>
-#include "bcesolverworker.hpp"
 #include "bcelogstream.hpp"
 
-BCEWindow::BCEWindow() {
+BCEWindow::BCEWindow(BCELogHandler &logHandler) {
+
+  // Set the stored logTab equal to the logHandler
+  logTab = &logHandler;
 
   // Set the default path for loading examples.
   path=QString("../examples/");
@@ -56,13 +58,13 @@ BCEWindow::BCEWindow() {
 	  this,SLOT(runSolve()));
 
   // Layout Setup
-  QTabWidget *tabWidget = new QTabWidget();
+  tabWidget = new QTabWidget();
   QWidget *solutionTabWidget = new QWidget();
   solutionTabWidget->setLayout(solutionTab.getLayout());
   QWidget *gameTabWidget = new QWidget();
   gameTabWidget->setLayout(gameTab.getLayout());
   QWidget *logTabWidget = new QWidget();
-  logTabWidget->setLayout(logTab.getLayout());
+  logTabWidget->setLayout(logTab->getLayout());
 
   tabWidget->addTab(solutionTabWidget,"Solution");
   tabWidget->addTab(gameTabWidget,"Game");
@@ -156,9 +158,11 @@ void BCEWindow::loadGame() {
 
 void BCEWindow::saveSolution() {
 
-  QString newPath = QFileDialog::getSaveFileName(this,tr("Select a solution file"),
-						 "./",
-						 tr("BCEViewer solution files (*.bce)"));
+  QFileDialog *saveSolnDialog = new QFileDialog();
+  saveSolnDialog->setDefaultSuffix(".bce");
+  QString newPath = saveSolnDialog->getSaveFileName(this,tr("Save a solution file"),
+						    "../examples/",
+						    tr("BCEViewer solution files (*.bce)"));
 
   if (newPath.isEmpty())
     return;
@@ -182,9 +186,11 @@ void BCEWindow::saveSolution() {
 
 void BCEWindow::saveGame() {
 
-  QString newPath = QFileDialog::getSaveFileName(this,tr("Select a game file"),
-						 "./",
-						 tr("BCEViewer game files (*.bce)"));
+  QFileDialog *saveGameDialog = new QFileDialog();
+  saveGameDialog->setDefaultSuffix(".bgm");
+  QString newPath = saveGameDialog->getSaveFileName(this,tr("Save a game file"),
+						    "../examples/",
+						    tr("BCEViewer game files (*.bgm)"));
 
   if (newPath.isEmpty())
     return;
@@ -209,29 +215,33 @@ void BCEWindow::saveGame() {
 void BCEWindow::runSolve() {
   try
     {
-      // Redirect all subsequent cout to the BCELogHandler.
-      BCELogStream qout(std::cout,logTab.logText);
+      // Switch to the Log Tab (the third tab, so indexed at 2).
+      tabWidget->setCurrentIndex(2);
 
-      logTab.logText->append(QString(""));
-      logTab.logText->append(QString("..........STARTING A NEW COMPUTATION.........."));
-      logTab.logText->append(QString(""));
+      logTab->logText->append(QString(""));
+      logTab->logText->append(QString("..........STARTING A NEW COMPUTATION.........."));
+      logTab->logText->append(QString(""));
 
       // std::cout << "Testing cout Redirect from runSolve()" << std::endl;
       
       // Reimplement when adding cancelGame()
       // cancelSolveFlag = false;
       
-      BCESolverWorker solverWorker(gameTab.getGame());
+      QThread *solverWorkerThread = new QThread();
+      solverWorker = new BCESolverWorker(gameTab.getGame());
 
-      solverWorker.moveToThread(&solverWorkerThread);
-      solverWorker.startSolve();
-      // connect(solverWorker,SIGNAL(resultReady(bool)),
-      // 	      this,SLOT(iterationFinished(bool)));
-      // connect(solverWorker,SIGNAL(exceptionCaught()),
-      // 	      this,SLOT(solverException()));
-      connect(&solverWorkerThread,SIGNAL(finished()),
-	      &solverWorkerThread,SLOT(deleteLater()));
-      solverWorkerThread.start();
+      solverWorker->moveToThread(solverWorkerThread);
+      connect(solverWorkerThread,SIGNAL(started()),
+	      solverWorker,SLOT(startSolve()));
+      connect(solverWorker,SIGNAL(workFinished()),
+	      solverWorkerThread,SLOT(quit()));
+      connect(solverWorker,SIGNAL(sendSolution(BCESolution*)),
+	      this,SLOT(tabToSolution(BCESolution*)));
+      connect(solverWorkerThread,SIGNAL(finished()),
+      	      solverWorkerThread,SLOT(deleteLater()));
+      connect(solverWorkerThread,SIGNAL(finished()),
+      	      solverWorker,SLOT(deleteLater()));
+      solverWorkerThread->start();
       
       // timer.restart();
       
@@ -243,4 +253,9 @@ void BCEWindow::runSolve() {
 			    tr("CPLEX was not able to solve your game."),
 			    QMessageBox::Ok);
     }
+}
+
+void BCEWindow::tabToSolution(BCESolution *soln) {
+  solutionTab.setSolution(*soln);
+  tabWidget->setCurrentIndex(0);
 }

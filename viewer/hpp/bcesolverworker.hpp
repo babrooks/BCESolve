@@ -26,9 +26,11 @@ public:
     game(_game) 
   {}
 
-  const BCESolution& getSolution() const {
+  BCESolution& getSolution() {
     return solution;
   }
+
+public slots:
 
   void startSolve() {
 
@@ -46,7 +48,15 @@ public:
 
     solver.getSolution(solution);
 
+    emit(sendSolution(&solution));
+    emit(workFinished());
+
   }
+
+signals:
+
+  void workFinished();
+  void sendSolution(BCESolution *soln);
 
 };
 
