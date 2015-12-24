@@ -8,6 +8,12 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   // Set the stored logTab equal to the logHandler
   logTab = &logHandler;
 
+  // Sets resolution settings
+  QRect rec = QApplication::desktop()->screenGeometry();
+  resWidth = rec.width();
+  resHeight = rec.height();
+  setResolution(resWidth,resHeight);
+
   // Set the default path for loading examples.
   path=QString("../examples/");
 
@@ -54,8 +60,8 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   	  &solutionTab,SLOT(loadData(QString)));
 
   // Solve Routine Connections
-  connect(&gameTab,SIGNAL(startSolveRoutine()),
-	  this,SLOT(runSolve()));
+  connect(&gameTab,SIGNAL(startSolveRoutine(vector<double>&)),
+	  this,SLOT(runSolve(vector<double>&)));
 
   // Layout Setup
   tabWidget = new QTabWidget();
@@ -212,7 +218,7 @@ void BCEWindow::saveGame() {
     }
 } // saveGame
 
-void BCEWindow::runSolve() {
+void BCEWindow::runSolve(vector<double> & weightData) {
   try
     {
       // Switch to the Log Tab (the third tab, so indexed at 2).
@@ -228,7 +234,7 @@ void BCEWindow::runSolve() {
       // cancelSolveFlag = false;
       
       QThread *solverWorkerThread = new QThread();
-      solverWorker = new BCESolverWorker(gameTab.getGame());
+      solverWorker = new BCESolverWorker(gameTab.getGame(),weightData);
 
       solverWorker->moveToThread(solverWorkerThread);
       connect(solverWorkerThread,SIGNAL(started()),
@@ -258,4 +264,9 @@ void BCEWindow::runSolve() {
 void BCEWindow::tabToSolution(BCESolution *soln) {
   solutionTab.setSolution(*soln);
   tabWidget->setCurrentIndex(0);
+}
+
+void BCEWindow::setResolution(int resWidth,int resHeight) {
+  solutionTab.setResolution(resWidth,resHeight);
+  gameTab.setResolution(resWidth,resHeight);
 }

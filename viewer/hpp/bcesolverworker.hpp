@@ -21,10 +21,11 @@ private:
 
   BCEGame game;
   BCESolution solution;
+  vector<double> weightData;
 
 public:
-  BCESolverWorker(BCEGame &_game):
-    game(_game) 
+  BCESolverWorker(BCEGame &_game,vector<double>& _weightData):
+    game(_game), weightData(_weightData) 
   {}
 
   BCESolution& getSolution() {

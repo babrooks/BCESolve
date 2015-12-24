@@ -50,6 +50,12 @@ private:
   QThread *solverWorkerThread;
   //! solverWorker Object for Solving Games
   BCESolverWorker *solverWorker;
+  //! Sets resolution width
+  int resWidth = 1920;
+  //! Sets resolution height
+  int resHeight = 1080;
+  //! Passes resolution to classes creating layouts.
+  void setResolution(int resWidth,int resHeight);
 
 private slots:
 
@@ -67,7 +73,7 @@ private slots:
   //! Interacts with BCEGameHandler and BCEPlotHandler to save a game.
   void saveGame();
   //! Interacts with BCEGameHandler and BCESolverWorker to solve a game.
-  void runSolve();
+  void runSolve(vector<double> & weightData);
   //! Switches the current tab to the solution tab.
   void tabToSolution(BCESolution *soln);
 

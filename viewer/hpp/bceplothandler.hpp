@@ -87,10 +87,9 @@ private:
   //! Layout for the Plot Handler
   QHBoxLayout *mainTab;
   //! Screen Resolution Width.
-  int resWidth;
+  int resWidth = 1920;
   //! Screen Resolution Height.
-  int resHeight;
-
+  int resHeight = 1080;
   //! Data state. 
   /*! Stores all data currently held or 
     displayed in the GUI. "Held" data 
@@ -156,6 +155,8 @@ public:
   const BCESolution& getSolutionData() const {
     return guiData.getSolution();
   }
+  //! Sets resolution to settings provided by BCEWindow.
+  void setResolution(int resWidth,int resHeight);
 
 };
 

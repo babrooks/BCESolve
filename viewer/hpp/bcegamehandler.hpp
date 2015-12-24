@@ -10,6 +10,7 @@
 #include "bcetableview.hpp"
 #include "bcepriortablemodel.hpp"
 #include "bceconditionaltablemodel.hpp"
+#include "bceobjweightstablemodel.hpp"
 
 //! This class handles the widgets for editing/displaying the game.
 /*! All of the widgets in the game tab and their slots are members of
@@ -44,6 +45,8 @@ private:
   BCEPriorTableModel* priorModel;
   //! Model for interfacing with conditional distn of types
   BCEConditionalTableModel * conditionalModel;
+  //! Model for setting weights on objectives
+  BCEObjWeightsTableModel * weightsModel;
 
   //! Layout for the game tab.
   QVBoxLayout * layout;
@@ -54,12 +57,15 @@ private:
   QPushButton * cancelButton;
 
   // Edits
+
   //! Edits for number of actions
   vector<QLineEdit*> numActionsEdits;
   //! Edit for number of states.
   QLineEdit * numStatesEdit;
   //! Edit for number of states.
   vector<QLineEdit*> numTypesEdits;
+  //! Edit for number of objectives.
+  QLineEdit *numObjectivesEdit;
 
   // Combo box
   //! Drop down menu for selecting a state.
@@ -72,9 +78,12 @@ private:
   BCETableView* priorTableView;
   //! Table for displaying conditional distn of types
   BCETableView* conditionalTableView;
-  // vector<BCETableView *> probabilityTableViews;
-  // //! Layout for holding transition probability tables.
-  // QVBoxLayout * probabilityTableLayout;
+  //! Table for displaying weights data
+  BCETableView *objWeightsTableView;
+  //! Resolution Width
+  int resWidth = 1920;
+  //! Resolution height
+  int resHeight = 1080;
 
 public:
   //! Constructor
@@ -110,6 +119,9 @@ public:
   /*! Switches all of the models over to new state and updates table
       views. */
   void setState(int state);
+
+  //! Sets the resolution.
+  void setResolution(int resWidth,int resHeight);
   
 private:
   //! Delete old data models and create new ones.
@@ -129,6 +141,10 @@ private slots:
   void typeAdded(int player);
   //! Removes a type for the indicated player.
   void typeRemoved(int player);
+  //! Adds an objective to the game.
+  void objectiveAdded();
+  //! Removes an objective from the game.
+  void objectiveRemoved();
   //! Removes the current state.
   void stateRemoved();
   //! Removes action for the given player. 
@@ -140,10 +156,12 @@ private slots:
   void nextState();
   //! Decreases currentState to the previous state.
   void prevState();
+  //! Emits the startSolveRoutine signal to BCEWindow.
+  void emitSolveSignal();
 
 signals:
 
-  void startSolveRoutine();
+  void startSolveRoutine(vector<double>& weightData);
 
 };
 

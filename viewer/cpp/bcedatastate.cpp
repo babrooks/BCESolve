@@ -360,3 +360,8 @@ void BCEDataState::setAllEqm() {
   emit(selectedEqmChanged());
 
 }
+
+void BCEDataState::setResolution(int _resWidth,int _resHeight) {
+  resWidth = _resWidth;
+  resHeight = _resHeight;
+}

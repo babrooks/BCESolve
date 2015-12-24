@@ -63,7 +63,8 @@ bcepushbutton.hpp \
 bcewindow.hpp \
 bcelogstream.hpp \
 bceloghandler.hpp \
-bcesolverworker.hpp
+bcesolverworker.hpp \
+bceobjweightstablemodel.hpp
 
 SOURCES += main.cpp \
 bceplothandler.cpp \
@@ -78,6 +79,7 @@ bcepriortablemodel.cpp \
 bceconditionaltablemodel.cpp \
 bcewindow.cpp \
 bcesolver.cpp \
+bceobjweightstablemodel.cpp
 
 LIBS += ../lib/libbce.a
 LIBS += -L/usr/lib/x86_64-linux-gnu/ -lboost_serialization -lboost_system
