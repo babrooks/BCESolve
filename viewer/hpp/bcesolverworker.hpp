@@ -51,21 +51,34 @@ public slots:
     IloCplex cplex = solver.getCplex();
     cplex.setOut(std::cout);
  
+    // Code if players have same number of values
+    // ADD CASE FOR JUST ONE STATE
+    int numStatesPerPlayer = sqrt(game.getNumStates())-1;
     for (int player = 0; player < 2; player++)
       {
-	for (int val = 0; val < 2; val++)
-	  {
-	    cplex.getModel()
-	      .add(solver.getObjectiveFunction(5+val+player*2)>=0.0);
-	  } // val
+    	for (int val = 0; val < numStatesPerPlayer; val++)
+    	  {
+    	    cplex.getModel()
+    	      .add(solver.getObjectiveFunction(5+val+player*2)>=0.0);
+    	  } // val
       }
+
+    // // Code if players can have different number of values
+    // for (int val = 0; val < 2; val++)
+    //   {
+
+    //   }
 
     cplex.setParam(IloCplex::RootAlg,IloCplex::Barrier);
     cplex.setParam(IloCplex::SimDisplay,0);
     solver.setParameter(BCESolver::DisplayLevel,1);
 
     cplex.getObjective().setSense(IloObjective::Maximize);
-    cplex.getObjective().setExpr(-1.0*(solver.getObjectiveFunction(2)));
+    cplex.getObjective().setExpr
+      (weightData[0]*solver.getObjectiveFunction(0)
+       + weightData[1]*solver.getObjectiveFunction(1)
+       + weightData[2]*-1.0*(solver.getObjectiveFunction(2))
+       + weightData[3]*solver.getObjectiveFunction(3));
     cplex.setParam(IloCplex::Threads,4);
   
     solver.solve();
