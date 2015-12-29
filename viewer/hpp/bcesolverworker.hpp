@@ -74,11 +74,22 @@ public slots:
     solver.setParameter(BCESolver::DisplayLevel,1);
 
     cplex.getObjective().setSense(IloObjective::Maximize);
-    cplex.getObjective().setExpr
-      (weightData[0]*solver.getObjectiveFunction(0)
-       + weightData[1]*solver.getObjectiveFunction(1)
-       + weightData[2]*-1.0*(solver.getObjectiveFunction(2))
-       + weightData[3]*solver.getObjectiveFunction(3));
+
+    IloNumExpr expr = weightData[0]*solver.getObjectiveFunction(0);
+    int numObjs = game.getNumObjectives();
+
+    if (numObjs == 2) {
+      expr += weightData[1]*solver.getObjectiveFunction(1);
+    }
+
+    else if (numObjs > 2) {
+      for (int obj = 1; obj < numObjs; obj++)
+	expr += weightData[obj]*solver.getObjectiveFunction(obj);
+    }
+
+    cplex.getObjective().setExpr(expr);
+
+
     cplex.setParam(IloCplex::Threads,4);
   
     solver.solve();

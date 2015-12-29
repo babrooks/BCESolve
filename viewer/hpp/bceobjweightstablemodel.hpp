@@ -25,7 +25,7 @@ private:
    */
   vector<double> weightData = vector<double>(2,.5);
   //! Called by the model to change weight data.
-  void setWeightData(int objective,int value)
+  void setWeightData(int objective,double value)
   { weightData[objective] = value; }
 
 public:
