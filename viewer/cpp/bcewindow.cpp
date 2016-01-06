@@ -131,7 +131,7 @@ void BCEWindow::loadGame() {
 
   QString newPath = QFileDialog::getOpenFileName(this,tr("Select a Game File"),
 						 path,
-						 tr("BCESolve Game Files (*.bce)"));
+						 tr("BCESolve Game Files (*.bgm)"));
 
 
   if (newPath.isEmpty()) {

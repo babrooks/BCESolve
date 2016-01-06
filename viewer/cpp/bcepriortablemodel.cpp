@@ -33,3 +33,24 @@ bool BCEPriorTableModel::setData(const QModelIndex & index,
     }
   return false;
 } // setData
+
+QVariant BCEPriorTableModel::headerData(int section,
+					Qt::Orientation orientation,
+					int role) const
+{
+  if (role == Qt::DisplayRole)
+    {
+      switch (orientation)
+	{
+	case Qt::Horizontal:
+	  return QVariant(QString(""));
+
+	case Qt::Vertical: {
+	  return QVariant
+	    (QString::fromStdString("S" + to_string(section)));
+	}
+	}
+    }
+  else
+    return QVariant();
+} // headerData

@@ -21,9 +21,8 @@ class BCETableModel : public QAbstractTableModel
 public:
   //! Constructor
   BCETableModel(BCEGame * _game,
-		int _state,
-		int _index):
-    game(_game), state(_state), index(_index)
+		int _state):
+    game(_game), state(_state)
   {}
   
   //! Returns flags.
@@ -31,24 +30,6 @@ public:
       and can be selected. */
   Qt::ItemFlags flags(const QModelIndex & index) const 
   { return Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable; }
-
-  //! Returns the number of row player actions or types.
-  int rowCount(const QModelIndex & parent = QModelIndex()) const Q_DECL_OVERRIDE
-  {
-    if (index == 0)
-      return game->getNumActions()[0]; 
-    if (index == 1)
-      return game->getNumTypes()[0];
-  }
-
-  //! Returns the number of column player actions or types.
-  int columnCount(const QModelIndex & parent = QModelIndex()) const Q_DECL_OVERRIDE
-  { 
-    if (index == 0)
-      return game->getNumActions()[1];
-    if (index == 1)
-      return game->getNumTypes()[1];
-  }
 
   //! Emits layoutChanged signal.
   void emitLayoutChanged()
@@ -68,8 +49,6 @@ protected:
   int state;
   //! Pointer to the associated game.
   BCEGame * game;
-  //! Index, 0 = payoff model, 1 = conditional types model
-  int index;
   
 };
 

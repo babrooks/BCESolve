@@ -9,8 +9,7 @@
 //! Table models for BCEViewer
 /*! Specializes QAbstractTableModel for the BCEViewer program.  Sets
     flags, reimplements the rowCount and columnCount methods to return
-    the numbers of actions. Also contains members to indicate which
-    state the model is currently associated with.
+    the numbers of actions. 
   
   \ingroup viewer
 */

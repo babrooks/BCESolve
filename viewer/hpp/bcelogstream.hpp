@@ -6,6 +6,15 @@
 #include <string>
 #include <QTextEdit>
 
+//! Redirects all couts in the program to the log tab.
+/*! This class, initialized in main, redirects all couts
+  to the QTextEdit in the log tab. This class contains
+  QMetaObject calls in order to redirect couts from 
+  other threads.
+
+  \ingroup viewer
+
+ */
 class BCELogStream : public std::basic_streambuf<char>
 {
 public:

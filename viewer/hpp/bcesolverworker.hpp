@@ -7,33 +7,48 @@
 #include <QObject>
 #include <ilcplex/ilocplex.h>
 
-//! Class for solving games created in the GUI.
+//! Class for solving games created in the game tab.
 /*! Contains a game and a solution object. When
   the solverWorker is created, a BCEGame is supplied in its
   constructor. Once the solve routine has completed, the
   default solution is replaced with the solution from
   the game.
+
+  \ingroup viewer
  */
 class BCESolverWorker : public QObject {
   Q_OBJECT;
 
 private:
 
+  //! Game
   BCEGame game;
+  //! Solution, either default or to the game (see class description).
   BCESolution solution;
+  //! Weights on the objectives, as supplied by the user in the game tab.
   vector<double> weightData;
 
 public:
+
+  //! Constructor
   BCESolverWorker(BCEGame &_game,vector<double>& _weightData):
     game(_game), weightData(_weightData) 
   {}
 
+  //! Returns a reference to the solution object.
   BCESolution& getSolution() {
     return solution;
   }
 
 public slots:
 
+  //! Triggered when the user clicks the "Solve" button in the game tab.
+  /*! Uses CPLEX and BCESolver to solve a BCEGame. Objectives are
+    multiplied by their respective weights, and then the sum of these
+    objectives is maximized. The weights should sum, in magnitude, to 1.
+    If weights are negative, then the solver is maxing the negative of an 
+    objective.
+   */
   void startSolve() {
 
     double minAngleIncrement = 0.05;
@@ -63,12 +78,6 @@ public slots:
     	  } // val
       }
 
-    // // Code if players can have different number of values
-    // for (int val = 0; val < 2; val++)
-    //   {
-
-    //   }
-
     cplex.setParam(IloCplex::RootAlg,IloCplex::Barrier);
     cplex.setParam(IloCplex::SimDisplay,0);
     solver.setParameter(BCESolver::DisplayLevel,1);
@@ -94,15 +103,6 @@ public slots:
   
     solver.solve();
 
-    cout << "Bidder 1's surplus: " 
-	 << cplex.getValue(solver.getObjectiveFunction(0)) << endl;
-    cout << "Bidder 2's surplus: "
-	 << cplex.getValue(solver.getObjectiveFunction(1)) << endl;
-    cout << "Revenue: " 
-	 << cplex.getValue(solver.getObjectiveFunction(2)) << endl;
-    cout << "Total surplus: " 
-	 << cplex.getValue(solver.getObjectiveFunction(3)) << endl;
-
     solver.getSolution(solution);
 
     emit(sendSolution(&solution));
@@ -112,7 +112,9 @@ public slots:
 
 signals:
 
+  //! Signals that the solve routine has ended.
   void workFinished();
+  //! Signals the solution found by the solver.
   void sendSolution(BCESolution *soln);
 
 };

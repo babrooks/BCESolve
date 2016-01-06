@@ -25,6 +25,8 @@ private:
   //! Data for the objectives
   /*! Access via objectiveData[obj][state][actionIndex] */
   vector< vector< vector<double> > > objectiveData;
+  //! Labels for the objectives
+  vector<string> objectiveLabels;
   //! Data for the prior
   /*! Access via priorData[state] */
   vector<double> priorData;
@@ -149,7 +151,7 @@ public:
   } // setFeasibleDeviation
 
   //! Adds a new objective after position
-  bool addObjective(int position);
+  bool addObjective(int position,string label);
   //! Removes the objective obj
   bool removeObjective(int obj);
   //! Adds a new state after position
@@ -164,6 +166,21 @@ public:
   bool addAction(int player, int position);
   //! Remove action for player
   bool removeAction(int player, int action);
+
+  //! Gets entire objective label vector
+  vector<string>& getObjLabels() {
+    return objectiveLabels; 
+  }
+
+  //! Gets an entry from objective label vector
+  string getObjLabels(int obj) {
+    return objectiveLabels[obj];
+  }
+
+  //! Sets a label in the objectiveLabels vector
+  void setObjLabel(int obj,string label) {
+    objectiveLabels[obj] = label;
+  }
 
   //! Serialization routine
   template <class Archive>

@@ -21,6 +21,11 @@
   interface with the respective data using the BCEGame class's
   interface methods. 
 
+  The class also contains a table model for editing weights
+  on several objectives. This data interfaces with 
+  BCESolverWorker, the class for solving custom games the user 
+  creates in the game tab.
+
   \ingroup viewer
  */
 class BCEGameHandler : public QObject
@@ -34,11 +39,8 @@ private:
       this can be a different game than the one that is associated
       with the solution in the solution tab. Alterations to the game
       can be saved using options in the file menu.
-
-      \ingroup viewer
   */
   BCEGame game;
-
   //! The model for interfacing with payoffs
   BCEPayoffTableModel* payoffModel;
   //! Model for interfacing with prior
@@ -62,7 +64,7 @@ private:
   vector<QLineEdit*> numActionsEdits;
   //! Edit for number of states.
   QLineEdit * numStatesEdit;
-  //! Edit for number of states.
+  //! Edit for number of types.
   vector<QLineEdit*> numTypesEdits;
   //! Edit for number of objectives.
   QLineEdit *numObjectivesEdit;
@@ -88,10 +90,10 @@ private:
 public:
   //! Constructor
   /*! Constructs edits and buttons, connects signals/slots, calls
-      SGGameHandler::initializeModels. */
+      BCEGameHandler::initializeModels. */
   BCEGameHandler();
   //! Destructor.
-  /*! Destroys probability table views, models, etc. */
+  /*! Destroys table views, models, etc. */
   ~BCEGameHandler();
 
   //! Replaces the current game with _game.
@@ -161,6 +163,7 @@ private slots:
 
 signals:
 
+  //! Signals that the user has clicked the solve button.
   void startSolveRoutine(vector<double>& weightData);
 
 };

@@ -15,12 +15,12 @@
 
 using namespace std;
 
-//! Viewer Window Class
-/*! Handles plotting and layout of the GUI. Connects
-  user interaction in the GUI with BCEDataState to
+//! This class handles all the plotting in the solution tab.
+/*! Handles plotting and layout of the solution tab. Connects
+  user interaction in the solution tab with BCEDataState to
   modify data elements for plotting. Gets data from
   BCEDataState for plotting. Connects data change signals
-  in BCEDataState with slots to change plot titles.
+  in BCEDataState with slots to change plot titles dynamically.
 
   \ingroup viewer
 */
@@ -141,6 +141,7 @@ private:
   BCEValueSetPlot *setOfBCEPlot;
   //! Bar Graphs.
   QVector<QCustomPlot*> deviationBarGraphs;
+  //! Plot titles for the deviation bar plots.
   QVector<BCELabel*> devPlotTitles;
 
 public:

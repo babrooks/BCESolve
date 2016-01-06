@@ -15,14 +15,15 @@
 #include <cmath>
 #include <boost/filesystem.hpp>
 
-//! Class for storing data used by the GUI.
-/*! Continuously manipulated after user interactions.
+//! Class for storing data used by the plot handler.
+/*! Continuously manipulated as user interacts with plot tab controls.
   Holds all data for plotting. Also holds conditions the 
-  user must supply. Contains private "set" methods.
-  BCEWindow retrieves data through public "get"
-  methods that make minor integer or string copies
+  user supplies through plot tab controls, such as the currently selected equilibrium. 
+  Contains private "set" methods for changing private data.
+  Contains public "get" methods that make minor integer or string copies
   or supply a const reference to the memory location
-  of larger data structures.
+  of larger data structures. These get methods are called
+  primarily by bceplothandler.
 
   \ingroup viewer
 */

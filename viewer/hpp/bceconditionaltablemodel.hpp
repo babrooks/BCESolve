@@ -23,25 +23,34 @@ public:
   //! Constructor
   BCEConditionalTableModel(BCEGame * _game,int _state):
     // 1 is the index for a conditional table model
-    BCETableModel(_game,_state,1)
+    BCETableModel(_game,_state)
   { }
 
   //! Reimplements the data method
-  /*! Retrieves the probability of going to nextState from state, when
-    the action profile indicated by index is played. Retrieves the
-    data using SGGame::getProbabilities. */
+  /*! Retrieves the
+    data using BCEGame::conditional. */
   QVariant data(const QModelIndex & index,
 		int role) const Q_DECL_OVERRIDE;
     
   //! Reimplements the setData method
-  /*! Sets the transition probability from state to nextState to
-    value, using SGGame::setProbability. */
+  /*! using BCEGame::setConditional. */
   bool setData(const QModelIndex & index, const QVariant & value, int role);
   
   //! Labels Rows and Columns in the Conditional Distn Table.
   QVariant headerData(int section,
 		      Qt::Orientation orientation,
 		      int role) const;
+
+  //! Returns the number of row player types.
+  int rowCount(const QModelIndex & parent = QModelIndex()) const Q_DECL_OVERRIDE {
+    return game->getNumTypes()[0];
+  }
+
+  //! Returns the number of column player types.
+  int columnCount(const QModelIndex & parent = QModelIndex()) const Q_DECL_OVERRIDE {
+    return game->getNumTypes()[1];
+  }
+
 };
 
 

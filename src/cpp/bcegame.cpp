@@ -3,6 +3,7 @@
 BCEGame::BCEGame():
   BCEAbstractGame(1,1,1,2),
   objectiveData(2,vector< vector<double> > (1, vector<double> (1,0.0))),
+  objectiveLabels(2,string()),
   priorData(1),
   conditionalData(1,vector<double>(1,1.0)),
   dominatedData(2,vector< vector<bool> >(1,vector<bool>(1,false))),
@@ -12,6 +13,7 @@ BCEGame::BCEGame():
 BCEGame::BCEGame(const BCEAbstractGame & game):
   BCEAbstractGame(game),
   objectiveData(game.getNumObjectives()),
+  objectiveLabels(game.getNumObjectives(),string()),
   priorData(game.getNumStates()),
   conditionalData(game.getNumStates()),
   dominatedData(2),
@@ -107,7 +109,7 @@ BCEGame::BCEGame(const BCEAbstractGame & game):
 
 } // Construct from BCEAbstractGame
 
-bool BCEGame::addObjective(int position)
+bool BCEGame::addObjective(int position,string label)
 {
   if (position < 2 || position > numObjectives)
     return false;
@@ -115,8 +117,8 @@ bool BCEGame::addObjective(int position)
   objectiveData.insert(objectiveData.begin() + position,
 		       vector< vector<double> > (numStates,
 						 vector<double>(numActions[0]*numActions[1],0.0)));
-  
   numObjectives++;
+  objectiveLabels.insert(objectiveLabels.begin() + position,label);
   return true;
 } // addObjective
 
@@ -126,6 +128,7 @@ bool BCEGame::removeObjective(int obj)
     return false;
 
   objectiveData.erase(objectiveData.begin() + obj);
+  objectiveLabels.erase(objectiveLabels.begin() + obj);
   numObjectives--;
 
   return true;

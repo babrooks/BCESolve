@@ -319,20 +319,25 @@ BCEGameHandler::BCEGameHandler():
   QWidget *payoffSplitterWidget = new QWidget();
   payoffSplitterWidget->setLayout(payoffLayout);
   tableLayout->addWidget(payoffSplitterWidget);
-  QWidget *probabilitySplitterWidget = new QWidget();
-  probabilitySplitterWidget->setLayout(probabilityLayout);
-  tableLayout->addWidget(probabilitySplitterWidget);
   QWidget *conditionalSplitterWidget = new QWidget();
   conditionalSplitterWidget->setLayout(conditionalLayout);
   tableLayout->addWidget(conditionalSplitterWidget);
+  QWidget *probabilitySplitterWidget = new QWidget();
+  probabilitySplitterWidget->setLayout(probabilityLayout);
+  tableLayout->addWidget(probabilitySplitterWidget);
   QWidget *weightsSplitterWidget = new QWidget();
   weightsSplitterWidget->setLayout(weightsLayout);
   tableLayout->addWidget(weightsSplitterWidget);
 
+  QSizePolicy policy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+  tableLayout->setSizePolicy(policy);
+
+  // tableLayout->setVerticalStretch(1);
+
   // END ADDING WIDGETS TO QSPLITTER
   //////////////////////////////////
 
-  tableLayout->setMinimumSize(.9*resWidth,resHeight*4/5);
+  // tableLayout->setMinimumSize(.9*resWidth,resHeight*4/5);
 
   QVBoxLayout *fullLayout = new QVBoxLayout();
   fullLayout->addWidget(tableLayout);
@@ -577,7 +582,7 @@ void BCEGameHandler::objectiveAdded() {
 		      ->selectedIndexes().front().row()+1);
     } 
 
-  game.addObjective(newObjective);
+  game.addObjective(newObjective,"k");
   weightsModel->addObjective(newObjective);
   numObjectivesEdit
     ->setText(QString::number(game.getNumObjectives()));
