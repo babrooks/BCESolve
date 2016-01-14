@@ -57,6 +57,11 @@ protected:
 
 
 public:
+  //! Allows user to specify if the game has a product structure
+  void setHasProductStructureData(bool hasProductStructure) {
+    hasProductStructureData = hasProductStructure; 
+  }
+
   //! Prior over state and types
   /*! For each state and vector of types, returns the prior
       probability of those occuring. This is a pure virtual function

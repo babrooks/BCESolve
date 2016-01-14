@@ -5,8 +5,8 @@ int main() {
   int numBids = 50;
   int numVals = 50;
   double weightOnOwnBid = 1;
-  double reservePrice = .2;
-  double entryFee = .1;
+  double reservePrice = .1;
+  double entryFee = 0;
 
   HybridEntryReserve hera(numVals,
 			  numBids,
@@ -25,8 +25,8 @@ int main() {
   
   solver.solve();
 
-  BCEData data;
-  solver.getData(data);
+  BCESolution data;
+  solver.getSolution(data);
   
   stringstream fName;
   fName << "hybridauction_nv=" << numVals
@@ -36,6 +36,6 @@ int main() {
 	<< "_ef=" << entryFee << ".bce";
   string fNameStr = fName.str();
   const char * fNameC = fNameStr.c_str();
-  BCEData::save(data,fNameC);
+  BCESolution::save(data,fNameC);
 
 }

@@ -55,9 +55,10 @@ MAINS=exampleforrobbie \
 	 fangmorris publicinfo commonfpa \
 	 multiplicative survey duopoly onesided \
 	loadingExample hybridentryreserve \
-	hybridauction allpayauction hybridreserve 
+	hybridauction hybridreserve 
 
-MAINSGRB=revenuelb onesidedrestricted surplusbnd relaxed rcacommon
+MAINSGRB=revenuelb onesidedrestricted relaxed rcacommon
+MAINSBCEGRB = allpayauction surplusbnd
 
 RCAMAINS=rcatest2
 
@@ -74,6 +75,15 @@ $(MAINS): % : $(CPPDIR)/%.cpp $(INCLDIR)/bce.hpp libbce.a
 	$(CXX) $(CFLAGS) $< -L. $(STATIC) -lbce $(STATIC) -L/usr/lib/x86_64-linux-gnu/ \
 	 -lboost_serialization \
 	 $(DYNAMIC)  $(LDFLAGS) -L./cpp -L../lib -o $@
+
+$(MAINSBCEGRB): % : $(CPPDIR)/%.cpp $(INCLDIR)/bce.hpp libbce.a
+	$(CXX) $(CFLAGS) -I/opt/gurobi650/linux64/include \
+	$< -L. $(STATIC) -lbce $(STATIC) -L/usr/lib/x86_64-linux-gnu/ \
+	-lboost_serialization -L/opt/gurobi650/linux64/lib \
+	-lgurobi_c++ \
+	$(DYNAMIC) -L/opt/gurobi650/linux64/lib \
+	-lgurobi65 \
+	 $(DYNAMIC)  $(LDFLAGS) -L./cpp -L../lib -o $@ 
 
 $(RCAMAINS): % : $(CPPDIR)/%.cpp $(INCLDIR)/bce.hpp  $(INCLDIR)/rca.hpp libbce.a
 	$(CXX) $(CFLAGS) $< -L. $(STATIC) -lbce -L/usr/lib/x86_64-linux-gnu/ \

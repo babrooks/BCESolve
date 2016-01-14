@@ -79,8 +79,56 @@ Chicago, Il
 */
 
 
-/*! \defgroup viewer BCEViewer graphical interface
+/*! \defgroup viewer BCEViewer interface
 
-@brief The graphical interface.
+@brief The interface's central purpose is to display solution objects 
+for solved games. It can also be used to create custom games. These games can be solved 
+from within the interface. Premade games written in C++ can also be loaded into the interface,
+edited, and resolved. Progress and numerical output for all of these solution routines is also
+contained within the interface. 
+
+The interface contains three tabs: a solution tab, a game tab,
+and a log tab. The solution tab displays graphs depicting features of the currently
+loaded solution object. The game tab permits creation of custom games
+and editing of premade games. The log tab outputs progress and some numerical solutions
+for any games games solved within the interface. 
+
+The solution tab uses two main classes: BCEPlotHandler and BCEDataState. 
+BCEDataState contains solution data for the currently loaded solution and
+has methods for manipulating that data. It also contains the user controls
+in the solution tab. These controls make use of the BCELineEdit, BCECheckBox,
+and BCESlider classes. When users interact with these controls, data is 
+manipulated to reflect new parameters, and signals are sent to BCEPlotHandler
+that data has been updated. BCEPlotHandler receives signals from BCEDataState
+to plot data. Its methods are largely aimed at configuring the various plots
+displayed in the solution tab. It makes use of the custom plot class BCEValueSetPlot,
+which adds the abilities to retrieve mouse-over graph coordinates and interact
+by clicking on the plot. It also uses the custom label class BCELabel, which
+serves to label all plots in the solution tab (some of them dynamically, as titles
+change when data is manipulated).
+
+The game tab uses a number of large classes. The overarching class that 
+manages the many objects within the tab is the BCEGameHandler. BCEGameHandler uses
+the class BCEPushButton to implement user controls. The tables seen within the gametab
+are, from left to right, a BCEPayoffTableModel, a BCEConditionalTableModel,
+a BCEPriorTableModel, and a BCEObjWeightsTableModel. These all inherit from the 
+BCETableModel class, which sets general settings used by all the models. When data in these models is changed, the currently loaded BCEGame object is altered to reflect the changes, 
+a signal is emitted to update the model, and then the model retrieves data from the 
+game to display in the model. In other words, data entered into the model is not the
+data that the user sees; that entered data is entered into the game, and the model
+updates the data it displays with that new data from the game (which should be the same data entered). Entering data into the model thus also reveals if the data was properly entered into
+the game object. BCETableView is also used by the BCEGameHandler. It sets general
+settings for displaying the models in the game tab. BCEGameHandler also uses BCESolverWorker
+for solving games. When the solve button is clicked by the user, a BCESolverWorker object
+is initialized and used to solve the game. Progress of the solve routine is sent to
+the log tab.
+
+The log tab layout is created by BCELogHandler. BCELogStream, which is initilized in
+main.cpp, serves to redirect all cout in the program to the log tab. 
+
+Finally, BCEWindow is called to create the high level layout containing the three tabs:
+a BCEPlotHandler object, a BCEGameHandler object, and a BCELogHandler object. It also
+creates the menu bar and implements methods for loading and saving both games and solutions.
+
 
 */

@@ -30,7 +30,7 @@ public:
 
   //! Double parameters
   /*! An enumeration type for parameters of type double. Pass to
-    BCESolver::setParam and BCESolver::getParam to set or retrieve a
+    BCESolver::setParam and BCESolver::Param to set or retrieve a
     double parameter value. */ 
   enum DoubleParameter
     {

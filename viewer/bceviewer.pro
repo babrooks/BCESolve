@@ -23,7 +23,8 @@ INCLUDEPATH += /usr/local/include \
 /opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex/include \
 /opt/ibm/ILOG/CPLEX_Studio1251/concert/include \
 /opt/ibm/ILOG/CPLEX_Studio1251/cplex/include \
-/usr/include/boost
+/usr/include/boost \
+/opt/gurobi650/linux64/include
 
 VPATH += ../src/cpp \
 ../src/hpp \
@@ -36,7 +37,8 @@ VPATH += ../src/cpp \
 /opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/concert/include \
 /opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex/include \
 /opt/ibm/ILOG/CPLEX_Studio1251/concert/include \
-/opt/ibm/ILOG/CPLEX_Studio1251/cplex/include
+/opt/ibm/ILOG/CPLEX_Studio1251/cplex/include \
+/opt/gurobi650/linux64/include
 
 HEADERS += bcedatastate.hpp \
 bceplothandler.hpp \
@@ -64,7 +66,8 @@ bcewindow.hpp \
 bcelogstream.hpp \
 bceloghandler.hpp \
 bcesolverworker.hpp \
-bceobjweightstablemodel.hpp
+bceobjweightstablemodel.hpp \
+bcegurobisolverworker.hpp
 
 SOURCES += main.cpp \
 bceplothandler.cpp \
@@ -79,11 +82,13 @@ bcepriortablemodel.cpp \
 bceconditionaltablemodel.cpp \
 bcewindow.cpp \
 bcesolver.cpp \
-bceobjweightstablemodel.cpp
+bceobjweightstablemodel.cpp \
+bcegurobisolver.cpp
 
 LIBS += ../lib/libbce.a
 LIBS += -L/usr/lib/x86_64-linux-gnu/ -lboost_serialization -lboost_system
 LIBS += -L/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex/lib/x86-64_linux/static_pic -L/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/concert/lib/x86-64_linux/static_pic -lilocplex -lconcert -L/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex/bin/x86-64_linux -lcplex1262
+LIBS += -L/opt/gurobi650/linux64/lib -lgurobi_c++ -lgurobi65
 # LIBS += -L/opt/ibm/ILOG/CPLEX_Studio1251/cplex/lib/x86-64_sles10_4.1/static_pic \
 # -L/opt/ibm/ILOG/CPLEX_Studio1251/concert/lib/x86-64_sles10_4.1/static_pic \
 # -lilocplex -lconcert -L/opt/ibm/ILOG/CPLEX_Studio1251/cplex/bin/x86-64_sles10_4.1/ -lcplex1251

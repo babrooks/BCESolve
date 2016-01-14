@@ -5,13 +5,15 @@
 #define ALLPAYAUCTION_HPP
 
 #include "bce.hpp"
+#include "bceabstractgame.hpp"
+#include "bcegame.hpp"
 
-class AllPayAuction : public BCEGame {
+class AllPayAuction : public BCEAbstractGame {
 
 public:
 
   AllPayAuction(int nv,int na):
-    BCEGame(2,nv,na,1,3) 
+    BCEAbstractGame(nv,na,1,3) 
   {}
 
   double prior (int state,const vector<int> & types) const {
