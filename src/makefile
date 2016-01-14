@@ -24,11 +24,13 @@ LIBDIR=../lib
 BOOSTINCLDIR=/usr/include/boost
 BOOSTDIR=/usr/include/boost
 
+# GRBDIR=/opt/gurobi650/linux64
+# GRBNAME=gurobi65
 
 CFLAGS = -std=gnu++11 -I$(CONCERTDIR)/include $(CSYSFLAGS) $(DEBUG) \
 	-I$(CPLEXDIR)/include \
 	-I$(CONCERTDIR)/include \
-	-I/opt/gurobi650/linux64/include \
+	-I$(GRBDIR)/include \
 	-I$(BOOSTDIR) \
 	-I$(HPPDIR) \
 	$(CMTFLAGS) \
@@ -36,8 +38,8 @@ CFLAGS = -std=gnu++11 -I$(CONCERTDIR)/include $(CSYSFLAGS) $(DEBUG) \
 LDFLAGS = -L$(CPLEXDIR)/lib/$(SYSTEM)/$(LIBFORMAT) \
 	-L$(CONCERTDIR)/lib/$(SYSTEM)/$(LIBFORMAT) \
 	-lilocplex -lconcert \
-	-L/opt/gurobi650/linux64/lib \
-	-lgurobi_c++ -lgurobi65 \
+	-L$(GRBDIR)/lib \
+	-lgurobi_c++ -l$(GRBNAME) \
 	-L$(CPLEXDIR)/bin/$(SYSTEM) \
 	-l$(CPLEXNAME)  \
 	$(LDSYSFLAGS) \
