@@ -313,12 +313,14 @@ void BCEGurobiSolver::populate ()
   //   constraints.add(IloRangeArray(env,numICConstraints_total,0.0,0.0));
   // constraints.add(IloRangeArray(env,numProbabilityConstraints,1.0,1.0));
   constraints = vector<GRBLinExpr>(numICConstraints_total+numProbabilityConstraints,0);
+  for (int ctr = 0; ctr < numICConstraints_total+numProbabilityConstraints; ctr++)
+    constraints[ctr] = 0;
   // For some reason, the initialization list gives a different environment.
   // We reinitialize objectives with default expressions of 0.
   objectiveFunctions.clear();
   objectiveFunctions.resize(numObjectives);
   for (objectiveCounter=0; objectiveCounter<numObjectives; objectiveCounter++)
-    objectiveFunctions[objectiveCounter]=GRBLinExpr();
+    objectiveFunctions[objectiveCounter] = 0;
   
   if (displayLevel)
     cout << "Done adding variables" << endl;
@@ -381,10 +383,10 @@ void BCEGurobiSolver::populate ()
 			*game->prior(counter.getState(),counter.getTypes());
 		    }
 		} while (++counter);
-	      double coeff = 1.0;
-	      lhs.addTerms(&coeff,&variables[numProbabilityVariables + row],1);
+
+	      lhs += variables[numProbabilityVariables + row];
 	      
-	      constraints[row] = lhs;
+	      constraints[row] += lhs;
 
 	      row++;
 
@@ -425,7 +427,7 @@ void BCEGurobiSolver::populate ()
 		    lhs += variables[variableLocationsMap[col]];
 		}
 	      
-	      constraints[row] = lhs;
+	      constraints[row] += lhs;
 	      
 	      row++;
 	    } // if
@@ -468,14 +470,16 @@ void BCEGurobiSolver::populate ()
     model.addConstr(constraints[constraintCounter],
 		    GRB_EQUAL,0.0);
   }
-
+  std::cout << "IC Constraints Added" << std::endl;
+  std::cout << "Size Constraints vec:" << constraints.size() << std::endl;
+  std::cout << "No Constraints:" << numICConstraints_total+numProbabilityVariables << std::endl;
   for (int constraintCounter = 0; 
-       constraintCounter < numProbabilityVariables;
+       constraintCounter < numProbabilityConstraints;
        constraintCounter++) {
     model.addConstr(constraints[numICConstraints_total
 				+constraintCounter],GRB_EQUAL,1.0);
   }
-
+  std::cout << "Pr Constraints Added" << std::endl;
   // gurobiObjective=IloMaximize(env);
   // model.add(gurobiObjective);
   
@@ -483,9 +487,10 @@ void BCEGurobiSolver::populate ()
 
   // gurobiObjective=cplex.getObjective();
   // gurobiObjective.setExpr(objectiveFunctions[1]);
-  gurobiObjective.clear();
-  gurobiObjective += objectiveFunctions[1];
-  model.setObjective(gurobiObjective,GRB_MAXIMIZE);
+
+  gurobiObjective = 0;
+  gurobiObjective += objectiveFunctions[2];
+  model.setObjective(gurobiObjective,GRB_MINIMIZE);
 
 
 } // populate

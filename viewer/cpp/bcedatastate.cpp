@@ -39,7 +39,7 @@ void BCEDataState::setData(QString dataPath) {
     QFileInfo info(dataPath);
     guiTitle = info.fileName().toStdString();
 		
-    isPrivateVals = !(gameData.hasProductStructure());
+    isPrivateVals = gameData.hasProductStructure();
     // cout << isPrivateVals << endl;
 
     // Reset Initial Parameters
