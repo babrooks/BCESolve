@@ -5,7 +5,7 @@ int main() {
   int numBids = 50;
   int numVals = 50;
   double weightOnOwnBid = 1;
-  double reservePrice = .1;
+  double reservePrice = .25;
   double entryFee = 0;
 
   HybridEntryReserve hera(numVals,

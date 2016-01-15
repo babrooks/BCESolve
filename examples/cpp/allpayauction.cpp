@@ -7,29 +7,33 @@ int main() {
   int numVals = 50;
 
   AllPayAuction apa(numVals,numBids);
-  apa.setHasProductStructureData(false);
 
   BCEGurobiSolver solver(apa);
+  // BCESolver solver(apa);
   
   solver.populate();
   
   GRBModel model = solver.getModel();
+  // IloCplex model = solver.getCplex();
 
+  // // CPLEX
   // // Minimize revenue
   // string objective = "minrev";
-  // cplex.getObjective().setSense(IloObjective::Minimize);
-  // cplex.getObjective().setExpr(solver.getObjectiveFunction(2));
+  // model.getObjective().setSense(IloObjective::Minimize);
+  // model.getObjective().setExpr(solver.getObjectiveFunction(2));
   
   // // Maximize revenue
   // string objective = "maxrev";
   // cplex.getObjective().setSense(IloObjective::Minimize);
   // cplex.getObjective().setExpr(solver.getObjectiveFunction(2));
 
-  BCESolution soln;
 
+  // GUROBI
   model.setObjective(solver.getObjectiveFunction(2),GRB_MINIMIZE);
 
   solver.solve();
+
+  BCESolution soln;
 
   solver.getSolution(soln);
 

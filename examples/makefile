@@ -58,7 +58,7 @@ MAINS=exampleforrobbie \
 	hybridauction hybridreserve 
 
 MAINSGRB=revenuelb onesidedrestricted relaxed rcacommon
-MAINSBCEGRB = allpayauction surplusbnd
+MAINSBCEGRB = surplusbnd allpayauction gurobihybridentryreserve postedprice
 
 RCAMAINS=rcatest2
 
