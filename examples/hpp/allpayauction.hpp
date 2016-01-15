@@ -30,9 +30,9 @@ public:
       {
 	// obj is the player whose payoff we are returning
 	
-	double val = static_cast<double>(state)/numStates;
-	double ownBid = static_cast<double>(actions[obj])/numActions[obj];
-	double otherBid = static_cast<double>(actions[1-obj])/numActions[obj];
+	double val = static_cast<double>(state)/(numStates-1.0);
+	double ownBid = static_cast<double>(actions[obj])/(numActions[obj]-1.0);
+	double otherBid = static_cast<double>(actions[1-obj])/(numActions[obj]-1.0);
 
 	if (actions[obj]>actions[1-obj])
 	  return val-ownBid;
@@ -46,12 +46,14 @@ public:
       {
 	// revenue
 	
-	double b0 = static_cast<double>(actions[0])/numActions[0];
-	double b1 = static_cast<double>(actions[1])/numActions[1];
+	double b0 = static_cast<double>(actions[0])/(numActions[0]-1.0);
+	double b1 = static_cast<double>(actions[1])/(numActions[1]-1.0);
 
 	return b0 + b1;
 
       }
+    
+    return 0.0;
   } // objective
 
 };
