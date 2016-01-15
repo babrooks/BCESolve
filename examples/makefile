@@ -77,12 +77,12 @@ $(MAINS): % : $(CPPDIR)/%.cpp $(INCLDIR)/bce.hpp libbce.a
 	 $(DYNAMIC)  $(LDFLAGS) -L./cpp -L../lib -o $@
 
 $(MAINSBCEGRB): % : $(CPPDIR)/%.cpp $(INCLDIR)/bce.hpp libbce.a
-	$(CXX) $(CFLAGS) -I/opt/gurobi650/linux64/include \
+	$(CXX) $(CFLAGS) -I$(GRBDIR)/include \
 	$< -L. $(STATIC) -lbce $(STATIC) -L/usr/lib/x86_64-linux-gnu/ \
-	-lboost_serialization -L/opt/gurobi650/linux64/lib \
+	-lboost_serialization -L$(GRBDIR)/lib \
 	-lgurobi_c++ \
-	$(DYNAMIC) -L/opt/gurobi650/linux64/lib \
-	-lgurobi65 \
+	$(DYNAMIC) -L$(GRBDIR)/lib \
+	-l$(GRBNAME) \
 	 $(DYNAMIC)  $(LDFLAGS) -L./cpp -L../lib -o $@ 
 
 $(RCAMAINS): % : $(CPPDIR)/%.cpp $(INCLDIR)/bce.hpp  $(INCLDIR)/rca.hpp libbce.a

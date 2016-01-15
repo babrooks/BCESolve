@@ -57,6 +57,27 @@ protected:
 
 
 public:
+  //! Default constructor
+  BCEAbstractGame();
+  //! Constructor
+  /*! This constructor assumes that all of the players have the same
+    numbers of types and actions. */
+  BCEAbstractGame(int numStatesArg, 
+		  int numActionsArg, 
+		  int numTypesArg, 
+		  int numObjectivesArg);
+  //! Constructor
+  /*! This constructor allows different players to have different
+    numbers of types and actions. */
+  BCEAbstractGame(int numStatesArg, 
+		  const vector<int> & numActionsArg, 
+		  const vector<int> & numTypesArg, 
+		  int numObjectivesArg);
+
+  //! Destructor
+  ~BCEAbstractGame()
+  {} 
+
   //! Allows user to specify if the game has a product structure
   void setHasProductStructureData(bool hasProductStructure) {
     hasProductStructureData = hasProductStructure; 
@@ -179,26 +200,6 @@ public:
   //! Returns the number of players (always 2)
   int getNumPlayers() const { return numPlayers; }
   
-  //! Default constructor
-  BCEAbstractGame();
-  //! Constructor
-  /*! This constructor assumes that all of the players have the same
-    numbers of types and actions. */
-  BCEAbstractGame(int numStatesArg, 
-		  int numActionsArg, 
-		  int numTypesArg, 
-		  int numObjectivesArg);
-  //! Constructor
-  /*! This constructor allows different players to have different
-    numbers of types and actions. */
-  BCEAbstractGame(int numStatesArg, 
-		  const vector<int> & numActionsArg, 
-		  const vector<int> & numTypesArg, 
-		  int numObjectivesArg);
-
-  //! Destructor
-  ~BCEAbstractGame()
-  {} 
 };
 
 #endif

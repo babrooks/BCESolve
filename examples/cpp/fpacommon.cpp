@@ -8,7 +8,7 @@ double solveAuction(int nb, int nv,
 int main(int argc, char ** argv)
 {
 
-  int nb = 75;
+  int nb = 50;
   int nv = nb;
 
   double highbid = 1.0;
@@ -23,7 +23,7 @@ int main(int argc, char ** argv)
 
   ofs << "reserve/fee, minrev, maxrev, minrev, maxrev" << endl;
 
-  for (int r = 0; r < nb/2+1; r++)
+  for (int r = 0; r < 1; r++)
     {
       double priceFee = static_cast<double>(r)/(nv-1)-1e-6;
 
@@ -73,7 +73,7 @@ double solveAuction(int nb, int nv,
 
   try
     {
-      solver.setParameter(BCESolver::DisplayLevel,0);
+      // solver.setParameter(BCESolver::DisplayLevel,0);
       solver.populate();
 
       IloCplex cplex=solver.getCplex();

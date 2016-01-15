@@ -24,7 +24,8 @@ INCLUDEPATH += /usr/local/include \
 /opt/ibm/ILOG/CPLEX_Studio1251/concert/include \
 /opt/ibm/ILOG/CPLEX_Studio1251/cplex/include \
 /usr/include/boost \
-/opt/gurobi650/linux64/include
+/opt/gurobi650/linux64/include \
+/opt/gurobi563/linux64/include
 
 VPATH += ../src/cpp \
 ../src/hpp \
@@ -87,11 +88,12 @@ bcegurobisolver.cpp
 
 LIBS += ../lib/libbce.a
 LIBS += -L/usr/lib/x86_64-linux-gnu/ -lboost_serialization -lboost_system
-LIBS += -L/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex/lib/x86-64_linux/static_pic -L/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/concert/lib/x86-64_linux/static_pic -lilocplex -lconcert -L/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex/bin/x86-64_linux -lcplex1262
-LIBS += -L/opt/gurobi650/linux64/lib -lgurobi_c++ -lgurobi65
-# LIBS += -L/opt/ibm/ILOG/CPLEX_Studio1251/cplex/lib/x86-64_sles10_4.1/static_pic \
-# -L/opt/ibm/ILOG/CPLEX_Studio1251/concert/lib/x86-64_sles10_4.1/static_pic \
-# -lilocplex -lconcert -L/opt/ibm/ILOG/CPLEX_Studio1251/cplex/bin/x86-64_sles10_4.1/ -lcplex1251
+# LIBS += -L/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex/lib/x86-64_linux/static_pic -L/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/concert/lib/x86-64_linux/static_pic -lilocplex -lconcert -L/opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex/bin/x86-64_linux -lcplex1262
+# LIBS += -L/opt/gurobi650/linux64/lib -lgurobi_c++ -lgurobi65
+LIBS += -L/opt/gurobi563/linux64/lib -lgurobi_c++ -lgurobi56
+ LIBS += -L/opt/ibm/ILOG/CPLEX_Studio1251/cplex/lib/x86-64_sles10_4.1/static_pic \
+ -L/opt/ibm/ILOG/CPLEX_Studio1251/concert/lib/x86-64_sles10_4.1/static_pic \
+ -lilocplex -lconcert -L/opt/ibm/ILOG/CPLEX_Studio1251/cplex/bin/x86-64_sles10_4.1/ -lcplex1251
 
 LIBS += -L../lib/ -L/usr/local/lib/ -L/usr/lib/x86_64-linux-gnu
 linux-g++ {
