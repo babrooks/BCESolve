@@ -6,8 +6,13 @@ BCEAbstractGame::BCEAbstractGame ():
   numStates(0),
   numTypes(numPlayers,0),
   hasProductStructureData(false),
-  numPrivateStates(2,0)
-{} // Default constructor
+  numPrivateStates(2,0),
+  objectiveLabels(2,string())
+{
+  for (int obj = 0; obj < objectiveLabels.size(); obj++) 
+    findLabelRedundancies(obj);
+  nameEmptyLabels();
+} // Default constructor
 
 BCEAbstractGame::BCEAbstractGame (int numStatesArg, 
 				  int numActionsArg, 
@@ -19,8 +24,13 @@ BCEAbstractGame::BCEAbstractGame (int numStatesArg,
   numTypes(numPlayers,numTypesArg),
   numObjectives(numObjectivesArg),
   hasProductStructureData(false),
-  numPrivateStates(2,0)
-{} 
+  numPrivateStates(2,0),
+  objectiveLabels(numObjectivesArg,string())
+{
+  for (int obj = 0; obj < objectiveLabels.size(); obj++) 
+    findLabelRedundancies(obj);
+  nameEmptyLabels();
+} 
 
 BCEAbstractGame::BCEAbstractGame (int numStatesArg, 
 				  const vector<int> & numActionsArg, 
@@ -32,8 +42,13 @@ BCEAbstractGame::BCEAbstractGame (int numStatesArg,
   numTypes(numTypesArg),
   numObjectives(numObjectivesArg),
   hasProductStructureData(false),
-  numPrivateStates(2,0)
-{} 
+  numPrivateStates(2,0),
+  objectiveLabels(numObjectivesArg,string())
+{  
+  for (int obj = 0; obj < objectiveLabels.size(); obj++) 
+    findLabelRedundancies(obj);
+  nameEmptyLabels();
+} 
 
 // Overloaded version of prior that finds the marginal.
 double BCEAbstractGame::prior(int state, int type, int player) const
@@ -99,4 +114,40 @@ bool BCEAbstractGame::dominated(const vector<int> &actions, const vector<int> &t
     }
   return (false);
 }
+
+void BCEAbstractGame::nameEmptyLabels() {
+
+  int numObjs = getNumObjectives();
+
+  for (int obj = 0; obj < 2; obj++) {
+    if (objectiveLabels[obj].empty())
+      objectiveLabels[obj] = "Player " + std::to_string(obj);
+  }
+
+  int currObj = 2;
+
+  while (currObj < numObjs) {
+    if (objectiveLabels[currObj].empty())
+      objectiveLabels[currObj] = "Objective " + std::to_string(currObj);
+    currObj++;
+  }
+}
+
+void BCEAbstractGame::findLabelRedundancies(int obj) {
+
+  string compareStr = objectiveLabels[obj];
+  if (compareStr.empty())
+    return;
+
+  for (int i = 0; i < getNumObjectives(); i++) {
+    if (i != obj) {
+      if (compareStr.compare(objectiveLabels[i]) == 0) {
+	objectiveLabels[obj] += "*";
+	findLabelRedundancies(obj);
+	return;
+      }
+    }
+  }
+}
+
 

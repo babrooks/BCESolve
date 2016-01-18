@@ -54,6 +54,8 @@ protected:
       of the numbers of private values is equal to the total numer of
       states. */
   vector<int> numPrivateStates;
+  //! Labels for the objectives
+  vector<string> objectiveLabels;
 
 
 public:
@@ -182,6 +184,27 @@ public:
 
     return true;
   }
+
+  //! Gets an entry from objective label vector
+  string getObjLabels(int obj) {
+    return objectiveLabels[obj];
+  }
+
+  //! Sets a label in the objectiveLabels vector
+  void setObjLabel(int obj,string label) {
+    objectiveLabels[obj] = label;
+  }
+
+  //! Finds if a specific label matches any existing labels.
+  /*! If a label matches and existing label, appends an * and 
+    checks recursively if the new label is unique. */
+  void findLabelRedundancies(int obj);
+
+  //! Names objectives according to defaults if given label is empty.
+  /*! Takes any empty string label and gives it
+   a default name. This default is "Player 0" for the first objective,
+  "Player 1" for the second objective, and "k" for all subsequent objectives. */
+  void nameEmptyLabels();
 
   //! Returns whether or not the state has a product structure
   bool hasProductStructure() const { return hasProductStructureData; }

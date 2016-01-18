@@ -55,36 +55,3 @@ QVariant BCEObjWeightsTableModel::headerData(int section,
     return QVariant();
 } // headerData
 
-void BCEObjWeightsTableModel::nameEmptyLabels() {
-
-  int numObjs = game->getNumObjectives();
-
-  for (int obj = 0; obj < 2; obj++) {
-    if (objectiveLabels[obj].empty())
-      objectiveLabels[obj] = "Player " + std::to_string(obj);
-  }
-
-  int currObj = 2;
-
-  while (currObj < numObjs) {
-    if (objectiveLabels[currObj].empty())
-      objectiveLabels[currObj] = "k";
-    currObj++;
-  }
-}
-
-void BCEObjWeightsTableModel::findLabelRedundancies(int obj) {
-
-  string compareStr = objectiveLabels[obj];
-  if (compareStr.empty())
-    return;
-
-  for (int i = 0; i < game->getNumObjectives(); i++) {
-    if (i != obj) {
-      if (compareStr.compare(objectiveLabels[i]) == 0) {
-	objectiveLabels[obj] += "*";
-	findLabelRedundancies(obj);
-      }
-    }
-  }
-}

@@ -38,9 +38,6 @@ public:
     the number of objectives in the game. Sets default
     weight data to .5 on player 0 and player 1's objectives.
     Gets any existing objective labels from the game. 
-    Finds if any of these labels are redundant and renames 
-    them. Also sets any empty/blank labels equal to specified
-    defaults.
    */
   BCEObjWeightsTableModel(BCEGame * _game):
     game(_game)
@@ -61,24 +58,7 @@ public:
 	currLabelIndex++;
       }
     }
-
-    for (int obj = 0; obj < objectiveLabels.size(); obj++) 
-      findLabelRedundancies(obj);
- 
-    nameEmptyLabels();
- 
   }
-  
-  //! Names objectives according to defaults if given label is empty.
-  /*! Takes any empty string label and gives it
-   a default name. This default is "Player 0" for the first objective,
-  "Player 1" for the second objective, and "k" for all subsequent objectives. */
-  void nameEmptyLabels();
-
-  //! Finds if a specific label matches any existing labels.
-  /*! If a label matches and existing label, appends an * and 
-    checks recursively if the new label is unique. */
-  void findLabelRedundancies(int obj);
 
   //! Returns flags.
   /*! Returns flags that indicate the model is enabled, can be edited,
@@ -119,7 +99,6 @@ public:
     weightData.insert(weightData.begin()+position,0);
     objectiveLabels.insert(objectiveLabels.begin()+position,
 			   game->getObjLabels(position));
-    findLabelRedundancies(position);
   }
 
   //! Removes an objective from the weight data and label vectors.

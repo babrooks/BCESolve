@@ -25,8 +25,6 @@ private:
   //! Data for the objectives
   /*! Access via objectiveData[obj][state][actionIndex] */
   vector< vector< vector<double> > > objectiveData;
-  //! Labels for the objectives
-  vector<string> objectiveLabels;
   //! Data for the prior
   /*! Access via priorData[state] */
   vector<double> priorData;
