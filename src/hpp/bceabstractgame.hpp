@@ -190,6 +190,11 @@ public:
     return objectiveLabels[obj];
   }
 
+  //! Gets all of the objective labels
+  vector<string>& getObjLabels() {
+    return objectiveLabels;
+  }
+
   //! Sets a label in the objectiveLabels vector
   void setObjLabel(int obj,string label) {
     objectiveLabels[obj] = label;
