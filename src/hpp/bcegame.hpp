@@ -165,21 +165,6 @@ public:
   //! Remove action for player
   bool removeAction(int player, int action);
 
-  //! Gets entire objective label vector
-  vector<string>& getObjLabels() {
-    return objectiveLabels; 
-  }
-
-  //! Gets an entry from objective label vector
-  string getObjLabels(int obj) {
-    return objectiveLabels[obj];
-  }
-
-  //! Sets a label in the objectiveLabels vector
-  void setObjLabel(int obj,string label) {
-    objectiveLabels[obj] = label;
-  }
-
   //! Serialization routine
   template <class Archive>
   void serialize(Archive & ar, const unsigned int version)
@@ -189,6 +174,7 @@ public:
     ar & numTypes;
     ar & numStates;
     ar & numObjectives;
+    ar & objectiveLabels;
     ar & objectiveData;
     ar & priorData;
     ar & conditionalData;

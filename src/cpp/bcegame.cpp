@@ -118,6 +118,7 @@ bool BCEGame::addObjective(int position,string label)
   numObjectives++;
   objectiveLabels.insert(objectiveLabels.begin() + position,label);
   findLabelRedundancies(position);
+  nameEmptyLabels();
   return true;
 } // addObjective
 

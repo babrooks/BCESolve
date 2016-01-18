@@ -7,7 +7,7 @@ BCEAbstractGame::BCEAbstractGame ():
   numTypes(numPlayers,0),
   hasProductStructureData(false),
   numPrivateStates(2,0),
-  objectiveLabels(2,string())
+  objectiveLabels(2,"DefaultStringTitle")
 {
   for (int obj = 0; obj < objectiveLabels.size(); obj++) 
     findLabelRedundancies(obj);
@@ -25,7 +25,7 @@ BCEAbstractGame::BCEAbstractGame (int numStatesArg,
   numObjectives(numObjectivesArg),
   hasProductStructureData(false),
   numPrivateStates(2,0),
-  objectiveLabels(numObjectivesArg,string())
+  objectiveLabels(numObjectivesArg,"DefaultStringTitle")
 {
   for (int obj = 0; obj < objectiveLabels.size(); obj++) 
     findLabelRedundancies(obj);
@@ -43,7 +43,7 @@ BCEAbstractGame::BCEAbstractGame (int numStatesArg,
   numObjectives(numObjectivesArg),
   hasProductStructureData(false),
   numPrivateStates(2,0),
-  objectiveLabels(numObjectivesArg,string())
+  objectiveLabels(numObjectivesArg,"DefaultStringTitle")
 {  
   for (int obj = 0; obj < objectiveLabels.size(); obj++) 
     findLabelRedundancies(obj);
@@ -118,16 +118,17 @@ bool BCEAbstractGame::dominated(const vector<int> &actions, const vector<int> &t
 void BCEAbstractGame::nameEmptyLabels() {
 
   int numObjs = getNumObjectives();
+  string compareStr = "DefaultStringTitle";
 
   for (int obj = 0; obj < 2; obj++) {
-    if (objectiveLabels[obj].empty())
+    if (objectiveLabels[obj].compare(compareStr) == 0)
       objectiveLabels[obj] = "Player " + std::to_string(obj);
   }
 
   int currObj = 2;
 
   while (currObj < numObjs) {
-    if (objectiveLabels[currObj].empty())
+    if (objectiveLabels[currObj].compare(compareStr) == 0)
       objectiveLabels[currObj] = "Objective " + std::to_string(currObj);
     currObj++;
   }
@@ -136,7 +137,7 @@ void BCEAbstractGame::nameEmptyLabels() {
 void BCEAbstractGame::findLabelRedundancies(int obj) {
 
   string compareStr = objectiveLabels[obj];
-  if (compareStr.empty())
+  if (compareStr.compare("DefaultStringTitle") == 0)
     return;
 
   for (int i = 0; i < getNumObjectives(); i++) {

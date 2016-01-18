@@ -9,6 +9,7 @@ int main() {
   AllPayAuction apa(numVals,numBids);
 
   BCEGurobiSolver solver(apa);
+
   // BCESolver solver(apa);
   
   solver.populate();
