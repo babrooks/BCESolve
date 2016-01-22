@@ -39,8 +39,8 @@ void BCEDataState::setData(QString dataPath) {
     QFileInfo info(dataPath);
     guiTitle = info.fileName().toStdString();
 		
-    isPrivateVals = gameData.hasProductStructure();
-    cout << isPrivateVals << endl;
+    isPrivateVals = !(gameData.hasProductStructure());
+    // cout << isPrivateVals << endl;
 
     // Reset Initial Parameters
     currentEqmIndex = 0;
@@ -55,14 +55,14 @@ void BCEDataState::setData(QString dataPath) {
     resetManipulatedData();
     emit(newDataLoaded());
 
-    cout << "prob: " << equilibriumMatrix[0][0] << endl;
+    // cout << "prob: " << equilibriumMatrix[0][0] << endl;
 
     vector<int> numActions = gameData.getNumActions();
-    cout << "NumActions[0] = " << numActions[0] << endl;
+    // cout << "NumActions[0] = " << numActions[0] << endl;
     vector<int> numTypes = gameData.getNumTypes();
-    cout << numTypes[0] << endl;
+    // cout << numTypes[0] << endl;
     int numStates = gameData.getNumStates();
-    cout << numStates << endl;
+    // cout << numStates << endl;
 
     // Set Slider Ranges 
     for (int player = 0; player < 2; player++) {
@@ -72,7 +72,7 @@ void BCEDataState::setData(QString dataPath) {
 	sliderGroup[3*player+2]->setRange(0,numStates-1);
       else
 	sliderGroup[3*player+2]->setRange(0,sqrt(numStates)-1);
-      cout << "Slider setting completed." << endl;
+      // cout << "Slider setting completed." << endl;
     }
 
     // Set Sliders to 0
@@ -356,7 +356,12 @@ void BCEDataState::setObjectiveVals(int player) {
 void BCEDataState::setAllEqm() {
 
   solutionData.getExpectedObjectives(allEqm);
-  cout << "setAllEqm Function Hit" << endl;
+  // cout << "setAllEqm Function Hit" << endl;
   emit(selectedEqmChanged());
 
+}
+
+void BCEDataState::setResolution(int _resWidth,int _resHeight) {
+  resWidth = _resWidth;
+  resHeight = _resHeight;
 }

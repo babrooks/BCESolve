@@ -12,11 +12,6 @@ BCEPlotHandler::BCEPlotHandler()
 {
   screenShotPath=QString("../examples/screenshots/");
 
-  // Resolution Settings
-
-  int resWidth = guiData.resWidth;
-  int resHeight = guiData.resHeight;
-
   // BCEDataState Connections to BCEWindow
 
   connect(&guiData,SIGNAL(selectedEqmChanged()),
@@ -387,4 +382,10 @@ void BCEPlotHandler::setGUITitle() {
 
 void BCEPlotHandler::setSolution(BCESolution &solution) {
   guiData.setSolutionData(solution);
+}
+
+void BCEPlotHandler::setResolution(int _resWidth,int _resHeight) {
+  resWidth = _resWidth;
+  resHeight = _resHeight;
+  guiData.setResolution(resWidth,resHeight);
 }

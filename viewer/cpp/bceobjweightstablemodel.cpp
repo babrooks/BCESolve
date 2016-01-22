@@ -1,7 +1,7 @@
 #include <QtWidgets>
-#include "bcepriortablemodel.hpp"
+#include "bceobjweightstablemodel.hpp"
 
-QVariant BCEPriorTableModel::data(const QModelIndex & index,
+QVariant BCEObjWeightsTableModel::data(const QModelIndex & index,
 				  int role) const
 {
    if (role == Qt::SizeHintRole)
@@ -9,24 +9,24 @@ QVariant BCEPriorTableModel::data(const QModelIndex & index,
   else if (role == Qt::DisplayRole || role == Qt::EditRole)
     {
 
-      int state = index.row();
+      int objective = index.row();
 
-      return QVariant(QString::number(game->prior(state)));
+      return QVariant(QString::number(weightData[objective]));
 	
     }
   else
     return QVariant();
 }
 
-bool BCEPriorTableModel::setData(const QModelIndex & index,
+bool BCEObjWeightsTableModel::setData(const QModelIndex & index,
 				 const QVariant & value,
 				 int role)
 {
   if (role == Qt::EditRole)
     {
-      int state = index.row();
+      int objective = index.row();
       QString strValue = value.toString();
-      game->setPrior(state,strValue.toDouble());
+      setWeightData(objective,strValue.toDouble());
 
       emit dataChanged(index,index);
       return true;
@@ -34,7 +34,7 @@ bool BCEPriorTableModel::setData(const QModelIndex & index,
   return false;
 } // setData
 
-QVariant BCEPriorTableModel::headerData(int section,
+QVariant BCEObjWeightsTableModel::headerData(int section,
 					Qt::Orientation orientation,
 					int role) const
 {
@@ -47,10 +47,11 @@ QVariant BCEPriorTableModel::headerData(int section,
 
 	case Qt::Vertical: {
 	  return QVariant
-	    (QString::fromStdString("S" + to_string(section)));
+	    (QString::fromStdString(objectiveLabels[section]));
 	}
 	}
     }
   else
     return QVariant();
 } // headerData
+

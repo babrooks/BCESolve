@@ -149,7 +149,7 @@ public:
   } // setFeasibleDeviation
 
   //! Adds a new objective after position
-  bool addObjective(int position);
+  bool addObjective(int position,string label);
   //! Removes the objective obj
   bool removeObjective(int obj);
   //! Adds a new state after position
@@ -174,6 +174,7 @@ public:
     ar & numTypes;
     ar & numStates;
     ar & numObjectives;
+    ar & objectiveLabels;
     ar & objectiveData;
     ar & priorData;
     ar & conditionalData;

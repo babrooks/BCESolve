@@ -1,81 +1,134 @@
 /*! \mainpage BCESolve Documentation
-    \section introsec Introduction
+\section introsec Introduction
 
-    BCESolve is a library of routines for representing, solving, and
-    analyzing Bayes correlated equilibria (BCE), a solution concept
-    that generalized correlated equilibrium to games of incomplete
-    information. BCE, like correlated equilibria, are joint
-    distributions that satisfy a series of linear constraints. The
-    library utilizes IBM's CPLEX linear programming package to solve
-    for BCE that maximize a given linear objective, such as expected
-    payoffs of the players.
+BCESolve is a library of routines for representing, solving, and
+analyzing Bayes correlated equilibria (BCE), a solution concept
+that generalized correlated equilibrium to games of incomplete
+information. BCE, like correlated equilibria, are joint
+distributions that satisfy a series of linear constraints. The
+library utilizes IBM's CPLEX linear programming package to solve
+for BCE that maximize a given linear objective, such as expected
+payoffs of the players.
 
-    \section installsec Installation
+\section installsec Installation
 
-    To use the library, you must first install CPLEX and have the
-    CPLEX libraries locatable on the path. The program also uses Boost
-    libraries for serialization, which the user must install. The src
-    and examples directories have makefiles for building the source
-    code using GNU's make. The makefile may have to be edited to
-    reflect the correct path to CPLEX and Boost. The program has most
-    recently been compiled with gcc 4.8.2 and run using CPLEX 12.51
-    and Boost 1.57 on Centos 7. To build the program, simple open a
-    terminal, change to the examples directory, and run "make".
+To use the library, you must first install CPLEX and have the
+CPLEX libraries locatable on the path. The program also uses Boost
+libraries for serialization, which the user must install. The src
+and examples directories have makefiles for building the source
+code using GNU's make. The makefile may have to be edited to
+reflect the correct path to CPLEX and Boost. The program has most
+recently been compiled with gcc 4.8.2 and run using CPLEX 12.51
+and Boost 1.57 on Centos 7. To build the program, simply open a
+terminal, change to the examples directory, and run "make".
 
-    \section overviewsec Overview of the program
+\section overviewsolvesec Overview of the solver program
 
-    The BCESolve library contains a series of classes for
-    representing, solving, and analyzing BCE. The BCEGame class is a
-    base class for representing games of incomplete information. One
-    must derive from this class, and reimplement its
-    BCEGame::objective and BCEGame::prior methods to reflect the
-    payoff functions and the distribution of the state for the
-    particular game of interest.
+The BCESolve library contains a series of classes for
+representing, solving, and analyzing BCE. The BCEAbstractGame class is a
+base class for representing games of incomplete information. One
+must derive from this class, and reimplement its
+BCEGame::objective and BCEGame::prior methods to reflect the
+payoff functions and the distribution of the state for the
+particular game of interest.
 
-    The BCESolver class uses CPLEX to solve a game represented by an
-    object derived from the BCEGame class, by maximizing a particular
-    linear objective over all BCE for that game.
+The BCESolver class uses CPLEX to solve a game represented by an
+object derived from the BCEAbstractGame class, by maximizing a particular
+linear objective over all BCE for that game.
 
-    The output from the BCESolver class is stored in a BCEData
-    object. BCEData objects can be serialized and de-serialized, and
-    the class also contains routines for analyzing the BCE contained
-    within.
+The output from the BCESolver class is stored in a BCESolution
+object. BCESolution objects can be serialized and de-serialized, and
+the class also contains routines for analyzing the BCE contained
+within.
 
-    \section examplesec Examples
-    
-    A number of examples have been provided to illustrate how to use
-    the program. Please see fpaknown.cpp, which uses the class files
-    fpaknown.hpp and fpagame.hpp, for an example that solves a private
-    first price auction. The file fpaunknown.cpp uses fpagame.hpp to
-    solve an "unknown" private value auction. Both of these programs
-    show how to derive from the BCEGame class to create a
-    representation of your own game.
+\section overviewviewersec Overview of the viewer program
 
-    \section finalsec Final thoughts
+BCESolve also includes an accompanying viewer. It is capable of displaying
+data in a BCESolution object. This includes plotting player payoffs for
+all equilibria, plotting deviation objectives for each player,
+and plotting the probability distribution of player actions given the state.
+It also includes a tab for creating custom games, using the class BCEGame,
+which is derived from BCEAbstractGame. The user can control the conditional
+distribution of types, objective payoffs, the prior over the states, and
+weights on the objectives for maximization. The user can solve these
+custom games within the viewer. Output is displayed in a log tab, and the 
+solution is displayed in the solution tab. The custom BCEGame can also
+be serialized and de-serialized.
 
-    The library also contains two utilities for studying games in
-    MATLAB. The first is a mex file interface called "bcemex" that can
-    be used to read BCEData objects, and translate various data from
-    the BCEData class into the MATLAB workspace. Second, the MATLAB
-    program bcegui.m is a graphical user interface that, together with
-    bcemex, provides various visualizations of a BCE.
+\section examplesec Examples
 
-    Enjoy!
+A number of examples have been provided to illustrate how to use
+the program. Please see fpaknown.cpp, which uses the class files
+fpaknown.hpp and fpagame.hpp, for an example that solves a private
+first price auction. The file fpaunknown.cpp uses fpagame.hpp to
+solve an "unknown" private value auction. Both of these programs
+show how to derive from the BCEGame class to create a
+representation of your own game.
 
-    Ben Brooks,
-    Chicago, Il
+Enjoy!
+
+Ben Brooks,
+Chicago, Il
 
 
 */
 
 
 /*! \defgroup src BCESolve solver engine
-    @brief The solver routines.
+@brief The solver routines.
 */
 
 
-/*! \defgroup viewer BCEViewer graphical interface
+/*! \defgroup viewer BCEViewer interface
 
-    @brief The graphical interface.
+@brief The interface's central purpose is to display solution objects 
+for solved games. It can also be used to create custom games. These games can be solved 
+from within the interface. Premade games written in C++ can also be loaded into the interface,
+edited, and resolved. Progress and numerical output for all of these solution routines is also
+contained within the interface. 
+
+The interface contains three tabs: a solution tab, a game tab,
+and a log tab. The solution tab displays graphs depicting features of the currently
+loaded solution object. The game tab permits creation of custom games
+and editing of premade games. The log tab outputs progress and some numerical solutions
+for any games games solved within the interface. 
+
+The solution tab uses two main classes: BCEPlotHandler and BCEDataState. 
+BCEDataState contains solution data for the currently loaded solution and
+has methods for manipulating that data. It also contains the user controls
+in the solution tab. These controls make use of the BCELineEdit, BCECheckBox,
+and BCESlider classes. When users interact with these controls, data is 
+manipulated to reflect new parameters, and signals are sent to BCEPlotHandler
+that data has been updated. BCEPlotHandler receives signals from BCEDataState
+to plot data. Its methods are largely aimed at configuring the various plots
+displayed in the solution tab. It makes use of the custom plot class BCEValueSetPlot,
+which adds the abilities to retrieve mouse-over graph coordinates and interact
+by clicking on the plot. It also uses the custom label class BCELabel, which
+serves to label all plots in the solution tab (some of them dynamically, as titles
+change when data is manipulated).
+
+The game tab uses a number of large classes. The overarching class that 
+manages the many objects within the tab is the BCEGameHandler. BCEGameHandler uses
+the class BCEPushButton to implement user controls. The tables seen within the gametab
+are, from left to right, a BCEPayoffTableModel, a BCEConditionalTableModel,
+a BCEPriorTableModel, and a BCEObjWeightsTableModel. These all inherit from the 
+BCETableModel class, which sets general settings used by all the models. When data in these models is changed, the currently loaded BCEGame object is altered to reflect the changes, 
+a signal is emitted to update the model, and then the model retrieves data from the 
+game to display in the model. In other words, data entered into the model is not the
+data that the user sees; that entered data is entered into the game, and the model
+updates the data it displays with that new data from the game (which should be the same data entered). Entering data into the model thus also reveals if the data was properly entered into
+the game object. BCETableView is also used by the BCEGameHandler. It sets general
+settings for displaying the models in the game tab. BCEGameHandler also uses BCESolverWorker
+for solving games. When the solve button is clicked by the user, a BCESolverWorker object
+is initialized and used to solve the game. Progress of the solve routine is sent to
+the log tab.
+
+The log tab layout is created by BCELogHandler. BCELogStream, which is initilized in
+main.cpp, serves to redirect all cout in the program to the log tab. 
+
+Finally, BCEWindow is called to create the high level layout containing the three tabs:
+a BCEPlotHandler object, a BCEGameHandler object, and a BCELogHandler object. It also
+creates the menu bar and implements methods for loading and saving both games and solutions.
+
 
 */

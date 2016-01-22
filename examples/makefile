@@ -45,7 +45,7 @@ LDFLAGS = -L$(CPLEXDIR)/lib/$(SYSTEM)/$(LIBFORMAT) \
 	$(LDSYSFLAGS) \
 	-L/usr/local/lib/	$(LDMTFLAGS) \
 	$(LDOPTIONS) \
-	-ldl \
+	-Wl,--no-as-needed -ldl \
 
 # MAINS=fpaknown fpaunknown fangmorris spa spaknown survey
 MAINS=exampleforrobbie \
@@ -55,9 +55,11 @@ MAINS=exampleforrobbie \
 	 fangmorris publicinfo commonfpa \
 	 multiplicative survey duopoly onesided \
 	loadingExample hybridentryreserve \
-	hybridauction allpayauction hybridreserve 
+	hybridauction hybridreserve 
 
-MAINSGRB=revenuelb onesidedrestricted surplusbnd relaxed rcacommon roessler
+MAINSGRB=revenuelb onesidedrestricted relaxed rcacommon
+MAINSBCEGRB = surplusbnd allpayauction gurobihybridentryreserve postedprice \
+		fpagurobiunknown fparandomrp
 
 RCAMAINS=rcatest2
 
@@ -74,6 +76,15 @@ $(MAINS): % : $(CPPDIR)/%.cpp $(INCLDIR)/bce.hpp libbce.a
 	$(CXX) $(CFLAGS) $< -L. $(STATIC) -lbce $(STATIC) -L/usr/lib/x86_64-linux-gnu/ \
 	 -lboost_serialization \
 	 $(DYNAMIC)  $(LDFLAGS) -L./cpp -L../lib -o $@
+
+$(MAINSBCEGRB): % : $(CPPDIR)/%.cpp $(INCLDIR)/bce.hpp libbce.a
+	$(CXX) $(CFLAGS) -I$(GRBDIR)/include \
+	$< -L. $(STATIC) -lbce $(STATIC) -L/usr/lib/x86_64-linux-gnu/ \
+	-lboost_serialization -L$(GRBDIR)/lib \
+	-lgurobi_c++ \
+	$(DYNAMIC) -L$(GRBDIR)/lib \
+	-l$(GRBNAME) \
+	 $(LDFLAGS) -L./cpp -L../lib -o $@ 
 
 $(RCAMAINS): % : $(CPPDIR)/%.cpp $(INCLDIR)/bce.hpp  $(INCLDIR)/rca.hpp libbce.a
 	$(CXX) $(CFLAGS) $< -L. $(STATIC) -lbce -L/usr/lib/x86_64-linux-gnu/ \

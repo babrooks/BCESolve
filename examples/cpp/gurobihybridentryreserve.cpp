@@ -1,4 +1,5 @@
 #include "hybridentryreserve.hpp"
+#include "bcegurobisolver.hpp"
 
 int main() {
 
@@ -14,27 +15,24 @@ int main() {
 			  reservePrice,
 			  entryFee);
 
-  BCESolver solver(hera);
+  BCEGurobiSolver solver(hera);
   
   solver.populate();
   
-  // Minimize Revenue
-  IloCplex cplex = solver.getCplex();
-  // cplex.getObjective().setSense(IloObjective::Maximize);
-  // cplex.getObjective().setExpr(.5*solver.getObjectiveFunction(0) + 
-  // 			       .5*solver.getObjectiveFunction(1));
-  cplex.getObjective().setSense(IloObjective::Minimize);
-  cplex.getObjective().setExpr(solver.getObjectiveFunction(2));
-  
+  // cplex.getObjective().setSense(IloObjective::Minimize);
+  // cplex.getObjective().setExpr(solver.getObjectiveFunction(2));
+  // GRBLinExpr objective = 0;
+  // objective += .5 * solver.getObjectiveFunction(0);
+  // objective += .5 * solver.getObjectiveFunction(1);
+  // solver.model.setObjective(objective,GRB_MAXIMIZE);
+  solver.model.setObjective(solver.getObjectiveFunction(2),GRB_MINIMIZE);  
+  solver.model.update();
+
   solver.solve();
 
   BCESolution data;
   solver.getSolution(data);
   
-  cout << "Objective 0: " << cplex.getValue(solver.getObjectiveFunction(0)) << endl;
-  cout << "Objective 1: " << cplex.getValue(solver.getObjectiveFunction(1)) << endl;
-  cout << "Objective 2: " << cplex.getValue(solver.getObjectiveFunction(2)) << endl;
-
   stringstream fName;
   fName << "hybridauction_nv=" << numVals
 	<< "_nb=" << numBids

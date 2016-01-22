@@ -5,7 +5,7 @@
 
 #include "bce.hpp"
 
-class FPACommon : public BCEGame
+class FPACommon : public BCEAbstractGame
 {
 private:
   int numValues;
@@ -20,7 +20,7 @@ public:
   
   FPACommon(int na, int nv, double _entryCost, 
 	     double _reservePrice,double _highbid) 
-    : BCEGame(2,nv,na+1,1,3), numValues(nv), 
+    : BCEAbstractGame(nv,na+1,1,3), numValues(nv), 
       entryCost(_entryCost), highbid(_highbid),
       lowbid(0.0), reservePrice(_reservePrice)
   { }

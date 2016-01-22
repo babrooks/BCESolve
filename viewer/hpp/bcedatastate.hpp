@@ -15,14 +15,15 @@
 #include <cmath>
 #include <boost/filesystem.hpp>
 
-//! Class for storing data used by the GUI.
-/*! Continuously manipulated after user interactions.
+//! Class for storing data used by the plot handler.
+/*! Continuously manipulated as user interacts with plot tab controls.
   Holds all data for plotting. Also holds conditions the 
-  user must supply. Contains private "set" methods.
-  BCEWindow retrieves data through public "get"
-  methods that make minor integer or string copies
+  user supplies through plot tab controls, such as the currently selected equilibrium. 
+  Contains private "set" methods for changing private data.
+  Contains public "get" methods that make minor integer or string copies
   or supply a const reference to the memory location
-  of larger data structures.
+  of larger data structures. These get methods are called
+  primarily by bceplothandler.
 
   \ingroup viewer
 */
@@ -97,6 +98,10 @@ signals:
 
 
 private: // Private Properties. Private Functions near EOF.
+  //! Resolution Width
+  int resWidth = 1920;
+  //! Resolution Height
+  int resHeight = 1080;
   //! A 2 element vector holding the current action for each player.
   vector<int> actions;
   //! A 2 element vector holding the current type for each player.
@@ -166,9 +171,6 @@ public:
      contained within this class.
   */
   BCEDataState();
-
-  int resWidth = 1920;
-  int resHeight = 1080;
 
   //! Sets the solution data to the newly loaded solution.
   void setSolutionData(BCESolution &solution);
@@ -260,6 +262,8 @@ public:
     return guiTitle;
   }
 
+  //! Sets resolution, data provided from BCEWindow.
+  void setResolution(int resWidth,int resHeight);
 
 public slots:
 

@@ -1,15 +1,16 @@
-#include "allpayauction.hpp"
+#include "postedprice.hpp"
 #include "bcegurobisolver.hpp"
 
 int main() {
 
-  int numBids = 50;
   int numVals = 50;
+  double price = .05;
+  double prPlayer0Wins = .50;
 
-  AllPayAuction apa(numVals,numBids);
+  PostedPrice pp(numVals,price,prPlayer0Wins);
+  pp.setHasProductStructureData(true);
 
-  BCEGurobiSolver solver(apa);
-
+  BCEGurobiSolver solver(pp);
   // BCESolver solver(apa);
   
   solver.populate();
@@ -39,9 +40,9 @@ int main() {
   solver.getSolution(soln);
 
   stringstream fName;
-  fName << "allpayauction_nv=" << numVals
-	<< "_nb=" << numBids
-	<< "_objective=" << "Filler, need to get objective" << ".bce";
+  fName << "postedprice_nv=" << numVals
+	<< "_price=" << price
+	<< "_pr0Wins=" << prPlayer0Wins << ".bce";
   string fNameStr = fName.str();
   const char * fNameC = fNameStr.c_str();
   BCESolution::save(soln,fNameC);
@@ -49,3 +50,4 @@ int main() {
   return 0;
 
 }
+

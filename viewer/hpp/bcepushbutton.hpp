@@ -4,7 +4,8 @@
 #include <QtWidgets>
 
 //! QPushButton that emits the player when clicked.
-/*!
+/*! This class is a QPushButton that emits the index
+  of the player associated with it when it is clicked.
 
   \ingroup viewer
 */
@@ -13,10 +14,12 @@ class BCEPushButton : public QPushButton {
   Q_OBJECT;
 
 private:
+  //! Associated player
   int player;
 
 public:
 
+  //! Constructor
   BCEPushButton(int _player, QString _label):
     QPushButton(_label),player(_player)
   {
@@ -25,6 +28,7 @@ public:
   }
 
 signals:
+  //! Signals when a player has clicked a BCEPushButton
   void clickedForPlayer(int player);
 
 public slots:

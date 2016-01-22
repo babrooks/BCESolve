@@ -41,6 +41,9 @@ ifneq "$(wildcard /opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex/b
  CPLEXLIB=-lcplex1262
  SYSTEM = x86-64_linux
 
+ GRBDIR=/opt/gurobi650/linux64
+ GRBNAME=gurobi65
+
  STATIC=-Wl,-Bstatic
  DYNAMIC=-Wl,-Bdynamic
 

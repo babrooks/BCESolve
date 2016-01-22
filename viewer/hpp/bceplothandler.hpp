@@ -15,12 +15,12 @@
 
 using namespace std;
 
-//! Viewer Window Class
-/*! Handles plotting and layout of the GUI. Connects
-  user interaction in the GUI with BCEDataState to
+//! This class handles all the plotting in the solution tab.
+/*! Handles plotting and layout of the solution tab. Connects
+  user interaction in the solution tab with BCEDataState to
   modify data elements for plotting. Gets data from
   BCEDataState for plotting. Connects data change signals
-  in BCEDataState with slots to change plot titles.
+  in BCEDataState with slots to change plot titles dynamically.
 
   \ingroup viewer
 */
@@ -87,10 +87,9 @@ private:
   //! Layout for the Plot Handler
   QHBoxLayout *mainTab;
   //! Screen Resolution Width.
-  int resWidth;
+  int resWidth = 1920;
   //! Screen Resolution Height.
-  int resHeight;
-
+  int resHeight = 1080;
   //! Data state. 
   /*! Stores all data currently held or 
     displayed in the GUI. "Held" data 
@@ -142,6 +141,7 @@ private:
   BCEValueSetPlot *setOfBCEPlot;
   //! Bar Graphs.
   QVector<QCustomPlot*> deviationBarGraphs;
+  //! Plot titles for the deviation bar plots.
   QVector<BCELabel*> devPlotTitles;
 
 public:
@@ -156,6 +156,8 @@ public:
   const BCESolution& getSolutionData() const {
     return guiData.getSolution();
   }
+  //! Sets resolution to settings provided by BCEWindow.
+  void setResolution(int resWidth,int resHeight);
 
 };
 

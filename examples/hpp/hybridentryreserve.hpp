@@ -9,7 +9,7 @@
 #include "bce.hpp"
 #include <math.h>
 
-class HybridEntryReserve : public BCEGame {
+class HybridEntryReserve : public BCEAbstractGame {
 
 private:
   double weightOnOwnBid;
@@ -22,7 +22,7 @@ public:
 		     double _weightOnOwnBid,
 		     double _reservePrice,
 		     double _entryFee):
-    BCEGame(2,nv,na,1,3),
+    BCEAbstractGame(nv,na,1,3),
     weightOnOwnBid(_weightOnOwnBid),
     reservePrice(_reservePrice),
     entryFee(_entryFee)

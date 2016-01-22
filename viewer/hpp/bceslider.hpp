@@ -5,7 +5,9 @@
 #include "bceenumeration.hpp"
 
 //! QScrollBar with added signal and slots.
-/*!
+/*! This class is a QScrollBar containing additional
+  information about whether the scroll bar is associated
+  with the action, type, or state of a given player.
 
     \ingroup viewer
  */
@@ -15,11 +17,14 @@ class BCESlider : public QScrollBar
 
 private:
 
+  //! Type of BCEScrollBar
   BCESliderType sliderType;
+  //! Player associated with the BCEScrollBar
   int player;  
 
 public:
 
+  //! Constructor
   BCESlider(BCESliderType _type,int _player):
     sliderType(_type), player(_player)
   {
@@ -28,6 +33,7 @@ public:
   }
 
 signals:
+  //! Signals that the user has moved the BCESlider.
   void valueChanged(int newValue,BCESliderType type,int player);
 
 public slots:

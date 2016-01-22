@@ -42,16 +42,21 @@ public:
   { emit layoutChanged(); }
 
   //! Reimplements the data method
-  /*! Retrieves the probability of going to nextState from state, when
-      the action profile indicated by index is played. Retrieves the
-      data using SGGame::getProbabilities. */
+  /*! Retrieves the prior over a state. Retrieves the
+      data using BCEGame::prior. */
   QVariant data(const QModelIndex & index,
 		int role) const Q_DECL_OVERRIDE;
     
   //! Reimplements the setData method
-  /*! Sets the transition probability from state to nextState to
-      value, using SGGame::setProbability. */
+  /*! Sets the prior over a state, using BCEGame::setPrior. */
   bool setData(const QModelIndex & index, const QVariant & value, int role);
+
+  //! Returns formatted header data
+  /*! Returns header data formatted to indicate the appropriate 
+    objective labels. */
+  QVariant headerData(int section,
+		      Qt::Orientation orientation,
+		      int role) const Q_DECL_OVERRIDE;
   
 protected:
   //! Pointer to the associated game.

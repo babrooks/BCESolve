@@ -107,7 +107,7 @@ BCEGame::BCEGame(const BCEAbstractGame & game):
 
 } // Construct from BCEAbstractGame
 
-bool BCEGame::addObjective(int position)
+bool BCEGame::addObjective(int position,string label)
 {
   if (position < 2 || position > numObjectives)
     return false;
@@ -115,8 +115,10 @@ bool BCEGame::addObjective(int position)
   objectiveData.insert(objectiveData.begin() + position,
 		       vector< vector<double> > (numStates,
 						 vector<double>(numActions[0]*numActions[1],0.0)));
-  
   numObjectives++;
+  objectiveLabels.insert(objectiveLabels.begin() + position,label);
+  findLabelRedundancies(position);
+  nameEmptyLabels();
   return true;
 } // addObjective
 
@@ -126,6 +128,7 @@ bool BCEGame::removeObjective(int obj)
     return false;
 
   objectiveData.erase(objectiveData.begin() + obj);
+  objectiveLabels.erase(objectiveLabels.begin() + obj);
   numObjectives--;
 
   return true;
