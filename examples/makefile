@@ -45,7 +45,7 @@ LDFLAGS = -L$(CPLEXDIR)/lib/$(SYSTEM)/$(LIBFORMAT) \
 	$(LDSYSFLAGS) \
 	-L/usr/local/lib/	$(LDMTFLAGS) \
 	$(LDOPTIONS) \
-	-ldl \
+	-Wl,--no-as-needed -ldl \
 
 # MAINS=fpaknown fpaunknown fangmorris spa spaknown survey
 MAINS=exampleforrobbie \
@@ -59,7 +59,7 @@ MAINS=exampleforrobbie \
 
 MAINSGRB=revenuelb onesidedrestricted relaxed rcacommon
 MAINSBCEGRB = surplusbnd allpayauction gurobihybridentryreserve postedprice \
-		fpagurobiunknown
+		fpagurobiunknown fparandomrp
 
 RCAMAINS=rcatest2
 
@@ -84,7 +84,7 @@ $(MAINSBCEGRB): % : $(CPPDIR)/%.cpp $(INCLDIR)/bce.hpp libbce.a
 	-lgurobi_c++ \
 	$(DYNAMIC) -L$(GRBDIR)/lib \
 	-l$(GRBNAME) \
-	 $(DYNAMIC)  $(LDFLAGS) -L./cpp -L../lib -o $@ 
+	 $(LDFLAGS) -L./cpp -L../lib -o $@ 
 
 $(RCAMAINS): % : $(CPPDIR)/%.cpp $(INCLDIR)/bce.hpp  $(INCLDIR)/rca.hpp libbce.a
 	$(CXX) $(CFLAGS) $< -L. $(STATIC) -lbce -L/usr/lib/x86_64-linux-gnu/ \

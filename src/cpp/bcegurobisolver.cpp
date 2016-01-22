@@ -57,8 +57,6 @@ void BCEGurobiSolver::countActionsTypes()
     }
 }
 
-///////////////////////////////////////
-// Fix for GUROBI
 void BCEGurobiSolver::clear()
 {
   model.reset();
@@ -490,8 +488,9 @@ void BCEGurobiSolver::populate ()
 
   gurobiObjective = 0;
   gurobiObjective += objectiveFunctions[2];
-  model.setObjective(gurobiObjective,GRB_MINIMIZE);
-
+  model.update();
+  // model.setObjective(gurobiObjective,GRB_MINIMIZE);
+  // model.update();
 
 } // populate
 
@@ -499,7 +498,7 @@ void BCEGurobiSolver::solve()
 {
   map<int,double> solutionEquilibrium;
 
-  // // cout << "Display level = " << displayLevel << endl;
+  cout << "Display level = " << displayLevel << endl;
   // cplex.setParam(IloCplex::SimDisplay,displayLevel);
   // cplex.setParam(IloCplex::BarDisplay,displayLevel);
   // cplex.setParam(IloCplex::RootAlg, IloCplex::Barrier);
@@ -509,9 +508,18 @@ void BCEGurobiSolver::solve()
   // cplex.solve();
   // if (displayLevel)
   //   cout << "Objective = " << setprecision(16) << cplex.getObjValue() << endl;
+  // GRBLinExpr objective = 0;
+  // objective += .5 * getObjectiveFunction(0);
+  // objective += .5 * getObjectiveFunction(1);
+  // model.setObjective(objective,GRB_MAXIMIZE);
+
+  model.update();
   model.optimize();
-  if (displayLevel)
-    cout << "Objective = " << setprecision(16) << model.get(GRB_DoubleAttr_ObjVal) << endl;
+  if (displayLevel) {
+    for (int obj = 0; obj < objectiveFunctions.size(); obj++)
+      cout << "Objective " << obj << " = " << setprecision(16) 
+	   << objectiveFunctions[obj].getValue() << endl;
+  }
 
   soln.clearEquilibria();
   bceToMap(solutionEquilibrium);

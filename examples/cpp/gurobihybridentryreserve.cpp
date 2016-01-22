@@ -3,8 +3,8 @@
 
 int main() {
 
-  int numBids = 50;
-  int numVals = 50;
+  int numBids = 30;
+  int numVals = 30;
   double weightOnOwnBid = 1;
   double reservePrice = .25;
   double entryFee = 0;
@@ -19,11 +19,15 @@ int main() {
   
   solver.populate();
   
-  // // Minimize Revenue
-  // GRBModel model = solver.getModel();
   // cplex.getObjective().setSense(IloObjective::Minimize);
   // cplex.getObjective().setExpr(solver.getObjectiveFunction(2));
-  
+  // GRBLinExpr objective = 0;
+  // objective += .5 * solver.getObjectiveFunction(0);
+  // objective += .5 * solver.getObjectiveFunction(1);
+  // solver.model.setObjective(objective,GRB_MAXIMIZE);
+  solver.model.setObjective(solver.getObjectiveFunction(2),GRB_MINIMIZE);  
+  solver.model.update();
+
   solver.solve();
 
   BCESolution data;

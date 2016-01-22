@@ -101,9 +101,7 @@ protected:
 
   // Cplex components
 
-  GRBEnv env; 
-  //! The CPLEX model. 
-  GRBModel model; 
+  GRBEnv env;  
   //! The objective for BCEGurobiSolver::cplex.
   GRBLinExpr gurobiObjective; 
 
@@ -191,6 +189,9 @@ public:
     game. */
   BCEGurobiSolver(BCEAbstractGame & _game);
 
+  //! The GUROBI model. 
+  GRBModel model;
+
   //! Destructor
   ~BCEGurobiSolver()
   { delete variables; } 
@@ -248,7 +249,7 @@ public:
   //! Set bool parameter.
   void setParameter(BCEGurobiSolver::BoolParameter, bool arg);
   //! Set objective function.
-  void setObfun (int n) { gurobiObjective = objectiveFunctions[n]; }
+  void setObfun(int n) { gurobiObjective = objectiveFunctions[n]; }
   //! Set boundary objective.
   void setBndryObjective(int index, const GRBLinExpr & expr);
 

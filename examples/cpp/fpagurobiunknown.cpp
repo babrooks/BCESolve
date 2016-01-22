@@ -30,7 +30,7 @@ int main(int argc, char ** argv)
       solver.populate();
       cout << "Done populating" << endl;
 
-      GRBModel cplex=solver.getModel();
+      GRBModel model = solver.getModel();
 
       // // First add efficiency constraint
       // cplex.getObjective().setExpr(solver.getObjectiveFunction(3));
@@ -46,6 +46,10 @@ int main(int argc, char ** argv)
 	   << "in BCEGurobiSolver source code." << endl;
 
       // cplex.setParam(IloCplex::RootAlg,IloCplex::Dual);
+      model.setObjective(.5*solver.getObjectiveFunction(0) +
+      			 .5*solver.getObjectiveFunction(1),GRB_MAXIMIZE);
+      // model.setObjective(solver.getObjectiveFunction(2),GRB_MINIMIZE);
+      model.update();
 
       solver.solve();
       cout << "Solved" << endl;
