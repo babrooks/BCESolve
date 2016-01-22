@@ -44,8 +44,9 @@ LDFLAGS = -L$(CPLEXDIR)/lib/$(SYSTEM)/$(LIBFORMAT) \
 	$(CPLEXLIB)  \
 	$(LDSYSFLAGS) \
 	-L/usr/local/lib/	$(LDMTFLAGS) \
-	$(LDOPTIONS) \
-	-Wl,--no-as-needed -ldl \
+	$(LDOPTIONS)  -ldl \
+
+# CODE REMOVED: -Wl,--no-as-needed
 
 # MAINS=fpaknown fpaunknown fangmorris spa spaknown survey
 MAINS=exampleforrobbie \

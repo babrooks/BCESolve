@@ -1,6 +1,7 @@
 #ifndef BCEABSTRACTGAME_HPP
 #define BCEABSTRACTGAME_HPP
 
+#include <sstream>
 #include "bcecommon.hpp"
 #include "bceexception.hpp"
 #include <boost/archive/text_iarchive.hpp>

@@ -43,32 +43,32 @@ public:
     return "BCEException was thrown";
   }
 
-  //! Returns an error message.
-  /*! Has not been fully implemented. */
-  string getMessage()
-  {
-    switch (errorType)
-      {
-      case OutOfBounds:
-	break;
-      case ConditionFailed:
-	break;
-      case NoEquilibria:
-	break;
-      case MapFrontierNotOptimal:
-	break;
-      case FailedOpen:
-	break;
-      case NotProbDistr:
-	break;
-      case BadArgument:
-	break;
-      case InvalidParameterName:
-	break;
-      case InvalidParameterValue:
-	break;
-      } // switch
-  }
+  // //! Returns an error message.
+  // /*! Has not been fully implemented. */
+  // string getMessage()
+  // {
+  //   switch (errorType)
+  //     {
+  //     case OutOfBounds:
+  // 	break;
+  //     case ConditionFailed:
+  // 	break;
+  //     case NoEquilibria:
+  // 	break;
+  //     case MapFrontierNotOptimal:
+  // 	break;
+  //     case FailedOpen:
+  // 	break;
+  //     case NotProbDistr:
+  // 	break;
+  //     case BadArgument:
+  // 	break;
+  //     case InvalidParameterName:
+  // 	break;
+  //     case InvalidParameterValue:
+  // 	break;
+  //     } // switch
+  // }
 };
 
 #endif

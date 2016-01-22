@@ -123,7 +123,7 @@ public:
   } // dominated
 
   //! Set dominated
-  bool setDominated(int action, int type, int player, bool value)
+  void setDominated(int action, int type, int player, bool value)
   {
     dominatedData[player][type][action] = value;
   } // setDominated

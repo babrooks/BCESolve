@@ -122,14 +122,23 @@ void BCEAbstractGame::nameEmptyLabels() {
 
   for (int obj = 0; obj < 2; obj++) {
     if (objectiveLabels[obj].compare(compareStr) == 0)
-      objectiveLabels[obj] = "Player " + std::to_string(obj);
+      {
+	stringstream ss;
+	ss << "Player " << obj;
+	objectiveLabels[obj] = ss.str();
+      }
   }
 
   int currObj = 2;
 
   while (currObj < numObjs) {
     if (objectiveLabels[currObj].compare(compareStr) == 0)
-      objectiveLabels[currObj] = "Objective " + std::to_string(currObj);
+      {
+	stringstream ss;
+	ss << "Objective " << currObj;
+	objectiveLabels[currObj] = ss.str();
+      }
+
     currObj++;
   }
 }

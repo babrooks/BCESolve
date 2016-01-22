@@ -36,6 +36,9 @@ public:
   {
     return PDF(v0,incr,v1,incr);
   }
+
+  //! Virtual destructor
+  virtual ~BCEDistr() {}
 };
 
 //! Weighted sum of distributions

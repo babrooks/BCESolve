@@ -47,7 +47,7 @@ QVariant BCEPriorTableModel::headerData(int section,
 
 	case Qt::Vertical: {
 	  return QVariant
-	    (QString::fromStdString("S" + to_string(section)));
+	    (QString("S") + QString::number(section));
 	}
 	}
     }

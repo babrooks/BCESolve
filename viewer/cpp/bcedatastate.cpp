@@ -7,8 +7,8 @@ BCEDataState::BCEDataState() {
     state = 0;
     margS0 = false;
     margS1 = false;
-    margA = {true,true};
-    margT = {false,false};
+    margA = vector<bool>(2,true);
+    margT = vector<bool>(2,false);
     currentEqmIndex = 0;
     isPrivateVals=false;
     setupControlsLayout();  

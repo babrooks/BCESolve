@@ -148,7 +148,7 @@ bool BCEGame::addState(int position)
   conditionalData.insert(conditionalData.begin()+position,
 			 vector<double>(numTypes[0]*numTypes[1],
 					1.0/numTypes[0]/numTypes[1]));
-    
+  return true;
 } // add state
 
 bool BCEGame::removeState(int state)

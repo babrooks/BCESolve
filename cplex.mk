@@ -6,10 +6,10 @@ ifneq "$(wildcard /Users/benjaminbrooks/Applications/IBM/ILOG/CPLEX_Studio1262/c
  CPLEXLIB=-lcplex
  SYSTEM=x86-64_osx
 
- GRBDIR=/Library/gurobi604/mac64
+ GRBDIR=/Library/gurobi650/mac64
  GRBINCLDIR=$(GRBDIR)/include
  GRBLIBDIR=$(GRBDIR)/lib
- GRBNAME=gurobi60
+ GRBNAME=gurobi65
 
  STATIC=
  DYNAMIC=
