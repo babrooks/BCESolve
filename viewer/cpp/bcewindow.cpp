@@ -234,7 +234,7 @@ void BCEWindow::runSolve(vector<double> & weightData) {
       // cancelSolveFlag = false;
       
       QThread *solverWorkerThread = new QThread();
-      solverWorker = new BCESolverWorker(gameTab.getGame(),weightData);
+      solverWorker = new BCEGurobiSolverWorker(gameTab.getGame(),weightData);
 
       solverWorker->moveToThread(solverWorkerThread);
       connect(solverWorkerThread,SIGNAL(started()),

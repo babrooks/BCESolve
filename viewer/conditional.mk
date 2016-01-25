@@ -16,8 +16,8 @@ CPLEXDIR = /opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio
 CPLEXSYSTEM = x86-64_linux
 CPLEXNAME = cplex1262
 
-GRBDIR=/opt/gurobi563/linux64
-GRBNAME=gurobi56
+GRBDIR=/opt/gurobi650/linux64
+GRBNAME=gurobi65
 } # Robbie's computer
 
 exists( /Users/benjaminbrooks/Applications/IBM/ILOG/CPLEX_Studio1262/cplex/bin/x86-64_osx/cplex ) {

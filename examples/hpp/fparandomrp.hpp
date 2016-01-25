@@ -34,9 +34,9 @@ public:
 
     if (obj<2)
       {
-	double val = static_cast<double>(state)/numStates;
-	double ownBid = static_cast<double>(actions[obj])/numActions[obj];
-	double otherBid = static_cast<double>(actions[1-obj])/numActions[obj];
+	double val = static_cast<double>(state)/(numStates-1);
+	double ownBid = static_cast<double>(actions[obj])/(numActions[obj]-1);
+	double otherBid = static_cast<double>(actions[1-obj])/(numActions[obj]-1);
 
 	if (ownBid == 0)
 	  return 0.0;

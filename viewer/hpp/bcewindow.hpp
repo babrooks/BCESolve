@@ -6,7 +6,7 @@
 #include "bcegamehandler.hpp"
 #include "bceplothandler.hpp"
 #include "bceloghandler.hpp"
-#include "bcesolverworker.hpp"
+#include "bcegurobisolverworker.hpp"
 
 //! Assembles BCEGameHandler, BCEPlotHandler, and BCESolverWorker into a Unified GUI.
 /*! Sets up a menu bar and assembles bcegamehandler, bceplothandler, 
@@ -49,7 +49,7 @@ private:
   //! Thread for solverWorker
   QThread *solverWorkerThread;
   //! solverWorker Object for Solving Games
-  BCESolverWorker *solverWorker;
+  BCEGurobiSolverWorker *solverWorker;
   //! Sets resolution width
   int resWidth = 1920;
   //! Sets resolution height

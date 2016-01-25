@@ -17,7 +17,6 @@ QMAKE_CXXFLAGS += -std=gnu++11
 QMAKE_CXXFLAGS += -m64 -lm -lpthread  -O0 -O -fPIC -fexceptions -DNDEBUG -DIL_STD 
 QMAKE_LFLAGS += -m64 -lm -lpthread  -m64 -O -fPIC -fexceptions -DNDEBUG -DIL_STD
 
-
 INCLUDEPATH += /usr/local/include \
 /usr/local/lib \
 ../src/cpp \
