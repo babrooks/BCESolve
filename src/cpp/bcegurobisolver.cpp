@@ -498,6 +498,9 @@ void BCEGurobiSolver::solve()
 {
   map<int,double> solutionEquilibrium;
 
+  model.getEnv().set(GRB_IntParam_Crossover,0);
+  model.getEnv().set(GRB_IntParam_Method,2);
+
   cout << "Display level = " << displayLevel << endl;
   // cplex.setParam(IloCplex::SimDisplay,displayLevel);
   // cplex.setParam(IloCplex::BarDisplay,displayLevel);

@@ -12,7 +12,7 @@ int main() {
   double reservePrice = .25;
   // SOLVER SWITCH
   // CPLEX, set to 0; GUROBI, set to 1;
-  int solverSwitch = 0;
+  int solverSwitch = 1;
 
   FPARandomRP fparrp(numVals,
 		     numBids,

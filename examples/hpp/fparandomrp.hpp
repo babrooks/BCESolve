@@ -75,7 +75,9 @@ public:
 
 	if (winningBid >= reservePrice)
 	  return winningBid;	  
+
       }
+    return 0;
   } // objective
 
 
