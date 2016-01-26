@@ -44,7 +44,7 @@ LDFLAGS = -L$(CPLEXDIR)/lib/$(SYSTEM)/$(LIBFORMAT) \
 	$(CPLEXLIB)  \
 	$(LDSYSFLAGS) \
 	-L/usr/local/lib/	$(LDMTFLAGS) \
-	$(LDOPTIONS)  -ldl \
+	$(LDOPTIONS) -ldl 
 
 # CODE REMOVED: -Wl,--no-as-needed
 

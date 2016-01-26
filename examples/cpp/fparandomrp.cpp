@@ -5,18 +5,16 @@
 
 int main() {
 
-  int numBids = 75;
-  int numVals = 75;
+  int numBids = 50;
+  int numVals = 50;
   // if bid < reservePrice, bidder still wins the item with pr reserveProb
-  double reserveProb = .5;
-  double reservePrice = .25;
+  double reservePrice = .5;
   // SOLVER SWITCH
   // CPLEX, set to 0; GUROBI, set to 1;
   int solverSwitch = 1;
 
   FPARandomRP fparrp(numVals,
 		     numBids,
-		     reserveProb,
 		     reservePrice);
   
   if (solverSwitch == 0) {
@@ -36,8 +34,7 @@ int main() {
     stringstream fName;
     fName << "fparandomrp_nv=" << numVals
   	  << "_nb=" << numBids
-  	  << "_rp=" << reservePrice
-  	  << "_rpPr=" << reserveProb << ".bce";
+  	  << "_rp=" << reservePrice << ".bce";
     string fNameStr = fName.str();
     const char * fNameC = fNameStr.c_str();
     BCESolution::save(data,fNameC);
@@ -64,8 +61,7 @@ int main() {
     stringstream fName;
     fName << "fparandomrp_nv=" << numVals
   	  << "_nb=" << numBids
-  	  << "_rp=" << reservePrice
-  	  << "_rpPr=" << reserveProb << ".bce";
+  	  << "_rp=" << reservePrice << ".bce";
     string fNameStr = fName.str();
     const char * fNameC = fNameStr.c_str();
     BCESolution::save(data,fNameC);

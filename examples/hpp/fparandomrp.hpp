@@ -12,17 +12,46 @@ class FPARandomRP : public BCEAbstractGame {
 
 private:
   double reservePrice;
-  double reserveProb;
+  vector<vector<double> > cdf;
+  int rpPrecision;
   
 public:
   FPARandomRP(int nv,
 	      int na,
-	      double _rp,
-	      double _rpProb):
+	      double _rp):
     BCEAbstractGame(nv,na,1,3),
-    reservePrice(_rp),
-    reserveProb(_rpProb)
-  { }
+    reservePrice(_rp)
+  {
+    rpPrecision = 1000;
+    // rp*rpPrecision will be a non-decimal for rp no more precise
+    // than rpPrecision => actionsUnderRP0 is an int.
+    // e.g. rpPrecision = 1000 => no more precise than 1000ths place.
+    int actionsUnderRP0 = numActions[0]*reservePrice*rpPrecision;
+    int actionsUnderRP1 = numActions[1]*reservePrice*rpPrecision;
+    cdf = vector<vector<double> > (2,vector<double>
+				   (max(actionsUnderRP0,actionsUnderRP1),0.0));
+
+    double acc0 = 1.00/actionsUnderRP0;
+    // Create a uniform distn
+    for (int action = 0; action < actionsUnderRP0; action++) {
+      cdf[0][action]=acc0;
+      acc0 = acc0 + 1.00/actionsUnderRP0;
+    }
+    cout << "cdf0Max (should be 1): " << cdf[0][actionsUnderRP0-1] << endl;
+
+    double acc1 = 1.00/actionsUnderRP1;
+    for (int action = 0; action < actionsUnderRP1; action++) {
+      cdf[1][action]=acc1;
+      acc1 += 1.00/actionsUnderRP1;
+    }
+    cout << "cdf1Max (should be 1): " << cdf[1][actionsUnderRP1-1] << endl;
+
+    //A Few Tests
+    cout << "test1: " << cdf[0][floor(na/2)*rpPrecision];
+    cout << "test2: " << cdf[0][ceil(na/4)*rpPrecision];
+    cout << "test3: " << cdf[0][floor(na/5)*rpPrecision];
+    cout << "test4: " << cdf[0][floor(na/2.5)*rpPrecision];
+  }
 
   double prior (int state, const vector<int> & types) const {
     return 1.0/numStates;    
@@ -45,15 +74,16 @@ public:
 	  return 0.0;
 
 	if (ownBid > otherBid) {
-	  if (ownBid < reservePrice)
-	    return reserveProb*(val-ownBid);
+	  if (ownBid < reservePrice) {
+	    return cdf[obj][actions[obj]*rpPrecision]*(val-ownBid);
+	  }
 	  else if (ownBid >= reservePrice)
 	    return val-ownBid;
 	}
 
 	else if (ownBid == otherBid) {
 	  if (ownBid < reservePrice)
-	    return reserveProb*.5*(val-ownBid);
+	    return cdf[obj][actions[obj]*rpPrecision]*.5*(val-ownBid);
 	  else if (ownBid >= reservePrice)
 	    return 0.5*(val-ownBid);
 	}
@@ -63,15 +93,18 @@ public:
       {
 	// revenue
 	
-	double b0 = static_cast<double>(actions[0])/numActions[0];
-	double b1 = static_cast<double>(actions[1])/numActions[1];
+	double b0 = static_cast<double>(actions[0])/(numActions[0]-1);
+	double b1 = static_cast<double>(actions[1])/(numActions[1]-1);
 
 	double winningBid = b0;
-	if (b1 > b0)
+	int winningPlayer = 0;
+	if (b1 > b0) {
 	  winningBid = b1;
+	  winningPlayer = 1;
+	}
 
 	if (winningBid < reservePrice)
-	  return reserveProb * winningBid;
+	  return cdf[winningPlayer][actions[winningPlayer]*rpPrecision] * winningBid;
 
 	if (winningBid >= reservePrice)
 	  return winningBid;	  

@@ -221,7 +221,7 @@ void BCEGurobiSolver::populate ()
 	  && game->prior(counter.getState(),counter.getTypes())>0.0)
 	{
 	  nonZeroVariableLocations.push_back(counter.getVariable());
-	  // variableLocationsMap.emplace(counter.getVariable(),numProbabilityVariables);
+	  variableLocationsMap.emplace(counter.getVariable(),numProbabilityVariables);
 	  numProbabilityVariables++;
 	}
     } while (++counter); // variableCounter

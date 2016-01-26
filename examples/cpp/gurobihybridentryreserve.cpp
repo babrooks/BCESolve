@@ -43,4 +43,6 @@ int main() {
   const char * fNameC = fNameStr.c_str();
   BCESolution::save(data,fNameC);
 
+  return 0;
+
 }
