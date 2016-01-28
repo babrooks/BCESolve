@@ -12,8 +12,8 @@ class FPARandomRP : public BCEAbstractGame {
 
 private:
   double reservePrice;
-  vector<vector<double> > cdf;
-  int rpPrecision;
+  // vector<vector<double> > cdf;
+  // int rpPrecision;
   
 public:
   FPARandomRP(int nv,
@@ -22,35 +22,35 @@ public:
     BCEAbstractGame(nv,na,1,3),
     reservePrice(_rp)
   {
-    rpPrecision = 1000;
-    // rp*rpPrecision will be a non-decimal for rp no more precise
-    // than rpPrecision => actionsUnderRP0 is an int.
-    // e.g. rpPrecision = 1000 => no more precise than 1000ths place.
-    int actionsUnderRP0 = numActions[0]*reservePrice*rpPrecision;
-    int actionsUnderRP1 = numActions[1]*reservePrice*rpPrecision;
-    cdf = vector<vector<double> > (2,vector<double>
-				   (max(actionsUnderRP0,actionsUnderRP1),0.0));
+    // rpPrecision = 1000;
+    // // rp*rpPrecision will be a non-decimal for rp no more precise
+    // // than rpPrecision => actionsUnderRP0 is an int.
+    // // e.g. rpPrecision = 1000 => no more precise than 1000ths place.
+    // int actionsUnderRP0 = numActions[0]*reservePrice*rpPrecision;
+    // int actionsUnderRP1 = numActions[1]*reservePrice*rpPrecision;
+    // cdf = vector<vector<double> > (2,vector<double>
+    // 				   (max(actionsUnderRP0,actionsUnderRP1),0.0));
 
-    double acc0 = 1.00/actionsUnderRP0;
-    // Create a uniform distn
-    for (int action = 0; action < actionsUnderRP0; action++) {
-      cdf[0][action]=acc0;
-      acc0 = acc0 + 1.00/actionsUnderRP0;
-    }
-    cout << "cdf0Max (should be 1): " << cdf[0][actionsUnderRP0-1] << endl;
+    // double acc0 = 1.00/actionsUnderRP0;
+    // // Create a uniform distn
+    // for (int action = 0; action < actionsUnderRP0; action++) {
+    //   cdf[0][action]=acc0;
+    //   acc0 = acc0 + 1.00/actionsUnderRP0;
+    // }
+    // cout << "cdf0Max (should be 1): " << cdf[0][actionsUnderRP0-1] << endl;
 
-    double acc1 = 1.00/actionsUnderRP1;
-    for (int action = 0; action < actionsUnderRP1; action++) {
-      cdf[1][action]=acc1;
-      acc1 += 1.00/actionsUnderRP1;
-    }
-    cout << "cdf1Max (should be 1): " << cdf[1][actionsUnderRP1-1] << endl;
+    // double acc1 = 1.00/actionsUnderRP1;
+    // for (int action = 0; action < actionsUnderRP1; action++) {
+    //   cdf[1][action]=acc1;
+    //   acc1 += 1.00/actionsUnderRP1;
+    // }
+    // cout << "cdf1Max (should be 1): " << cdf[1][actionsUnderRP1-1] << endl;
 
-    //A Few Tests
-    cout << "test1: " << cdf[0][floor(na/2)*rpPrecision];
-    cout << "test2: " << cdf[0][ceil(na/4)*rpPrecision];
-    cout << "test3: " << cdf[0][floor(na/5)*rpPrecision];
-    cout << "test4: " << cdf[0][floor(na/2.5)*rpPrecision];
+    // //A Few Tests
+    // cout << "test1: " << cdf[0][floor(na/2)*rpPrecision];
+    // cout << "test2: " << cdf[0][ceil(na/4)*rpPrecision];
+    // cout << "test3: " << cdf[0][floor(na/5)*rpPrecision];
+    // cout << "test4: " << cdf[0][floor(na/2.5)*rpPrecision];
   }
 
   double prior (int state, const vector<int> & types) const {
@@ -75,7 +75,7 @@ public:
 
 	if (ownBid > otherBid) {
 	  if (ownBid < reservePrice) {
-	    return cdf[obj][actions[obj]*rpPrecision]*(val-ownBid);
+	    return (ownBid/reservePrice)*(val-ownBid);
 	  }
 	  else if (ownBid >= reservePrice)
 	    return val-ownBid;
@@ -83,7 +83,7 @@ public:
 
 	else if (ownBid == otherBid) {
 	  if (ownBid < reservePrice)
-	    return cdf[obj][actions[obj]*rpPrecision]*.5*(val-ownBid);
+	    return (ownBid/reservePrice)*.5*(val-ownBid);
 	  else if (ownBid >= reservePrice)
 	    return 0.5*(val-ownBid);
 	}
@@ -104,7 +104,7 @@ public:
 	}
 
 	if (winningBid < reservePrice)
-	  return cdf[winningPlayer][actions[winningPlayer]*rpPrecision] * winningBid;
+	  return (winningBid/reservePrice) * winningBid;
 
 	if (winningBid >= reservePrice)
 	  return winningBid;	  
