@@ -83,15 +83,15 @@ private:
   //! Table for displaying weights data
   BCETableView *objWeightsTableView;
   //! Resolution Width
-  int resWidth = 1920;
+  int resWidth;
   //! Resolution height
-  int resHeight = 1080;
+  int resHeight;
 
 public:
   //! Constructor
   /*! Constructs edits and buttons, connects signals/slots, calls
       BCEGameHandler::initializeModels. */
-  BCEGameHandler();
+  BCEGameHandler(int resW,int resH);
   //! Destructor.
   /*! Destroys table views, models, etc. */
   ~BCEGameHandler();
@@ -121,9 +121,6 @@ public:
   /*! Switches all of the models over to new state and updates table
       views. */
   void setState(int state);
-
-  //! Sets the resolution.
-  void setResolution(int resWidth,int resHeight);
   
 private:
   //! Delete old data models and create new ones.
@@ -131,6 +128,8 @@ private:
   void initializeModels();
   //! Adds/removes models to achieve correct number of states.
   void changeNumberOfStates(int newS);
+  //! Sets up the layout for the game handler.
+  void setupLayout();
 				     
 private slots:
   //! Slot for changing the state. Calls setState.

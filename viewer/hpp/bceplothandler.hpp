@@ -11,7 +11,7 @@
 #include "bcevaluesetplot.hpp"
 #include "bceenumeration.hpp"
 #include "bcelabelhandler.hpp"
-#include "bcegamehandler.hpp"
+#include <QPointer>
 
 using namespace std;
 
@@ -30,7 +30,11 @@ class BCEPlotHandler : public QMainWindow
 
 public:
   //! Constructor
-  BCEPlotHandler();
+  BCEPlotHandler(int resW,int resH);
+  //! Destructor
+  ~BCEPlotHandler() {
+    delete guiData;
+  }
 
 signals:
   //! Sends data path to BCEDataState
@@ -87,9 +91,9 @@ private:
   //! Layout for the Plot Handler
   QHBoxLayout *mainTab;
   //! Screen Resolution Width.
-  int resWidth = 1920;
+  int resWidth;
   //! Screen Resolution Height.
-  int resHeight = 1080;
+  int resHeight;
   //! Data state. 
   /*! Stores all data currently held or 
     displayed in the GUI. "Held" data 
@@ -104,7 +108,7 @@ private:
     guiData through BCEDataState's "get"
     functions.
   */
-  BCEDataState guiData;
+  BCEDataState *guiData;
   //! Not currently implemented.
   /*! Checkboxes are displayed in the GUI but
     are not fully implemented. Using them in the
@@ -143,6 +147,8 @@ private:
   QVector<QCustomPlot*> deviationBarGraphs;
   //! Plot titles for the deviation bar plots.
   QVector<BCELabel*> devPlotTitles;
+  //! Sets up the layout of the plot handler.
+  void setupLayout();
 
 public:
   //! Returns Layout of the Plot Handler
@@ -154,10 +160,8 @@ public:
 
   //! Returns the current BCESolution in BCEDataState
   const BCESolution& getSolutionData() const {
-    return guiData.getSolution();
+    return guiData->getSolution();
   }
-  //! Sets resolution to settings provided by BCEWindow.
-  void setResolution(int resWidth,int resHeight);
 
 };
 

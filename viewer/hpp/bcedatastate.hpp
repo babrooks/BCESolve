@@ -99,9 +99,9 @@ signals:
 
 private: // Private Properties. Private Functions near EOF.
   //! Resolution Width
-  int resWidth = 1920;
+  int resWidth;
   //! Resolution Height
-  int resHeight = 1080;
+  int resHeight;
   //! A 2 element vector holding the current action for each player.
   vector<int> actions;
   //! A 2 element vector holding the current type for each player.
@@ -170,7 +170,7 @@ public:
      Further connects signals and slots when both are 
      contained within this class.
   */
-  BCEDataState();
+  BCEDataState(int resWidth,int resHeight);
 
   //! Sets the solution data to the newly loaded solution.
   void setSolutionData(BCESolution &solution);
@@ -261,9 +261,6 @@ public:
   string getGUITitle() {
     return guiTitle;
   }
-
-  //! Sets resolution, data provided from BCEWindow.
-  void setResolution(int resWidth,int resHeight);
 
 public slots:
 

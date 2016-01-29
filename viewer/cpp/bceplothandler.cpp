@@ -8,22 +8,29 @@
 #include "bcelabelhandler.hpp"
 #include "bcegamehandler.hpp"
 
-BCEPlotHandler::BCEPlotHandler() 
+BCEPlotHandler::BCEPlotHandler(int resW,int resH) 
 {
+  resWidth = resW;
+  resHeight = resH;
+  guiData = new BCEDataState(resW,resH);
   screenShotPath=QString("../examples/screenshots/");
+  setupLayout();
 
+} // constructor
+
+void BCEPlotHandler::setupLayout() {
   // BCEDataState Connections to BCEWindow
 
-  connect(&guiData,SIGNAL(selectedEqmChanged()),
+  connect(guiData,SIGNAL(selectedEqmChanged()),
 	  this,SLOT(plotBCEValueSet()));
-  connect(&guiData,SIGNAL(objectiveValuesChanged(int)),
+  connect(guiData,SIGNAL(objectiveValuesChanged(int)),
 	  this,SLOT(plotDeviationObjectives(int)));
-  connect(&guiData,SIGNAL(equilibriumMatrixChanged()),
+  connect(guiData,SIGNAL(equilibriumMatrixChanged()),
 	  this,SLOT(plotEqm()));
-  connect(&guiData,SIGNAL(newDataLoaded()),
+  connect(guiData,SIGNAL(newDataLoaded()),
 	  this,SLOT(setGUITitle()));
   connect(this,SIGNAL(sendingDataPath(QString)),
-	  &guiData,SLOT(setData(QString)));
+	  guiData,SLOT(setData(QString)));
 
   // End Data Connections
   /////////////////////////////////////////
@@ -36,8 +43,8 @@ BCEPlotHandler::BCEPlotHandler()
   setOfBCEPlot->yAxis->setLabel("Player 1");
   setOfBCEPlot->setMinimumSize(resWidth/4,resHeight/3.5);
   connect(setOfBCEPlot,SIGNAL(newEqmCoordinates(double,double)),
-	  &guiData,SLOT(modifyEqmFocus(double,double)));
-  connect(&guiData,SIGNAL(eqmCoordSignal(double,double)),
+	  guiData,SLOT(modifyEqmFocus(double,double)));
+  connect(guiData,SIGNAL(eqmCoordSignal(double,double)),
 	  setOfBCEPlotTitle,SLOT(changeDisplayedCoords(double,double)));
 
   // Bar Plot Initialization 
@@ -50,17 +57,17 @@ BCEPlotHandler::BCEPlotHandler()
     deviationBarGraphs[player]->setMinimumHeight(resHeight/3.5);
 
     devPlotTitles.push_back(new BCELabel(DeviationPlot,player));
-    connect(&guiData,
+    connect(guiData,
 	    SIGNAL(devPlotTitleChange(int,int,int,double)),
 	    devPlotTitles[player],
 	    SLOT(changeText(int,int,int,double)));
-    connect(&guiData,
+    connect(guiData,
 	    SIGNAL(devPlotPrChange(int,double)),
 	    devPlotTitles[player],
 	    SLOT(changeProbability(int,double)));
   }
 
-  QGridLayout *controlsGrid = guiData.controlsLayout;
+  QGridLayout *controlsGrid = guiData->controlsLayout;
 
   // BCE Set Plot and Sliders Horizontal Layout
   QVBoxLayout *setOfBCEPlotWithTitle = new QVBoxLayout();
@@ -82,7 +89,7 @@ BCEPlotHandler::BCEPlotHandler()
   conditionalMarginalPlot = new BCEValueSetPlot();
   BCELabel *colorMapTitle = new BCELabel(HeatMap);
   colorMapTitle->setMaximumHeight(resHeight/54);
-  connect(&guiData,SIGNAL(newStateSignal(int,int,int,bool)),
+  connect(guiData,SIGNAL(newStateSignal(int,int,int,bool)),
 	  colorMapTitle,SLOT(changeDisplayedState(int,int,int,bool)));
 
   // Plot Layout and Interaction Settings
@@ -91,7 +98,7 @@ BCEPlotHandler::BCEPlotHandler()
   conditionalMarginalPlot->addPlottable(colorMap);
   conditionalMarginalPlot->setInteractions(QCP::iRangeDrag|QCP::iRangeZoom);
   conditionalMarginalPlot->axisRect()->setupFullAxesBox(true);
-  conditionalMarginalPlot->setMinimumWidth(resWidth/2); // 1080p resolution
+  conditionalMarginalPlot->setMinimumWidth(resWidth/2); // 1080p 
   conditionalMarginalPlot->xAxis->setLabel("Player 0");
   conditionalMarginalPlot->yAxis->setLabel("Player 1");
 
@@ -151,16 +158,14 @@ BCEPlotHandler::BCEPlotHandler()
 
   // // Window Title
   // setWindowTitle(QApplication::translate("bceviewer","BCE Solution Viewer"));
-
-
-} // constructor
+}
 
 /////////////////////////////////////////////
 // Plot Conditional-Marginal Distribution
 
 void BCEPlotHandler::plotEqm() {
 
-  vector< vector<double> > eqmMatrix = guiData.getEqmMatrix();
+  vector< vector<double> > eqmMatrix = guiData->getEqmMatrix();
 
   colorMap->clearData();
   int nx = eqmMatrix.size();
@@ -203,13 +208,13 @@ void BCEPlotHandler::plotBCEValueSet() {
 
   // Getting Data
 
-  vector< vector<double> > allEqm = guiData.getAllEqm();
+  vector< vector<double> > allEqm = guiData->getAllEqm();
   QVector<double> objective0Payoffs;
   QVector<double> objective1Payoffs;
   vector<int> playerObjectives;
 
   for (int player = 0; player < 2; player++)
-    playerObjectives.push_back(guiData.getPlayerObjective(player));
+    playerObjectives.push_back(guiData->getPlayerObjective(player));
 
   for (int i = 0; i < allEqm.size(); i++) {
     objective0Payoffs.push_back(allEqm[i][playerObjectives[0]]);
@@ -237,7 +242,7 @@ void BCEPlotHandler::plotBCEValueSet() {
 
   QVector<double> xCoordCurrentEqm;
   QVector<double> yCoordCurrentEqm;
-  int currentEqmIndex = guiData.getCurrentEqmIndex();
+  int currentEqmIndex = guiData->getCurrentEqmIndex();
 
   xCoordCurrentEqm.push_back(objective0Payoffs[currentEqmIndex]);
   yCoordCurrentEqm.push_back(objective1Payoffs[currentEqmIndex]);
@@ -274,7 +279,7 @@ void BCEPlotHandler::plotDeviationObjectives(int player) {
   deviationBarGraphs[player]->addPlottable(barGraph);
   barGraph->setName("Expected Payoffs from Deviation");
 
-  vector< vector<double> > objectiveValues = guiData.getObjectiveValues();
+  vector< vector<double> > objectiveValues = guiData->getObjectiveValues();
 
   QVector<double> yData;
 
@@ -297,7 +302,7 @@ void BCEPlotHandler::plotDeviationObjectives(int player) {
 				   deviationBarGraphs[player]->yAxis);
   deviationBarGraphs[player]->addPlottable(recAction);
 
-  int action = guiData.getCurrentSliderVal(Action,player);
+  int action = guiData->getCurrentSliderVal(Action,player);
 
   recAction->setData(QVector<double>(1,action),
 		     QVector<double>(1,yData[action]));
@@ -369,7 +374,7 @@ void BCEPlotHandler::setGUITitle() {
 
   stringstream dynamicTitle;
 
-  string guiTitle = guiData.getGUITitle();
+  string guiTitle = guiData->getGUITitle();
 
   dynamicTitle << "BCE Solution Viewer, Current File = "
 	       << guiTitle;
@@ -381,11 +386,5 @@ void BCEPlotHandler::setGUITitle() {
 }
 
 void BCEPlotHandler::setSolution(BCESolution &solution) {
-  guiData.setSolutionData(solution);
-}
-
-void BCEPlotHandler::setResolution(int _resWidth,int _resHeight) {
-  resWidth = _resWidth;
-  resHeight = _resHeight;
-  guiData.setResolution(resWidth,resHeight);
+  guiData->setSolutionData(solution);
 }

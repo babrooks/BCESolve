@@ -1,29 +1,31 @@
 #include "bcedatastate.hpp"
 
-BCEDataState::BCEDataState() {
-    actions = vector<int>(2,0);
-    types = vector<int>(2,0);
-    values = vector<int>(2,0);
-    state = 0;
-    margS0 = false;
-    margS1 = false;
-    margA = vector<bool>(2,true);
-    margT = vector<bool>(2,false);
-    currentEqmIndex = 0;
-    isPrivateVals=false;
-    setupControlsLayout();  
+BCEDataState::BCEDataState(int resW,int resH) {
+  resWidth = resW;
+  resHeight = resH;
+  actions = vector<int>(2,0);
+  types = vector<int>(2,0);
+  values = vector<int>(2,0);
+  state = 0;
+  margS0 = false;
+  margS1 = false;
+  margA = vector<bool>(2,true);
+  margT = vector<bool>(2,false);
+  currentEqmIndex = 0;
+  isPrivateVals=false;
+  setupControlsLayout();  
 }
 
 int BCEDataState::shareDataProperties(BCESliderType st,int player) {
-    switch(st) {
-    case Action: return gameData.getNumActions()[player];
-      break;
-    case Type: return gameData.getNumTypes()[player];
-      break;
-    case State: return gameData.getNumStates();
-      break;
-    }
+  switch(st) {
+  case Action: return gameData.getNumActions()[player];
+    break;
+  case Type: return gameData.getNumTypes()[player];
+    break;
+  case State: return gameData.getNumStates();
+    break;
   }
+}
 
 void BCEDataState::setSolutionData(BCESolution &solution) {
   solutionData = BCESolution(solution);
@@ -32,55 +34,55 @@ void BCEDataState::setSolutionData(BCESolution &solution) {
 
 void BCEDataState::setData(QString dataPath) {
 
-    // Get File Name for GUI's Title
-    string filePath = dataPath.toStdString();
-    // boost::filesystem::path boostPath(filePath);
-    // guiTitle = boostPath.filename().string();
-    QFileInfo info(dataPath);
-    guiTitle = info.fileName().toStdString();
+  // Get File Name for GUI's Title
+  string filePath = dataPath.toStdString();
+  // boost::filesystem::path boostPath(filePath);
+  // guiTitle = boostPath.filename().string();
+  QFileInfo info(dataPath);
+  guiTitle = info.fileName().toStdString();
 		
-    isPrivateVals = !(gameData.hasProductStructure());
-    // cout << isPrivateVals << endl;
+  isPrivateVals = !(gameData.hasProductStructure());
+  // cout << isPrivateVals << endl;
 
-    // Reset Initial Parameters
-    currentEqmIndex = 0;
-    actions = vector<int>(2,0);
-    types = vector<int>(2,0);
-    values = vector<int>(2,0);
-    state = 0;
+  // Reset Initial Parameters
+  currentEqmIndex = 0;
+  actions = vector<int>(2,0);
+  types = vector<int>(2,0);
+  values = vector<int>(2,0);
+  state = 0;
 
-    for (int player = 0; player < 2; player++)
-      emit(sliderLabelsChanged(isPrivateVals,player));
+  for (int player = 0; player < 2; player++)
+    emit(sliderLabelsChanged(isPrivateVals,player));
 
-    resetManipulatedData();
-    emit(newDataLoaded());
+  resetManipulatedData();
+  emit(newDataLoaded());
 
-    // cout << "prob: " << equilibriumMatrix[0][0] << endl;
+  // cout << "prob: " << equilibriumMatrix[0][0] << endl;
 
-    vector<int> numActions = gameData.getNumActions();
-    // cout << "NumActions[0] = " << numActions[0] << endl;
-    vector<int> numTypes = gameData.getNumTypes();
-    // cout << numTypes[0] << endl;
-    int numStates = gameData.getNumStates();
-    // cout << numStates << endl;
+  vector<int> numActions = gameData.getNumActions();
+  // cout << "NumActions[0] = " << numActions[0] << endl;
+  vector<int> numTypes = gameData.getNumTypes();
+  // cout << numTypes[0] << endl;
+  int numStates = gameData.getNumStates();
+  // cout << numStates << endl;
 
-    // Set Slider Ranges 
-    for (int player = 0; player < 2; player++) {
-      sliderGroup[3*player]->setRange(0,numActions[player]-1);
-      sliderGroup[3*player+1]->setRange(0,numTypes[player]-1);
-      if (isPrivateVals)
-	sliderGroup[3*player+2]->setRange(0,numStates-1);
-      else
-	sliderGroup[3*player+2]->setRange(0,sqrt(numStates)-1);
-      // cout << "Slider setting completed." << endl;
-    }
+  // Set Slider Ranges 
+  for (int player = 0; player < 2; player++) {
+    sliderGroup[3*player]->setRange(0,numActions[player]-1);
+    sliderGroup[3*player+1]->setRange(0,numTypes[player]-1);
+    if (isPrivateVals)
+      sliderGroup[3*player+2]->setRange(0,numStates-1);
+    else
+      sliderGroup[3*player+2]->setRange(0,sqrt(numStates)-1);
+    // cout << "Slider setting completed." << endl;
+  }
 
-    // Set Sliders to 0
-    for (int i = 0; i < 6; i++) {
-      sliderGroup[i]->setSliderPosition(0);
-      sliderGroup[i]->setSingleStep(1);
-      lineEditGroup[i]->setText("0");
-    }
+  // Set Sliders to 0
+  for (int i = 0; i < 6; i++) {
+    sliderGroup[i]->setSliderPosition(0);
+    sliderGroup[i]->setSingleStep(1);
+    lineEditGroup[i]->setText("0");
+  }
 
   // catch (std::exception & e)
   //   {
@@ -303,7 +305,7 @@ void BCEDataState::setEqmMatrix() {
   vector<int> numActions = gameData.getNumActions();
 
   equilibriumMatrix = vector< vector<double> >(numActions[1],
-					     vector<double>(numActions[0],0));
+					       vector<double>(numActions[0],0));
 
   for (int a1 = 0; a1 < numActions[1]; a1++)
     {
@@ -359,9 +361,4 @@ void BCEDataState::setAllEqm() {
   // cout << "setAllEqm Function Hit" << endl;
   emit(selectedEqmChanged());
 
-}
-
-void BCEDataState::setResolution(int _resWidth,int _resHeight) {
-  resWidth = _resWidth;
-  resHeight = _resHeight;
 }

@@ -2,9 +2,15 @@
 #include "bcegamehandler.hpp"
 #include "bcepushbutton.hpp"
 
-BCEGameHandler::BCEGameHandler():
+BCEGameHandler::BCEGameHandler(int resW,int resH):
   game(BCEGame())
 {
+  resWidth = resW;
+  resHeight = resH;
+  setupLayout();
+}
+
+void BCEGameHandler::setupLayout() {
   ////////////////////////////////
   // LINEEDIT AND PUSHBUTTON SETUP
 
@@ -710,11 +716,6 @@ void BCEGameHandler::stateRemoved()
   setState(newState);
   
 } // stateRemoved
-
-void BCEGameHandler::setResolution(int _resWidth,int _resHeight) {
-  resWidth = _resWidth;
-  resHeight = _resHeight;
-}
 
 void BCEGameHandler::emitSolveSignal() {
   emit(startSolveRoutine(weightsModel->getSolverData()));

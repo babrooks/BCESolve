@@ -12,10 +12,12 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   QRect rec = QApplication::desktop()->screenGeometry();
   resWidth = rec.width();
   resHeight = rec.height();
-  setResolution(resWidth,resHeight);
 
   // Set the default path for loading examples.
   path=QString("../examples/");
+
+  solutionTab = new BCEPlotHandler(resWidth,resHeight);
+  gameTab = new BCEGameHandler(resWidth,resHeight);
 
   // Menu Bar
   QMenu * fileMenu = menuBar()->addMenu(tr("&File"));
@@ -51,24 +53,24 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   connect(saveSolutionAction,SIGNAL(triggered()),this,SLOT(saveSolution()));
   connect(saveGameAction,SIGNAL(triggered()),this,SLOT(saveGame()));
   connect(quitAction,SIGNAL(triggered()),this,SLOT(close()));
-  connect(linearScale,SIGNAL(toggled(bool)),&solutionTab,SLOT(toggleLinearScale(bool)));
-  connect(colorfulDistn,SIGNAL(toggled(bool)),&solutionTab,SLOT(toggleColorfulTheme(bool)));
-  connect(screenShotAction,SIGNAL(triggered()),&solutionTab,SLOT(screenShot()));
+  connect(linearScale,SIGNAL(toggled(bool)),solutionTab,SLOT(toggleLinearScale(bool)));
+  connect(colorfulDistn,SIGNAL(toggled(bool)),solutionTab,SLOT(toggleColorfulTheme(bool)));
+  connect(screenShotAction,SIGNAL(triggered()),solutionTab,SLOT(screenShot()));
 
   // Loading Connection
   connect(this,SIGNAL(dataPathChanged(QString)),
-  	  &solutionTab,SLOT(loadData(QString)));
+  	  solutionTab,SLOT(loadData(QString)));
 
   // Solve Routine Connections
-  connect(&gameTab,SIGNAL(startSolveRoutine(vector<double>&)),
+  connect(gameTab,SIGNAL(startSolveRoutine(vector<double>&)),
 	  this,SLOT(runSolve(vector<double>&)));
 
   // Layout Setup
   tabWidget = new QTabWidget();
   QWidget *solutionTabWidget = new QWidget();
-  solutionTabWidget->setLayout(solutionTab.getLayout());
+  solutionTabWidget->setLayout(solutionTab->getLayout());
   QWidget *gameTabWidget = new QWidget();
-  gameTabWidget->setLayout(gameTab.getLayout());
+  gameTabWidget->setLayout(gameTab->getLayout());
   QWidget *logTabWidget = new QWidget();
   logTabWidget->setLayout(logTab->getLayout());
 
@@ -114,8 +116,8 @@ void BCEWindow::loadSolution() {
     BCESolution::load(loadedSolution,newPath_c);
     BCEGame loadedGame = loadedSolution.getGame();
 
-    solutionTab.setSolution(loadedSolution);
-    gameTab.setGame(loadedGame);
+    solutionTab->setSolution(loadedSolution);
+    gameTab->setGame(loadedGame);
 
     emit(dataPathChanged(newPath));
 
@@ -147,7 +149,7 @@ void BCEWindow::loadGame() {
     BCEGame loadedGame;
     BCEGame::load(loadedGame,newPath_c);
 
-    gameTab.setGame(loadedGame);
+    gameTab->setGame(loadedGame);
 
     emit(dataPathChanged(newPath));
 
@@ -181,7 +183,7 @@ void BCEWindow::saveSolution() {
       QByteArray ba = newPath.toLocal8Bit();
       const char * newPath_c = ba.data();
 
-      BCESolution::save(solutionTab.getSolutionData(),
+      BCESolution::save(solutionTab->getSolutionData(),
 		       newPath_c);
     }
   catch (std::exception & e)
@@ -209,7 +211,7 @@ void BCEWindow::saveGame() {
       QByteArray ba = newPath.toLocal8Bit();
       const char * newPath_c = ba.data();
 
-      BCEGame::save(gameTab.getGame(),
+      BCEGame::save(gameTab->getGame(),
 		   newPath_c);
     }
   catch (std::exception & e)
@@ -234,7 +236,7 @@ void BCEWindow::runSolve(vector<double> & weightData) {
       // cancelSolveFlag = false;
       
       QThread *solverWorkerThread = new QThread();
-      solverWorker = new BCEGurobiSolverWorker(gameTab.getGame(),weightData);
+      solverWorker = new BCEGurobiSolverWorker(gameTab->getGame(),weightData);
 
       solverWorker->moveToThread(solverWorkerThread);
       connect(solverWorkerThread,SIGNAL(started()),
@@ -262,11 +264,6 @@ void BCEWindow::runSolve(vector<double> & weightData) {
 }
 
 void BCEWindow::tabToSolution(BCESolution *soln) {
-  solutionTab.setSolution(*soln);
+  solutionTab->setSolution(*soln);
   tabWidget->setCurrentIndex(0);
-}
-
-void BCEWindow::setResolution(int resWidth,int resHeight) {
-  solutionTab.setResolution(resWidth,resHeight);
-  gameTab.setResolution(resWidth,resHeight);
 }

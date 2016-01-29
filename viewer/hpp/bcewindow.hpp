@@ -24,6 +24,11 @@ class BCEWindow : public QMainWindow
 public:
   //! Constructor
   BCEWindow(BCELogHandler &logHandler);
+  //! Destructor
+  ~BCEWindow() {
+    delete gameTab;
+    delete solutionTab;
+  }
 
 signals:
 
@@ -37,9 +42,9 @@ signals:
 private:
 
   //! Contains all information for the game tab.
-  BCEGameHandler gameTab;
+  BCEGameHandler *gameTab;
   //! Contains all information for the solution tab.
-  BCEPlotHandler solutionTab;
+  BCEPlotHandler *solutionTab;
   //! Pointer to the logTab in main.cpp
   QPointer<BCELogHandler> logTab;
   //! Widget holding layouts for game, solution, and log tabs.
