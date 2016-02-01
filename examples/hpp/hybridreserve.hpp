@@ -70,6 +70,7 @@ public:
 	    return weightOnOwnBid*b1+(1.0-weightOnOwnBid)*b0;
 	  }
       }
+    return 0.0;
   } // objective
 
 };

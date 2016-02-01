@@ -67,6 +67,22 @@ public:
     return priorData[state];
   } // prior
 
+  //! Prior over types
+  double prior(int player, int type) const
+  {
+    double probSum = 0;
+    vector<int> types (2,0);
+    types[player] = type;
+    for (int state = 0; state < numStates; state++)
+      {
+	for (types[1-player]=0; 
+	     types[1-player]<numTypes[1-player]; 
+	     types[1-player]++)
+	  probSum += prior(state,types);
+      }
+    return probSum;
+  } // prior
+
   //! Conditional distribution of types given states
   /*! For each state and vector of types, returns the conditional
       probability of the types given the state.  */

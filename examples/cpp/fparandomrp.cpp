@@ -5,8 +5,8 @@
 
 int main() {
 
-  int numBids = 50;
-  int numVals = 50;
+  int numBids = 100;
+  int numVals = 100;
   // if bid < reservePrice, bidder still wins the item with pr reserveProb
   double reservePrice = .5;
   // SOLVER SWITCH

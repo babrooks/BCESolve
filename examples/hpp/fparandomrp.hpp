@@ -14,13 +14,15 @@ private:
   double reservePrice;
   // vector<vector<double> > cdf;
   // int rpPrecision;
+  double highBid;
   
 public:
   FPARandomRP(int nv,
 	      int na,
 	      double _rp):
     BCEAbstractGame(nv,na,1,3),
-    reservePrice(_rp)
+    reservePrice(_rp),
+    highBid(0.5)
   {
     // rpPrecision = 1000;
     // // rp*rpPrecision will be a non-decimal for rp no more precise
@@ -64,8 +66,8 @@ public:
     if (obj<2)
       {
 	double val = static_cast<double>(state)/(numStates-1);
-	double ownBid = static_cast<double>(actions[obj])/(numActions[obj]-1);
-	double otherBid = static_cast<double>(actions[1-obj])/(numActions[obj]-1);
+	double ownBid = highBid*static_cast<double>(actions[obj])/(numActions[obj]-1);
+	double otherBid = highBid*static_cast<double>(actions[1-obj])/(numActions[obj]-1);
 
 	if (ownBid == 0)
 	  return 0.0;
@@ -93,8 +95,8 @@ public:
       {
 	// revenue
 	
-	double b0 = static_cast<double>(actions[0])/(numActions[0]-1);
-	double b1 = static_cast<double>(actions[1])/(numActions[1]-1);
+	double b0 = highBid*static_cast<double>(actions[0])/(numActions[0]-1);
+	double b1 = highBid*static_cast<double>(actions[1])/(numActions[1]-1);
 
 	double winningBid = b0;
 	int winningPlayer = 0;

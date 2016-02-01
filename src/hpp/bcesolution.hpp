@@ -114,7 +114,8 @@ public:
 
   //! Calculates deviation objectives
   /*! Calculates the expected payoff resulting from each action for
-    the given player, type, and recommended action. */
+    the given player, type, and recommended action. Returns the
+    probability of the given action. */
   double getDeviationObjectives(int player, int action, int type,
 				vector< vector<double> > & objectiveValues) const;
 

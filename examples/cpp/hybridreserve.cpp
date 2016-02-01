@@ -5,7 +5,7 @@ int main()
   int numBids = 75;
   int numVals = 75;
   double weightOnOwnBid = 1;
-  double reservePrice = .3;
+  double reservePrice = .125;
 
   HybridReserveAuction hra(numVals,numBids,weightOnOwnBid,reservePrice);
 

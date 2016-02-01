@@ -216,7 +216,7 @@ double BCESolution::getDeviationObjectives(int player, int action, int type,
 	}
     }
 
-  return probSum;
+  return probSum/game.prior(player,type);
 } // getDeviationObjectives
 
 // getConditionalMarginal finds a conditional marginal
