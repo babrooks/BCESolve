@@ -18,7 +18,7 @@ public:
   Duopoly() {distribution.push_back(independent(),1.0);}
   
   Duopoly(int na, int nv, int no, double _entryCost, double _margCost) 
-    : BCEGame(2,nv*nv,na,1,no), numValues(nv), entryCost(_entryCost)
+    : BCEAbstractGame(nv*nv,na,1,no), numValues(nv), entryCost(_entryCost)
   {
     distribution.push_back(uniform(),1.0);
   }

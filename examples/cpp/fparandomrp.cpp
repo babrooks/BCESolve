@@ -5,8 +5,8 @@
 
 int main() {
 
-  int numBids = 100;
-  int numVals = 100;
+  int numBids = 50;
+  int numVals = 50;
   // if bid < reservePrice, bidder still wins the item with pr reserveProb
   double reservePrice = .5;
   // SOLVER SWITCH
@@ -27,6 +27,8 @@ int main() {
     cplex.getObjective().setExpr(solver.getObjectiveFunction(2));
 
     solver.solve();
+
+
 
     BCESolution data;
     solver.getSolution(data);
@@ -55,6 +57,11 @@ int main() {
 
     solver.solve();
 
+    solver.setParameter(BCEGurobiSolver::BoundaryObjective1,0);
+    solver.setParameter(BCEGurobiSolver::BoundaryObjective2,1);
+
+    solver.mapBoundary("fparandomrp_bndry.dat");
+
     BCESolution data;
     solver.getSolution(data);
   
@@ -65,6 +72,7 @@ int main() {
     string fNameStr = fName.str();
     const char * fNameC = fNameStr.c_str();
     BCESolution::save(data,fNameC);
+
 
   }
 

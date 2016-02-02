@@ -150,7 +150,8 @@ private slots:
   void stateRemoved();
   //! Removes action for the given player. 
   /*! Will remove the action that is currently selected in the payoff
-      table, if one is selected. */
+      table, if one is selected. Otherwise, this function removes the
+      last action for the player. */
   void actionRemoved(int player);
 
   //! Advances currentState to the next state.
