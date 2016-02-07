@@ -532,22 +532,12 @@ void BCEGurobiSolver::solve()
 
 void BCEGurobiSolver::mapBoundary()
 {
-  return;
-  // mapBoundary("bndry.dat");
+  mapBoundary("bndry.dat");
 }
 
 void BCEGurobiSolver::mapBoundary(const char * fname)
 {
   cout << "mapping objfun1 vs objfun2..." << endl;
-
-  // // Store the defaults so we can restore them at the end.
-  // IloInt BarDisplayDefault = cplex.getParam(IloCplex::BarDisplay);
-  // IloInt DisplayDefault = cplex.getParam(IloCplex::SimDisplay);
-  // IloInt NetDisplayDefault = cplex.getParam(IloCplex::NetDisplay);
-
-  // cplex.setParam(IloCplex::BarDisplay, 0);
-  // cplex.setParam(IloCplex::SimDisplay, 0);
-  // cplex.setParam(IloCplex::NetDisplay, 0);
 
   // Clear the equilibria array.
   soln.clearEquilibria();
@@ -555,9 +545,12 @@ void BCEGurobiSolver::mapBoundary(const char * fname)
   // First solve 
   gurobiObjective = objectiveFunctions[boundaryObjectiveIndex1];
   // Primal Simplex, Indexed at 0
+  int oldMethod = model.getEnv().get(GRB_IntParam_Method);
+  int oldOutput = model.getEnv().get(GRB_IntParam_OutputFlag);
   model.getEnv().set(GRB_IntParam_Method,0);
+  model.getEnv().set(GRB_IntParam_OutputFlag,0);
   model.setObjective(gurobiObjective,GRB_MAXIMIZE);
-  // cplex.setParam(IloCplex::BarCrossAlg,IloCplex::Primal);
+
   model.update();
   model.optimize();
 
@@ -591,34 +584,31 @@ void BCEGurobiSolver::mapBoundary(const char * fname)
   
   soln.consolidateEquilibria();
 
-  // cplex.setParam(IloCplex::BarDisplay,BarDisplayDefault);
-  // cplex.setParam(IloCplex::SimDisplay,DisplayDefault);
-  // cplex.setParam(IloCplex::NetDisplay,NetDisplayDefault);
+  model.getEnv().set(GRB_IntParam_Method,oldMethod);
+  model.getEnv().set(GRB_IntParam_OutputFlag,oldOutput);
 }
 
 void BCEGurobiSolver::mapFrontier(int plusOrMinus1, int plusOrMinus2, bool reversePrint)
 {
-  return;
   double objectiveWeight=0, newWeight, alpha;
 
-  // IloCplex::BasisStatusArray basisStatuses(env);
   map<int,double> currentEquilibrium;
-  // IloNumArray reducedCosts1(env);
-  // IloNumArray reducedCosts2(env);
 
   double objectiveValue1, objectiveValue2;
 
   int variableCounter=0;
-  // int ItLimDefault = cplex.getParam(IloCplex::ItLim);
   int ItLimDefault = 2100000000;
 
   double oldAngleIncrement, minalpha;
 
+  int numVars = model.get(GRB_IntAttr_NumVars);
+
+  vector<double> reducedCosts1(numVars), reducedCosts2(numVars);
+  vector<int> basisStatuses(numVars);
+
   int displayVal=0;
 
-  // cplex.setParam(IloCplex::EpOpt, 1E-9);
   model.getEnv().set(GRB_DoubleParam_FeasibilityTol,1E-9);
-
   model.getEnv().set(GRB_DoubleParam_TimeLimit,1e+75);
 
   int iterationCounter = 0;
@@ -626,122 +616,94 @@ void BCEGurobiSolver::mapFrontier(int plusOrMinus1, int plusOrMinus2, bool rever
     {
       // solve the new objective function.
       // Switch to dual for the initial solve phase. Might take awhile.
-  model.setObjective(objectiveWeight*bndryObjectives[1]
-		     +bndryObjectives[0],GRB_MAXIMIZE);
-  model.getEnv().set(GRB_DoubleParam_IterationLimit,ItLimDefault);
-  model.getEnv().set(GRB_IntParam_Method,0);
-  model.update();
-  model.optimize();
+      model.setObjective(objectiveWeight*bndryObjectives[1]
+			 +bndryObjectives[0],GRB_MAXIMIZE);
+      model.getEnv().set(GRB_DoubleParam_IterationLimit,ItLimDefault);
+      model.getEnv().set(GRB_IntParam_Method,0);
+      model.optimize();
 
-  model.getEnv().set(GRB_DoubleParam_TimeLimit,2);
+      model.getEnv().set(GRB_DoubleParam_TimeLimit,2);
       
-  if (model.get(GRB_IntAttr_Status) != GRB_OPTIMAL)
-    throw(BCEException(BCEException::MapFrontierNotOptimal));
+      if (model.get(GRB_IntAttr_Status) != GRB_OPTIMAL)
+	throw(BCEException(BCEException::MapFrontierNotOptimal));
 
-  model.getEnv().set(GRB_IntParam_Method,0);
-  model.getEnv().set(GRB_DoubleParam_IterationLimit, 0);
-  // model.optimize();
+      model.getEnv().set(GRB_IntParam_Method,0);
+      model.getEnv().set(GRB_DoubleParam_IterationLimit, 0);
       
-  int numVars = model.get(GRB_IntAttr_NumVars);
+      for (int i=0; i<basisStatuses.size(); i++) 
+	basisStatuses[i] = variables[i].get(GRB_IntAttr_VBasis);
 
-  //     cplex.getBasisStatuses(basisStatuses,variables);
-  vector<int> basisStatuses;
-  basisStatuses.resize(numVars);
-  for (int i=0; i<basisStatuses.size(); i++) 
-    basisStatuses[i] = variables[i].get(GRB_IntAttr_VBasis);
+      // Print current equilibrium
+      bceToMap(currentEquilibrium);
+      soln.addEquilibrium(currentEquilibrium);
 
-  // Print current equilibrium
-  bceToMap(currentEquilibrium);
-  soln.addEquilibrium(currentEquilibrium);
+      // Find the next weight
+      gurobiObjective = bndryObjectives[0];
+      model.setObjective(gurobiObjective,GRB_MAXIMIZE);
+      model.optimize();
+      for (int i=0; i<numVars; i++)
+	reducedCosts1[i] = variables[i].get(GRB_DoubleAttr_RC);
+      objectiveValue1 = bndryObjectives[0].getValue();
 
-  // Find the next weight
-  gurobiObjective = bndryObjectives[0];
-  model.setObjective(gurobiObjective,GRB_MAXIMIZE);
-  model.update();
-  model.optimize();
-  // GUROBI FIX ////
-  vector<double> reducedCosts1;
-  reducedCosts1.resize(numVars);
-  for (int i=0; i<numVars; i++)
-    reducedCosts1[i] = variables[i].get(GRB_DoubleAttr_RC);
-  // cplex.getReducedCosts(reducedCosts1,variables);
+      model.setObjective(bndryObjectives[1],GRB_MAXIMIZE);
+      model.optimize();
+      for (int i=0; i<numVars; i++)
+	reducedCosts2[i] = variables[i].get(GRB_DoubleAttr_RC);
+      objectiveValue2 = bndryObjectives[1].getValue();
 
-  objectiveValue1 = bndryObjectives[0].getValue();
-
-  model.setObjective(bndryObjectives[1],GRB_MAXIMIZE);
-  model.update();
-  model.optimize();
-
-  // GUROBI FIX ////
-  vector<double> reducedCosts2;
-  reducedCosts1.resize(numVars);
-  for (int i=0; i<numVars; i++)
-    reducedCosts2[i] = variables[i].get(GRB_DoubleAttr_RC);
-  // cplex.getReducedCosts(reducedCosts2,variables);
-
-  objectiveValue2 = bndryObjectives[1].getValue();
-
-  // Now find the smallest new weight that is greater than the old weight.
-  newWeight=-1;
-  for (variableCounter = 0; variableCounter<numVars; variableCounter++)
-    {
-      // 0 is the flag for GRB BASIC.
-      if (basisStatuses[variableCounter]!=0 
-	  && reducedCosts1[variableCounter]<0 
-	  && reducedCosts2[variableCounter]>0)
+      // Now find the smallest new weight that is greater than the old weight.
+      newWeight=-1;
+      for (variableCounter = 0; variableCounter<numVars; variableCounter++)
 	{
-	  alpha = -reducedCosts1[variableCounter]/reducedCosts2[variableCounter]+1E-8;
-	  if (alpha>objectiveWeight && ( alpha<newWeight || newWeight<0 ))
-	    newWeight = alpha;
+	  // 0 is the flag for GRB BASIC.
+	  if (basisStatuses[variableCounter]!=0 
+	      && reducedCosts1[variableCounter]<0 
+	      && reducedCosts2[variableCounter]>0)
+	    {
+	      alpha = -reducedCosts1[variableCounter]/reducedCosts2[variableCounter]+1E-8;
+	      if (alpha>objectiveWeight && ( alpha<newWeight || newWeight<0 ))
+		newWeight = alpha;
+	    }
 	}
-    }
-  if (newWeight<0 || newWeight > 1e13)
-    break; // Could not find a new weight that met criteria. Done.
+      if (newWeight<0 || newWeight > 1e13)
+	break; // Could not find a new weight that met criteria. Done.
 
-  // Add new element to the list.
-  if (reversePrint)
-    {
-      boundaryXs.push_back(plusOrMinus2*objectiveValue2);
-      boundaryYs.push_back(plusOrMinus1*objectiveValue1);
-    }
-  else
-    {
-      boundaryXs.push_back(plusOrMinus1*objectiveValue1);
-      boundaryYs.push_back(plusOrMinus2*objectiveValue2);
-    }
-
-  basisStatuses.clear();
-  reducedCosts1.clear();
-  reducedCosts2.clear();
-
-  if (minAngleIncrement>0)
-    {
-      oldAngleIncrement = atan2(objectiveWeight,1);
-      // assert(oldAngleIncrement>=0);
-      if (oldAngleIncrement+minAngleIncrement > PI/2-1e-12)
-	break;
+      // Add new element to the list.
+      if (reversePrint)
+	{
+	  boundaryXs.push_back(plusOrMinus2*objectiveValue2);
+	  boundaryYs.push_back(plusOrMinus1*objectiveValue1);
+	}
       else
-	minalpha = tan(oldAngleIncrement + minAngleIncrement);
+	{
+	  boundaryXs.push_back(plusOrMinus1*objectiveValue1);
+	  boundaryYs.push_back(plusOrMinus2*objectiveValue2);
+	}
+
+      if (minAngleIncrement>0)
+	{
+	  oldAngleIncrement = atan2(objectiveWeight,1);
+	  // assert(oldAngleIncrement>=0);
+	  if (oldAngleIncrement+minAngleIncrement > PI/2-1e-12)
+	    break;
+	  else
+	    minalpha = tan(oldAngleIncrement + minAngleIncrement);
 	  
-      if (newWeight < minalpha)
-	newWeight = minalpha;
-    }
+	  if (newWeight < minalpha)
+	    newWeight = minalpha;
+	}
 
-  objectiveWeight = newWeight;
+      objectiveWeight = newWeight;
 
-  if (!(iterationCounter%10))
-    cout << setprecision(3) 
-	 << "weight on objective 2 = " << objectiveWeight 
-	 << ", iterationCounter = " << iterationCounter << endl;
+      if (!(iterationCounter%10))
+	cout << setprecision(3) 
+	     << "weight on objective 2 = " << objectiveWeight 
+	     << ", iterationCounter = " << iterationCounter << endl;
 
-
-  iterationCounter++;
+      iterationCounter++;
     }
 
   cout << "Final weight = " << objectiveWeight << ", total iterations = " << iterationCounter << endl;
-  // cout << "# of elements of list: " << boundaryXs.size() << endl;
-
-  // cplex.setParam(IloCplex::ItLim,ItLimDefault);
   model.getEnv().set(GRB_DoubleParam_IterationLimit,ItLimDefault);
 } // mapFrontier
 
@@ -758,7 +720,6 @@ void BCEGurobiSolver::bceToMap(map<int,double> & distribution)
   for(int var = 0; var<numProbabilityVariables; var++)
     gurobiValues[var] = variables[var].get(GRB_DoubleAttr_X);
 
-  // cplex.getValues(cplexValues,variables);
   distribution = map<int,double>();
 
   // Populate the distribution vector.
@@ -771,7 +732,6 @@ void BCEGurobiSolver::bceToMap(map<int,double> & distribution)
   					     gurobiValues[variable]));
     }
 
-  // cplexValues.end();
 }
 
 
