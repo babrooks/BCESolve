@@ -5,8 +5,8 @@
 
 int main() {
 
-  int numBids = 50;
-  int numVals = 50;
+  int numBids = 10;
+  int numVals = 10;
   // if bid < reservePrice, bidder still wins the item with pr reserveProb
   double reservePrice = .5;
   // SOLVER SWITCH
@@ -16,49 +16,23 @@ int main() {
   FPARandomRP fparrp(numVals,
 		     numBids,
 		     reservePrice);
-  
-  if (solverSwitch == 0) {
-
-    BCESolver solver(fparrp);
-    solver.populate();
-
-    IloCplex cplex = solver.getCplex();
-    cplex.getObjective().setSense(IloObjective::Minimize);
-    cplex.getObjective().setExpr(solver.getObjectiveFunction(2));
-
-    solver.solve();
-
-
-
-    BCESolution data;
-    solver.getSolution(data);
-  
-    stringstream fName;
-    fName << "fparandomrp_nv=" << numVals
-  	  << "_nb=" << numBids
-  	  << "_rp=" << reservePrice << ".bce";
-    string fNameStr = fName.str();
-    const char * fNameC = fNameStr.c_str();
-    BCESolution::save(data,fNameC);
-
-  }
 
   if (solverSwitch == 1) {
 
     BCEGurobiSolver solver(fparrp);
-    solver.populate();
+    // solver.populate();
 
-    // GRBLinExpr objective = 0;
-    // objective += .5 * solver.getObjectiveFunction(0);
-    // objective += .5 * solver.getObjectiveFunction(1);
-    // solver.model.setObjective(objective,GRB_MAXIMIZE);
-    solver.model.setObjective(solver.getObjectiveFunction(2),GRB_MINIMIZE);  
-    solver.model.update();
+    // // GRBLinExpr objective = 0;
+    // // objective += .5 * solver.getObjectiveFunction(0);
+    // // objective += .5 * solver.getObjectiveFunction(1);
+    // // solver.model.setObjective(objective,GRB_MAXIMIZE);
+    // solver.model.setObjective(solver.getObjectiveFunction(2),GRB_MINIMIZE);  
+    // solver.model.update();
 
-    solver.solve();
+    // solver.solve();
 
-    solver.setParameter(BCEGurobiSolver::BoundaryObjective1,0);
-    solver.setParameter(BCEGurobiSolver::BoundaryObjective2,1);
+    // solver.setParameter(BCEGurobiSolver::BoundaryObjective1,0);
+    // solver.setParameter(BCEGurobiSolver::BoundaryObjective2,1);
 
     solver.mapBoundary("fparandomrp_bndry.dat");
 

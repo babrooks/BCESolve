@@ -316,17 +316,8 @@ void BCEDataState::setEqmMatrix() {
 	} // for a0
     } // for a1
 
-  // Gets marginal probability of an action from the joint distn.
-  double acc0 = 0.0;
-  for (int a = 0; a < numActions[0]; a++)
-    acc0 += equilibriumMatrix[actions[0]][a];
-
-  double acc1 = 0.0;
-  for (int a = 0; a < numActions[1]; a++)
-    acc1 += equilibriumMatrix[a][actions[1]];
-
-  emit(devPlotPrChange(0,acc0));
-  emit(devPlotPrChange(1,acc1));
+  for (int player=0; player<2; player++)
+    emit(devPlotPrChange(player,gameData.prior(player,types[player])));
   emit(equilibriumMatrixChanged());
 
 }
@@ -340,17 +331,7 @@ void BCEDataState::setObjectiveVals(int player) {
 			  types[player],
 			  objectiveValues[player][actions[player]]));
 
-  // Gets marginal probability of an action from the joint distn.
-  vector<int> numActions = gameData.getNumActions();
-  double acc = 0.0;
-  for (int a = 0; a < numActions[1-player]; a++) {
-    if (player == 0)
-      acc += equilibriumMatrix[actions[player]][a];
-    else
-      acc += equilibriumMatrix[a][actions[player]];
-  }
-
-  emit(devPlotPrChange(player,acc));
+  emit(devPlotPrChange(player,gameData.prior(player,types[player])));
   emit(objectiveValuesChanged(player));
 
 }

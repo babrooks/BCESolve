@@ -13,9 +13,9 @@ private:
   double margCost;
 
 public:
-  distributionArray distribution;
+  BCEDistrArray distribution;
 
-  Duopoly() {distribution.push_back(independent(),1.0);}
+  // Duopoly() {distribution.push_back(independent(),1.0);}
   
   Duopoly(int na, int nv, int no, double _entryCost, double _margCost) 
     : BCEAbstractGame(nv*nv,na,1,no), numValues(nv), entryCost(_entryCost)
@@ -43,7 +43,7 @@ public:
     double incr = 1.0/numValues;
 
     // return PDF(distribution,v0,v1,incr);
-    return PDF(distribution,v0,v1,incr);
+    return distribution.PDF(v0,v1,incr);
   }
 
   double objective(int state, const vector<int> &actions, int objectiveIndex)

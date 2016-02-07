@@ -35,7 +35,7 @@ void solveModel (double signalAccuracy)
   cout << "Starting main" << endl;
 
   FangMorris fpa(nbids,entryCost,signalAccuracy);
-  BCESolver solver(fpa);
+  BCEGurobiSolver solver(fpa);
 
   solver.setParameter(BCESolver::MinAngleIncrement,minAngleIncrement);
 
@@ -50,9 +50,8 @@ void solveModel (double signalAccuracy)
       // sprintf(filename,"fangmorris_-p1+p0_nb=%d_entrycost_%1.2f_signalacc_%1.2f.bce",
       // 	      nbids,entryCost,signalAccuracy);
 
-      IloCplex cplex=solver.getCplex();
-      cplex.getObjective().setExpr(-solver.getObjectiveFunction(1)
-				   +solver.getObjectiveFunction(0));
+      model.setObjective(-solver.getObjectiveFunction(1)
+			 +solver.getObjectiveFunction(0),GRB_MAXIMIZE);
       cout << "Objective function set" << endl;
       
       // solver.solve();
@@ -62,30 +61,30 @@ void solveModel (double signalAccuracy)
 
       solver.mapBoundary();
 
-      BCEData data;
-      solver.getData(data);
-      data.setNumValues(vector<int>(2,2));
+      BCESolution data;
+      solver.getSolution(data);
+      // data.setNumValues(vector<int>(2,2));
 
       // vector<int> sortObj(2,0);
       // sortObj[1]=1;
       // data.sortEquilibria(sortObj);
 
-      BCEData::save(data,filename);
+      BCESolution::save(data,filename);
 
-      vector< vector<int> > actionConditions(2,vector<int>(0));
-      vector< vector<int> > typeConditions(2,vector<int>(0));
-      vector<int> stateConditions(0);
+      // vector< vector<int> > actionConditions(2,vector<int>(0));
+      // vector< vector<int> > typeConditions(2,vector<int>(0));
+      // vector<int> stateConditions(0);
 
-      // actionConditions[0] = vector<int>(3,0);
-      // actionConditions[0][1] = 1;
-      // actionConditions[0][2] = 2;
-      // stateConditions = vector<int>(1,0);
+      // // actionConditions[0] = vector<int>(3,0);
+      // // actionConditions[0][1] = 1;
+      // // actionConditions[0][2] = 2;
+      // // stateConditions = vector<int>(1,0);
 
-      vector<double> distr;
+      // vector<double> distr;
 
-      data.getConditionalMarginal(stateConditions,actionConditions,typeConditions,
-				  false, vector<bool>(2,false),vector<bool>(2,true),
-				  distr);
+      // data.getConditionalMarginal(stateConditions,actionConditions,typeConditions,
+      // 				  false, vector<bool>(2,false),vector<bool>(2,true),
+      // 				  distr);
     }
   catch (IloException & e)
     {

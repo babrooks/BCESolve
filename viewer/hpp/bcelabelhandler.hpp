@@ -126,7 +126,7 @@ public slots:
       std::stringstream titleName;
       std::string titleNameNoPrStr = dynamicString.str();
       titleName << titleNameNoPrStr
-		<< "Probability = " << probability;
+		<< "Prior (Given Type) = " << probability;
       std::string titleStr = titleName.str();
       QString title = QString::fromStdString(titleStr);
 
@@ -142,7 +142,7 @@ public slots:
       if (isPrivateVals) {
 	if (sliderType == State) {
 
-	  setText("Unified State");
+	  setText("Common State");
 
 	}
       }

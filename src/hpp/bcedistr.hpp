@@ -218,6 +218,8 @@ public:
 class uniform: public BCEDistr
 {
 public:
+  uniform() {};
+
   double CDF(double v0, double v1) const
   {
     double p = 1.0;

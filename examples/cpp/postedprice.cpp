@@ -3,12 +3,12 @@
 
 int main() {
 
-  int numVals = 50;
+  int numVals = 100;
   double price = .05;
   double prPlayer0Wins = .50;
 
   PostedPrice pp(numVals,price,prPlayer0Wins);
-  pp.setHasProductStructureData(true);
+  pp.setHasProductStructureData(false);
 
   BCEGurobiSolver solver(pp);
   // BCESolver solver(apa);

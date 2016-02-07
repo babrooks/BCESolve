@@ -1,4 +1,4 @@
-#include "distributions.hpp"
+#include "bcedistr.hpp"
 #include <iostream>
 
 int main()

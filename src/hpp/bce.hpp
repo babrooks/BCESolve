@@ -4,7 +4,7 @@
 #ifndef BCE_HPP
 #define BCE_HPP
 
-#include "bcesolver.hpp"
+#include "bcegurobisolver.hpp"
 #include "bcedistr.hpp"
 
 #endif

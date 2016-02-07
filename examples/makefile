@@ -53,14 +53,14 @@ MAINS=exampleforrobbie \
 	exantefee fpaunknown spaunknown \
 	fpaunknown_revbounds fpacommon fpaknown_revbounds \
 	stationary stationary2 fpaknown \
-	 fangmorris publicinfo commonfpa \
-	 multiplicative survey duopoly onesided \
+	  publicinfo commonfpa \
+	 multiplicative survey onesided \
 	loadingExample hybridentryreserve \
 	hybridauction hybridreserve 
 
 MAINSGRB=revenuelb onesidedrestricted relaxed rcacommon
 MAINSBCEGRB = surplusbnd allpayauction gurobihybridentryreserve postedprice \
-		fpagurobiunknown fparandomrp
+		fpagurobiunknown fparandomrp duopoly fangmorris
 
 RCAMAINS=rcatest2
 
