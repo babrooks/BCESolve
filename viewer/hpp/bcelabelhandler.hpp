@@ -40,6 +40,12 @@ public:
     std::string titleStr = titleName.str();
     QString title = QString::fromStdString(titleStr);
 
+    // setSizePolicy(QSizePolicy(QSizePolicy::Minimum,
+    // 			      QSizePolicy::Expanding));
+    QSizePolicy sp = sizePolicy();
+    sp.setVerticalStretch(0);
+    setSizePolicy(sp);
+    
     setText(title);
     setStyleSheet("background-color: white");
   } 

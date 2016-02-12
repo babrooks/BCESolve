@@ -8,7 +8,8 @@
 #include "bcelabelhandler.hpp"
 #include "bcegamehandler.hpp"
 
-BCEPlotHandler::BCEPlotHandler(int resW,int resH) 
+BCEPlotHandler::BCEPlotHandler(int resW,int resH):
+  deviationBarGraphs(0)
 {
   resWidth = resW;
   resHeight = resH;
@@ -36,12 +37,17 @@ void BCEPlotHandler::setupLayout() {
   /////////////////////////////////////////
   // Plot Initializations and Organization
   
+  QSizePolicy sp(QSizePolicy::Expanding,QSizePolicy::Expanding);
+  sp.setVerticalStretch(1);
+  sp.setHorizontalStretch(1);
+
   // Payoff Plot Initialization
   BCELabel *setOfBCEPlotTitle = new BCELabel(ValueSetPlot);
   setOfBCEPlot = new BCEValueSetPlot();
+  setOfBCEPlot->setSizePolicy(sp);
   setOfBCEPlot->xAxis->setLabel("Player 0");
   setOfBCEPlot->yAxis->setLabel("Player 1");
-  setOfBCEPlot->setMinimumSize(resWidth/4,resHeight/3.5);
+  // setOfBCEPlot->setMinimumSize(resWidth/4,resHeight/3.5);
   connect(setOfBCEPlot,SIGNAL(newEqmCoordinates(double,double)),
 	  guiData,SLOT(modifyEqmFocus(double,double)));
   connect(guiData,SIGNAL(eqmCoordSignal(double,double)),
@@ -49,12 +55,14 @@ void BCEPlotHandler::setupLayout() {
 
   // Bar Plot Initialization 
   deviationBarGraphs.push_back(new QCustomPlot());
+  deviationBarGraphs.back()->setSizePolicy(sp);
   deviationBarGraphs[0]->xAxis->setLabel("Player 0's Actions");
   deviationBarGraphs.push_back(new QCustomPlot());
+  deviationBarGraphs.back()->setSizePolicy(sp);
   deviationBarGraphs[1]->xAxis->setLabel("Player 1's Actions");
   for (int player = 0; player < 2; player++) {
     deviationBarGraphs[player]->yAxis->setLabel("Expected Payoff");
-    deviationBarGraphs[player]->setMinimumHeight(resHeight/3.5);
+    // deviationBarGraphs[player]->setMinimumHeight(resHeight/3.5);
 
     devPlotTitles.push_back(new BCELabel(DeviationPlot,player));
     connect(guiData,
@@ -87,8 +95,10 @@ void BCEPlotHandler::setupLayout() {
 
   // Right Viewer Panel, Conditional-Marginal Distribution
   conditionalMarginalPlot = new BCEValueSetPlot();
+  conditionalMarginalPlot->setSizePolicy(sp);
+
   BCELabel *colorMapTitle = new BCELabel(HeatMap);
-  colorMapTitle->setMaximumHeight(resHeight/54);
+  // colorMapTitle->setMaximumHeight(resHeight/54);
   connect(guiData,SIGNAL(newStateSignal(int,int,int,bool)),
 	  colorMapTitle,SLOT(changeDisplayedState(int,int,int,bool)));
 
@@ -98,7 +108,7 @@ void BCEPlotHandler::setupLayout() {
   conditionalMarginalPlot->addPlottable(colorMap);
   conditionalMarginalPlot->setInteractions(QCP::iRangeDrag|QCP::iRangeZoom);
   conditionalMarginalPlot->axisRect()->setupFullAxesBox(true);
-  conditionalMarginalPlot->setMinimumWidth(resWidth/2); // 1080p 
+  // conditionalMarginalPlot->setMinimumWidth(resWidth/2); // 1080p 
   conditionalMarginalPlot->xAxis->setLabel("Player 0");
   conditionalMarginalPlot->yAxis->setLabel("Player 1");
 
@@ -208,7 +218,7 @@ void BCEPlotHandler::plotBCEValueSet() {
 
   // Getting Data
 
-  vector< vector<double> > allEqm = guiData->getAllEqm();
+  const vector< vector<double> > & allEqm = guiData->getAllEqm();
   QVector<double> objective0Payoffs;
   QVector<double> objective1Payoffs;
   vector<int> playerObjectives;
