@@ -52,25 +52,15 @@ LDFLAGS = -L$(CPLEXDIR)/lib/$(SYSTEM)/$(LIBFORMAT) \
 MAINS=exampleforrobbie \
 	exantefee fpaunknown spaunknown \
 	fpaunknown_revbounds fpacommon fpaknown_revbounds \
-<<<<<<< HEAD
-	stationary stationary2 fpaknown \
+	stationary stationary2 \
 	  publicinfo commonfpa \
 	 multiplicative survey onesided \
-=======
-	stationary stationary2  \
-	 fangmorris publicinfo commonfpa \
-	 multiplicative survey duopoly onesided \
->>>>>>> 82f1f8568a193e72b9a50da6d987b17dc61707ca
 	loadingExample hybridentryreserve \
 	hybridauction hybridreserve 
 
 MAINSGRB=revenuelb onesidedrestricted relaxed rcacommon
 MAINSBCEGRB = surplusbnd allpayauction gurobihybridentryreserve postedprice \
-<<<<<<< HEAD
-		fpagurobiunknown fparandomrp duopoly fangmorris
-=======
-		fpagurobiunknown fparandomrp fpaknown
->>>>>>> 82f1f8568a193e72b9a50da6d987b17dc61707ca
+		fpagurobiunknown fparandomrp duopoly fangmorris fpaknown
 
 RCAMAINS=rcatest2
 

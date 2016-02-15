@@ -16,11 +16,7 @@ int main(int argc, char ** argv)
   double entryCost=0.0;
   double reservePrice=0.0;
   int nvals=2;
-<<<<<<< HEAD
-  int nbids=50;
-=======
-  int nbids=20;
->>>>>>> 82f1f8568a193e72b9a50da6d987b17dc61707ca
+  int nbids=10;
   double lowbid = 0.0;
 
   solveFPA(nvals,nbids,entryCost,reservePrice,false);
@@ -65,6 +61,7 @@ void solveFPA(int nvals, int nbids,
 
       if (verbose)
       	cout << "Objective function set" << endl;
+      solver.solve();
       solver.mapBoundary("fpaknown.dat");
 
       BCESolution soln;

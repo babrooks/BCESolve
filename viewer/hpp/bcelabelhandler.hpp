@@ -126,7 +126,7 @@ public slots:
       std::stringstream titleName;
       std::string titleNameNoPrStr = dynamicString.str();
       titleName << titleNameNoPrStr
-		<< "Prior (Given Type) = " << probability;
+		<< "ActionPr/Prior(Given Type) = " << probability;
       std::string titleStr = titleName.str();
       QString title = QString::fromStdString(titleStr);
 

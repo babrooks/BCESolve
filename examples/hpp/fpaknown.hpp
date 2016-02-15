@@ -16,6 +16,7 @@ public:
     : FPAGame(na,nv,_entryCost,_reservePrice,_highbid, exAnteFee)
   { 
     numTypes = vector<int>(2,nv);
+    setHasProductStructureData(true);
   };
 
   double prior (int state, const vector<int> &types) const

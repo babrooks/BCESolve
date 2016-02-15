@@ -3,8 +3,8 @@
 
 int main() {
 
-  int numBids = 50;
-  int numVals = 50;
+  int numBids = 15;
+  int numVals = 15;
 
   AllPayAuction apa(numVals,numBids);
 
@@ -32,7 +32,7 @@ int main() {
   // GUROBI
   model.setObjective(solver.getObjectiveFunction(2),GRB_MINIMIZE);
 
-  solver.solve();
+  solver.mapBoundary("allpay.dat");
 
   BCESolution soln;
 

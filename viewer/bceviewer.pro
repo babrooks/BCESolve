@@ -59,7 +59,6 @@ bcepushbutton.hpp \
 bcewindow.hpp \
 bcelogstream.hpp \
 bceloghandler.hpp \
-bcesolverworker.hpp \
 bceobjweightstablemodel.hpp \
 bcegurobisolverworker.hpp
 

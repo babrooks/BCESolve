@@ -316,22 +316,25 @@ void BCEDataState::setEqmMatrix() {
 	} // for a0
     } // for a1
 
-  for (int player=0; player<2; player++)
-    emit(devPlotPrChange(player,gameData.prior(player,types[player])));
+  // for (int player=0; player<2; player++)
+  //   emit(devPlotPrChange(player,gameData.prior(player,types[player])));
   emit(equilibriumMatrixChanged());
 
 }
 
 void BCEDataState::setObjectiveVals(int player) {
 
-  solutionData.getDeviationObjectives(player,actions[player],types[player],objectiveValues);
+  double prob = solutionData.getDeviationObjectives(player,
+						    actions[player],
+						    types[player],
+						    objectiveValues);
 
   emit(devPlotTitleChange(player,
 			  actions[player],
 			  types[player],
 			  objectiveValues[player][actions[player]]));
 
-  emit(devPlotPrChange(player,gameData.prior(player,types[player])));
+  emit(devPlotPrChange(player,prob/gameData.prior(player,types[player])));
   emit(objectiveValuesChanged(player));
 
 }

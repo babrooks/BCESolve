@@ -144,7 +144,7 @@ private:
   //! Set of BCE Plot.
   BCEValueSetPlot *setOfBCEPlot;
   //! Bar Graphs.
-  QVector<QCustomPlot*> deviationBarGraphs;
+  QVector<BCEValueSetPlot*> deviationBarGraphs;
   //! Plot titles for the deviation bar plots.
   QVector<BCELabel*> devPlotTitles;
   //! Sets up the layout of the plot handler.

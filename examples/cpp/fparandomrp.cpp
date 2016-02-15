@@ -5,8 +5,8 @@
 
 int main() {
 
-  int numBids = 10;
-  int numVals = 10;
+  int numBids = 30;
+  int numVals = 30;
   // if bid < reservePrice, bidder still wins the item with pr reserveProb
   double reservePrice = .5;
   // SOLVER SWITCH
@@ -26,7 +26,7 @@ int main() {
     // // objective += .5 * solver.getObjectiveFunction(0);
     // // objective += .5 * solver.getObjectiveFunction(1);
     // // solver.model.setObjective(objective,GRB_MAXIMIZE);
-    // solver.model.setObjective(solver.getObjectiveFunction(2),GRB_MINIMIZE);  
+    solver.model.setObjective(solver.getObjectiveFunction(2),GRB_MINIMIZE);  
     // solver.model.update();
 
     // solver.solve();
@@ -34,6 +34,7 @@ int main() {
     // solver.setParameter(BCEGurobiSolver::BoundaryObjective1,0);
     // solver.setParameter(BCEGurobiSolver::BoundaryObjective2,1);
 
+    solver.solve();
     solver.mapBoundary("fparandomrp_bndry.dat");
 
     BCESolution data;

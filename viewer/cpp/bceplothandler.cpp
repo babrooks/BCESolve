@@ -48,9 +48,9 @@ void BCEPlotHandler::setupLayout() {
 	  setOfBCEPlotTitle,SLOT(changeDisplayedCoords(double,double)));
 
   // Bar Plot Initialization 
-  deviationBarGraphs.push_back(new QCustomPlot());
+  deviationBarGraphs.push_back(new BCEValueSetPlot());
   deviationBarGraphs[0]->xAxis->setLabel("Player 0's Actions");
-  deviationBarGraphs.push_back(new QCustomPlot());
+  deviationBarGraphs.push_back(new BCEValueSetPlot());
   deviationBarGraphs[1]->xAxis->setLabel("Player 1's Actions");
   for (int player = 0; player < 2; player++) {
     deviationBarGraphs[player]->yAxis->setLabel("Expected Payoff");
@@ -219,6 +219,7 @@ void BCEPlotHandler::plotBCEValueSet() {
   for (int i = 0; i < allEqm.size(); i++) {
     objective0Payoffs.push_back(allEqm[i][playerObjectives[0]]);
     objective1Payoffs.push_back(allEqm[i][playerObjectives[1]]);
+    cout << allEqm[i][playerObjectives[0]] << endl;
   }
 
   // Graphing Curve

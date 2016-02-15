@@ -6,7 +6,6 @@
 #define FPAGAME_HPP
 
 #include "bce.hpp"
-#include "bcegurobisolver.hpp"
 #include "bceabstractgame.hpp"
 
 class FPAGame : public BCEAbstractGame
