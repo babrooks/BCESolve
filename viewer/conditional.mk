@@ -33,10 +33,5 @@ GRBDIR=/Library/gurobi650/mac64
 } # Ben's macbook pro
 
 LIBS += -L$${GRBDIR}/lib -lgurobi_c++ -l$${GRBNAME}
-LIBS += -L$${CPLEXDIR}/cplex/lib/$${CPLEXSYSTEM}/static_pic \
--L$${CPLEXDIR}/concert/lib/$${CPLEXSYSTEM}/static_pic \
--lilocplex -lconcert -lcplex -L$${CPLEXDIR}/cplex/bin/$${CPLEXSYSTEM} -l$${CPLEXNAME}
-INCLUDEPATH += $${CPLEXDIR}/concert/include $${CPLEXDIR}/cplex/include \
-	$${GRBDIR}/include
-VPATH += $${CPLEXDIR}/concert/include $${CPLEXDIR}/cplex/include \
-	$${GRBDIR}/include
+INCLUDEPATH += $${GRBDIR}/include
+VPATH += $${GRBDIR}/include

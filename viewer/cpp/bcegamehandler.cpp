@@ -1,6 +1,4 @@
-#include <QtWidgets>
 #include "bcegamehandler.hpp"
-#include "bcepushbutton.hpp"
 
 BCEGameHandler::BCEGameHandler(int resW,int resH):
   game(BCEGame())

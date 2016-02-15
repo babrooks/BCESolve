@@ -11,6 +11,7 @@
 #include "bcepriortablemodel.hpp"
 #include "bceconditionaltablemodel.hpp"
 #include "bceobjweightstablemodel.hpp"
+#include "bcepushbutton.hpp"
 
 //! This class handles the widgets for editing/displaying the game.
 /*! All of the widgets in the game tab and their slots are members of
@@ -102,7 +103,7 @@ public:
   void setGame(const BCEGame & _game);
 
   //! Returns constant reference to the current game.
-  BCEGame & getGame() 
+  const BCEGame & getGame() const
   { return game; }
 
   //! Returns the layout

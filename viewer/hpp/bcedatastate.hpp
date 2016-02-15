@@ -8,7 +8,7 @@
 #include "bceslider.hpp"
 #include "bcelineedit.hpp"
 #include "bcecheckbox.hpp"
-#include "bcelabelhandler.hpp"
+#include "bcelabel.hpp"
 #include <QtWidgets>
 #include <QMainWindow>
 #include <vector>
@@ -187,7 +187,7 @@ public:
   int shareDataProperties(BCESliderType st,int player);
 
   //! Returns the current eqm index stored in BCEDataState.
-  int getCurrentEqmIndex() {
+  const int getCurrentEqmIndex() const {
     return currentEqmIndex;
   }
 
@@ -196,7 +196,7 @@ public:
      State, returns the integer value at the current
      position of the slider for the given player.
   */
-  int getCurrentSliderVal(BCESliderType st,int player) {
+  const int getCurrentSliderVal(BCESliderType st,int player) const {
     switch(st) {
     case Action: return actions[player];
       break;
@@ -212,7 +212,7 @@ public:
     for player 1. These correspond to players
     maximizing their own supluses.
   */
-  int getPlayerObjective(int player) {
+  const int getPlayerObjective(int player) const {
     switch(player) {
     case 0: return objective0;
       break;
@@ -258,7 +258,7 @@ public:
   }
 
   //! Shares file name of currently loaded file with BCEWindow.
-  string getGUITitle() {
+  const string getGUITitle() const {
     return guiTitle;
   }
 

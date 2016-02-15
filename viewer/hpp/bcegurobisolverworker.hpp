@@ -31,7 +31,7 @@ private:
 public:
 
   //! Constructor
-  BCEGurobiSolverWorker(BCEGame &_game,vector<double>& _weightData):
+  BCEGurobiSolverWorker(BCEGame _game,vector<double> _weightData):
     game(_game), weightData(_weightData) 
   {}
 

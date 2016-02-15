@@ -1,4 +1,3 @@
-#include <QtWidgets>
 #include "bcepriortablemodel.hpp"
 
 QVariant BCEPriorTableModel::data(const QModelIndex & index,

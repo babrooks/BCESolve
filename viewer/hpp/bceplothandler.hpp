@@ -10,7 +10,7 @@
 #include "bcecheckbox.hpp"
 #include "bcevaluesetplot.hpp"
 #include "bceenumeration.hpp"
-#include "bcelabelhandler.hpp"
+#include "bcelabel.hpp"
 #include <QPointer>
 
 using namespace std;

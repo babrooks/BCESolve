@@ -47,7 +47,7 @@ bcelineedit.hpp \
 bcecheckbox.hpp \
 bcevaluesetplot.hpp \
 bceenumeration.hpp \
-bcelabelhandler.hpp \
+bcelabel.hpp \
 bcegamehandler.hpp \
 bcepayofftablemodel.hpp \
 bcetableview.hpp \
@@ -71,7 +71,8 @@ bcepriortablemodel.cpp \
 bceconditionaltablemodel.cpp \
 bcewindow.cpp \
 bceobjweightstablemodel.cpp \
-bcegurobisolver.cpp
+bcegurobisolver.cpp \
+bcelabel.cpp
 
 LIBS += ../lib/libbce.a
 

@@ -1,4 +1,3 @@
-#include <QtWidgets>
 #include "bcepayofftablemodel.hpp"
 
 QVariant BCEPayoffTableModel::data(const QModelIndex & index,

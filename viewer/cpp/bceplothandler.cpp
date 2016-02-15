@@ -1,12 +1,4 @@
 #include "bceplothandler.hpp"
-#include "qcustomplot.h"
-#include <QtWidgets>
-#include <QMenuBar>
-#include <QMainWindow>
-#include "bceslider.hpp"
-#include "bceenumeration.hpp"
-#include "bcelabelhandler.hpp"
-#include "bcegamehandler.hpp"
 
 BCEPlotHandler::BCEPlotHandler(int resW,int resH):
   deviationBarGraphs(0)

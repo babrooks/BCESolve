@@ -1,4 +1,3 @@
-#include <QtWidgets>
 #include "bceobjweightstablemodel.hpp"
 
 QVariant BCEObjWeightsTableModel::data(const QModelIndex & index,

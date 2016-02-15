@@ -8,7 +8,7 @@ int main(int argc, char ** args)
 
   BCELogHandler logHandler;
   // Redirect all subsequent cout to the BCELogHandler.
-  BCELogStream qout(std::cout,logHandler.logText);
+  BCELogStream cout(std::cout,logHandler.logText);
 
   BCEWindow window(logHandler);
 
