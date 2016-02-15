@@ -54,17 +54,11 @@ void BCEPlotHandler::setupLayout() {
 	  setOfBCEPlotTitle,SLOT(changeDisplayedCoords(double,double)));
 
   // Bar Plot Initialization 
-<<<<<<< HEAD
   deviationBarGraphs.push_back(new BCEValueSetPlot());
-  deviationBarGraphs[0]->xAxis->setLabel("Player 0's Actions");
-  deviationBarGraphs.push_back(new BCEValueSetPlot());
-=======
-  deviationBarGraphs.push_back(new QCustomPlot());
   deviationBarGraphs.back()->setSizePolicy(sp);
   deviationBarGraphs[0]->xAxis->setLabel("Player 0's Actions");
-  deviationBarGraphs.push_back(new QCustomPlot());
+  deviationBarGraphs.push_back(new BCEValueSetPlot());
   deviationBarGraphs.back()->setSizePolicy(sp);
->>>>>>> 148cd287ca9b0365623bba286446c043d20f0a15
   deviationBarGraphs[1]->xAxis->setLabel("Player 1's Actions");
   for (int player = 0; player < 2; player++) {
     deviationBarGraphs[player]->yAxis->setLabel("Expected Payoff");

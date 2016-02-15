@@ -27,21 +27,14 @@ BOOSTDIR=/usr/include/boost
 # GRBDIR=/opt/gurobi650/linux64
 # GRBNAME=gurobi65
 
-CFLAGS = -std=gnu++11 -I$(CONCERTDIR)/include $(CSYSFLAGS) $(DEBUG) \
-	-I$(CPLEXDIR)/include \
-	-I$(CONCERTDIR)/include \
+CFLAGS = -std=gnu++11 $(CSYSFLAGS) $(DEBUG) \
 	-I$(GRBDIR)/include \
 	-I$(BOOSTDIR) \
 	-I$(HPPDIR) \
 	$(CMTFLAGS) \
 	$(OPTIONS)  
-LDFLAGS = -L$(CPLEXDIR)/lib/$(SYSTEM)/$(LIBFORMAT) \
-	-L$(CONCERTDIR)/lib/$(SYSTEM)/$(LIBFORMAT) \
-	-lilocplex -lconcert \
-	-L$(GRBDIR)/lib \
+LDFLAGS = -L$(GRBDIR)/lib \
 	-lgurobi_c++ -l$(GRBNAME) \
-	-L$(CPLEXDIR)/bin/$(SYSTEM) \
-	-l$(CPLEXNAME)  \
 	$(LDSYSFLAGS) \
 	$(LDMTFLAGS) \
 	$(LDOPTIONS) \
@@ -52,7 +45,7 @@ VPATH=../lib
 all: libbce.a
 
 # BCE
-BCEOBJ=bceabstractgame.o bcegame.o bceutilities.o bcesolver.o \
+BCEOBJ=bceabstractgame.o bcegame.o bceutilities.o \
 	 bcecounter.o bcesolution.o bcegurobisolver.o #rca.o
 
 $(BCEOBJ): %.o : $(CPPDIR)/%.cpp $(HPPDIR)/%.hpp $(HPPDIR)/bce.hpp

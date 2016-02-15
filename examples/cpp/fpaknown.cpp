@@ -16,11 +16,7 @@ int main(int argc, char ** argv)
   double entryCost=0.0;
   double reservePrice=0.0;
   int nvals=2;
-<<<<<<< HEAD
   int nbids=10;
-=======
-  int nbids=20;
->>>>>>> 148cd287ca9b0365623bba286446c043d20f0a15
   double lowbid = 0.0;
 
   solveFPA(nvals,nbids,entryCost,reservePrice,false);

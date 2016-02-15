@@ -40,7 +40,6 @@ qcustomplot.h \
 bcesolution.hpp \
 bcegame.hpp \
 bce.hpp \
-bcesolver.hpp \
 bcedistr.hpp \
 bceabstractgame.hpp \
 bceslider.hpp \
