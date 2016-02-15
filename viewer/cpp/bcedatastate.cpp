@@ -84,6 +84,8 @@ void BCEDataState::setData(QString dataPath) {
     lineEditGroup[i]->setText("0");
   }
 
+  // setAllEqm();
+
   // catch (std::exception & e)
   //   {
   //     qDebug() << "Load solution didnt work :( from BCEDataState" << endl;
@@ -110,10 +112,10 @@ void BCEDataState::setupControlsLayout() {
 
   for (int widgetIndex = 0; widgetIndex < 6; widgetIndex++) {
     lineEditGroup[widgetIndex]->setReadOnly(true);
-    sliderGroup[widgetIndex]->setMaximumHeight(resHeight/54);
-    sliderGroup[widgetIndex]->setMinimumWidth(resWidth/16);
+    // sliderGroup[widgetIndex]->setMaximumHeight(resHeight/54);
+    // sliderGroup[widgetIndex]->setMinimumWidth(resWidth/16);
+    // lineEditGroup[widgetIndex]->setMaximumSize(resWidth/64,resHeight/54);
     sliderGroup[widgetIndex]->setOrientation(Qt::Horizontal);
-    lineEditGroup[widgetIndex]->setMaximumSize(resWidth/64,resHeight/54);
     connect(sliderGroup[widgetIndex],
 	    SIGNAL(valueChanged(int,BCESliderType,int)),
 	    this,SLOT(setSliderValue(int,BCESliderType,int)));
@@ -142,7 +144,7 @@ void BCEDataState::setupControlsLayout() {
 
 
   for (int labelIt = 0; labelIt < 6; labelIt++) {
-    sliderLabels[labelIt]->setMaximumHeight(resHeight/54);
+    // sliderLabels[labelIt]->setMaximumHeight(resHeight/54);
     connect(this,SIGNAL(sliderLabelsChanged(bool,int)),
 	    sliderLabels[labelIt],SLOT(displayStateOrValues(bool,int)));
   }

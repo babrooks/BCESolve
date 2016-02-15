@@ -148,12 +148,12 @@ void BCEGameHandler::setupLayout() {
   solveButton = new QPushButton(tr("Solve"));
   solveButton->setSizePolicy(QSizePolicy::Fixed,
 			     QSizePolicy::Preferred);
-  solveButton->resize(.2*resWidth,solveButton->height());
+  // solveButton->resize(.2*resWidth,solveButton->height());
 
   cancelButton = new QPushButton(tr("Cancel"));
   cancelButton->setSizePolicy(QSizePolicy::Fixed,
 			      QSizePolicy::Preferred);
-  cancelButton->resize(.2*resWidth,cancelButton->height());
+  // cancelButton->resize(.2*resWidth,cancelButton->height());
 
   // qDebug() << "I got to here!!!" << endl;
 

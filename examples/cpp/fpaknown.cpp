@@ -16,7 +16,11 @@ int main(int argc, char ** argv)
   double entryCost=0.0;
   double reservePrice=0.0;
   int nvals=2;
+<<<<<<< HEAD
   int nbids=10;
+=======
+  int nbids=20;
+>>>>>>> 148cd287ca9b0365623bba286446c043d20f0a15
   double lowbid = 0.0;
 
   solveFPA(nvals,nbids,entryCost,reservePrice,false);
@@ -66,6 +70,24 @@ void solveFPA(int nvals, int nbids,
 
       BCESolution soln;
       solver.getSolution(soln);
+
+      vector< vector<double> > expObj;
+      soln.getExpectedObjectives(expObj);
+      
+      cout << endl
+	   << "Expected objectives: " << endl;
+      for (vector< vector<double> >::const_iterator it = expObj.begin();
+	   it != expObj.end();
+	   ++it)
+	{
+	  for (vector<double>::const_iterator it2 = it->begin();
+	       it2 != it->end();
+	       ++it2)
+	    {
+	      cout << *it2 << " ";
+	    }
+	  cout << endl;
+	}
 
       BCESolution::save(soln,"mysolution.bce");
     }

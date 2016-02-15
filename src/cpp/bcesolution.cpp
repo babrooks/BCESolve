@@ -131,7 +131,8 @@ void BCESolution::getExpectedObjectives(vector<double> &values,
       for (obj=0; obj<game.getNumObjectives(); obj++)
 	{
 	  values[obj]
-	    +=game.objective(counter.getState(),counter.getActions(),obj)
+	    +=it->second
+	    *game.objective(counter.getState(),counter.getActions(),obj)
 	    *game.prior(counter.getState(),counter.getTypes());
 	  
 	  } // obj

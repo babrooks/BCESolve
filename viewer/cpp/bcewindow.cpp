@@ -32,10 +32,10 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   QAction * quitAction = new QAction(tr("&Quit GUI"),this);
   fileMenu->addAction(loadSolutionAction);
   fileMenu->addAction(loadGameAction);
-  fileMenu->addAction(quitAction);
   fileMenu->addAction(saveSolutionAction);
   fileMenu->addAction(saveGameAction);
   viewMenu->addAction(linearScale);
+  fileMenu->addAction(quitAction);
   linearScale->setCheckable(true);
   linearScale->setChecked(true);
   viewMenu->addAction(colorfulDistn);
@@ -44,7 +44,7 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   viewMenu->addAction(screenShotAction);
   loadSolutionAction->setShortcut(tr("Ctrl+L"));
   screenShotAction->setShortcut(tr("Ctrl+P"));
-  quitAction->setShortcut(tr("Ctrl+Q"));
+  quitAction->setShortcut(tr("Ctrl+W"));
   saveSolutionAction->setShortcut(tr("Ctrl+S"));
 
   // Menu Connections
