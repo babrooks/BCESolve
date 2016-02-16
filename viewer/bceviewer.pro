@@ -44,7 +44,6 @@ bcedistr.hpp \
 bceabstractgame.hpp \
 bceslider.hpp \
 bcelineedit.hpp \
-bcecheckbox.hpp \
 bcevaluesetplot.hpp \
 bceenumeration.hpp \
 bcelabel.hpp \

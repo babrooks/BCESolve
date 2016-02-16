@@ -7,7 +7,6 @@
 #include "bceenumeration.hpp"
 #include "bceslider.hpp"
 #include "bcelineedit.hpp"
-#include "bcecheckbox.hpp"
 #include "bcelabel.hpp"
 #include <QtWidgets>
 #include <QMainWindow>
@@ -98,6 +97,11 @@ signals:
 
 
 private: // Private Properties. Private Functions near EOF.
+  //! Notes if data is currently loaded into the GUI.
+  /*! Prevents programming from crashing if user clicks on 
+    GUI controls before any data is loaded.
+   */
+  bool isDataLoaded;
   //! Resolution Width
   int resWidth;
   //! Resolution Height
@@ -143,8 +147,6 @@ private: // Private Properties. Private Functions near EOF.
     called in the example .cpp file.
   */
   vector< vector<double> > allEqm;
-  //! Vector of Controls Check Boxes
-  QVector<BCECheckBox*> checkBoxGroup;
   //! Vector of Controls Sliders
   /*! Each element is identified by slider
     type and player. There are 2 players and
@@ -285,12 +287,6 @@ public slots:
     state are reset to 0). Emits that 
   */
   void setData(QString dataPath);
-
-  //! Not currently in use.
-  /*! May be implemented to view certain marginal distributions
-    in the heatmap. Connected to GUI's checkboxes.
-  */
-  void setMarginalConditions(bool newBool,BCESliderType st,int player);
 
   //! Calls "set" data  functions for specific cases.
   /*! Called within the BCEWindow class after user interaction with

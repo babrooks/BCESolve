@@ -5,9 +5,6 @@
 #include <QtWidgets>
 #include "bcedatastate.hpp"
 #include "qcustomplot.h"
-#include "bceslider.hpp"
-#include "bcelineedit.hpp"
-#include "bcecheckbox.hpp"
 #include "bcevaluesetplot.hpp"
 #include "bceenumeration.hpp"
 #include "bcelabel.hpp"
@@ -109,12 +106,6 @@ private:
     functions.
   */
   BCEDataState *guiData;
-  //! Not currently implemented.
-  /*! Checkboxes are displayed in the GUI but
-    are not fully implemented. Using them in the
-    GUI will cause the program to crash.
-  */
-  QVector<BCECheckBox*> checkBoxGroup;
   //! Default path to gui screenshots (*.png files).
   /*! Currently set as ../examples/screenshots/
    */

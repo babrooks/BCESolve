@@ -28,7 +28,7 @@ void BCEPlotHandler::setupLayout() {
   // End Data Connections
   /////////////////////////////////////////
   // Plot Initializations and Organization
-  
+
   QSizePolicy sp(QSizePolicy::Expanding,QSizePolicy::Expanding);
   sp.setVerticalStretch(1);
   sp.setHorizontalStretch(1);
@@ -36,10 +36,8 @@ void BCEPlotHandler::setupLayout() {
   // Payoff Plot Initialization
   BCELabel *setOfBCEPlotTitle = new BCELabel(ValueSetPlot);
   setOfBCEPlot = new BCEValueSetPlot();
-  setOfBCEPlot->setSizePolicy(sp);
   setOfBCEPlot->xAxis->setLabel("Player 0");
   setOfBCEPlot->yAxis->setLabel("Player 1");
-  // setOfBCEPlot->setMinimumSize(resWidth/4,resHeight/3.5);
   connect(setOfBCEPlot,SIGNAL(newEqmCoordinates(double,double)),
 	  guiData,SLOT(modifyEqmFocus(double,double)));
   connect(guiData,SIGNAL(eqmCoordSignal(double,double)),
@@ -54,7 +52,6 @@ void BCEPlotHandler::setupLayout() {
   deviationBarGraphs[1]->xAxis->setLabel("Player 1's Actions");
   for (int player = 0; player < 2; player++) {
     deviationBarGraphs[player]->yAxis->setLabel("Expected Payoff");
-    // deviationBarGraphs[player]->setMinimumHeight(resHeight/3.5);
 
     devPlotTitles.push_back(new BCELabel(DeviationPlot,player));
     connect(guiData,
@@ -69,17 +66,33 @@ void BCEPlotHandler::setupLayout() {
 
   QGridLayout *controlsGrid = guiData->controlsLayout;
 
+  QSizePolicy sp2(QSizePolicy::Expanding,QSizePolicy::Expanding);
+  sp.setVerticalStretch(1);
+  sp.setHorizontalStretch(3);
+
+  QSizePolicy sp3(QSizePolicy::Preferred,QSizePolicy::Preferred);
+  sp.setVerticalStretch(1);
+  sp.setHorizontalStretch(1);
+
+  setOfBCEPlot->setSizePolicy(sp2);
   // BCE Set Plot and Sliders Horizontal Layout
   QVBoxLayout *setOfBCEPlotWithTitle = new QVBoxLayout();
   setOfBCEPlotWithTitle->addWidget(setOfBCEPlotTitle);
   setOfBCEPlotWithTitle->addWidget(setOfBCEPlot);
+
+  QWidget *controlsGridWidget = new QWidget();
+  controlsGridWidget->setLayout(controlsGrid);
+  controlsGridWidget->setSizePolicy(sp3);
+  QWidget *setOfBCEWidget = new QWidget();
+  setOfBCEWidget->setLayout(setOfBCEPlotWithTitle);
+  setOfBCEWidget->setSizePolicy(sp2);
+
   QHBoxLayout *topLeftPanel = new QHBoxLayout();
-  topLeftPanel->addLayout(setOfBCEPlotWithTitle);
-  topLeftPanel->addLayout(controlsGrid);
+  topLeftPanel->addWidget(setOfBCEWidget);
+  topLeftPanel->addWidget(controlsGridWidget);
 
   // Left Viewer Panel, Bar Plots and Slider Box
   QVBoxLayout *leftSectorDivide = new QVBoxLayout();
-  leftSectorDivide->addLayout(topLeftPanel);
   for (int player = 0; player < 2; player++) {
     leftSectorDivide->addWidget(devPlotTitles[player]);
     leftSectorDivide->addWidget(deviationBarGraphs[player]);
@@ -124,42 +137,39 @@ void BCEPlotHandler::setupLayout() {
   conditionalMarginalPlot->axisRect()->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
   colorScale->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
 
+  QSizePolicy sp1(QSizePolicy::Expanding,QSizePolicy::Expanding);
+  sp1.setVerticalStretch(2);
+  sp1.setHorizontalStretch(1);
+
   // Layout of Left and Right Viewer Panels
+  QVBoxLayout *rightSide = new QVBoxLayout();
+  rightSide->addWidget(colorMapTitle);
+  rightSide->addWidget(conditionalMarginalPlot);
+  QVBoxLayout *leftSide = new QVBoxLayout();
+  QSplitter *leftSideSplitter = new QSplitter(Qt::Vertical);
+  leftSideSplitter->setSizePolicy(sp);
+  QWidget *topQSplit = new QWidget();
+  topQSplit->setLayout(topLeftPanel);
+  topQSplit->setSizePolicy(sp);
+  QWidget *bottomQSplit = new QWidget();
+  bottomQSplit->setLayout(leftSectorDivide);
+  bottomQSplit->setSizePolicy(sp1);
+  leftSideSplitter->addWidget(topQSplit);
+  leftSideSplitter->addWidget(bottomQSplit);
+
   QVBoxLayout *colorMapWithTitle = new QVBoxLayout();
   colorMapWithTitle->addWidget(colorMapTitle);
   colorMapWithTitle->addWidget(conditionalMarginalPlot);
+  QWidget *rightSideWidget = new QWidget();
+  rightSideWidget->setLayout(colorMapWithTitle);
+  rightSideWidget->setSizePolicy(sp);
+
   mainTab = new QHBoxLayout();
-  mainTab->addLayout(leftSectorDivide);
-  mainTab->addLayout(colorMapWithTitle);
+  mainTab->addWidget(leftSideSplitter);
+  mainTab->addWidget(rightSideWidget);
 
   // End Plot Initializations and Organization
   /////////////////////////////////////////////// 
-
-  // // Graph Tab Setup and Main Panel Initialization
-  // QWidget * mainPanel = new QWidget();
-  // QHBoxLayout * mainLayout = new QHBoxLayout();
-  // QWidget * graphTab = new QWidget();
-
-  // graphTab->setLayout(mainTab);
-
-  // // Main Widget
-  // QTabWidget *tabWidget = new QTabWidget();
-  // tabWidget->addTab(graphTab,"Solution");
-  // QWidget *gameWidget = new QWidget();
-  // gameWidget->setLayout(gameTab.getLayout());
-  // tabWidget->addTab(gameWidget,"Game");
-  // mainLayout->addWidget(tabWidget);
-
-  // mainPanel->setLayout(mainLayout);
-
-  // // Set Default Tab 
-  // setCentralWidget(mainPanel);
-
-  // // Maximize Window by Default
-  // setWindowState(Qt::WindowMaximized);
-
-  // // Window Title
-  // setWindowTitle(QApplication::translate("bceviewer","BCE Solution Viewer"));
 }
 
 /////////////////////////////////////////////
@@ -202,7 +212,7 @@ void BCEPlotHandler::plotEqm() {
 void BCEPlotHandler::plotBCEValueSet() {
 
   // Erase Current Contents
-
+  cout << "Plot BCE Value Set Hit" << endl;
   setOfBCEPlot->clearGraphs();
   setOfBCEPlot->clearPlottables();
   setOfBCEPlot->addGraph();
@@ -221,7 +231,6 @@ void BCEPlotHandler::plotBCEValueSet() {
   for (int i = 0; i < allEqm.size(); i++) {
     objective0Payoffs.push_back(allEqm[i][playerObjectives[0]]);
     objective1Payoffs.push_back(allEqm[i][playerObjectives[1]]);
-    cout << allEqm[i][playerObjectives[0]] << endl;
   }
 
   // Graphing Curve

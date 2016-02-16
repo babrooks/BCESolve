@@ -1,6 +1,9 @@
 #include "bcedatastate.hpp"
 
-BCEDataState::BCEDataState(int resW,int resH) {
+BCEDataState::BCEDataState(int resW,int resH):
+  sliderGroup(0),lineEditGroup(0)
+{
+  isDataLoaded = false;
   resWidth = resW;
   resHeight = resH;
   actions = vector<int>(2,0);
@@ -28,86 +31,142 @@ int BCEDataState::shareDataProperties(BCESliderType st,int player) {
 }
 
 void BCEDataState::setSolutionData(BCESolution &solution) {
-  solutionData = BCESolution(solution);
-  gameData = BCEGame(solutionData.getGame());
+  try{
+    solutionData = BCESolution(solution);
+    gameData = BCEGame(solutionData.getGame());
+
+    isPrivateVals = !(gameData.hasProductStructure());
+    // cout << isPrivateVals << endl;
+
+    // Reset Initial Parameters
+    currentEqmIndex = 0;
+    actions = vector<int>(2,0);
+    types = vector<int>(2,0);
+    values = vector<int>(2,0);
+    state = 0;
+
+    for (int player = 0; player < 2; player++)
+      emit(sliderLabelsChanged(isPrivateVals,player));
+
+    resetManipulatedData();
+    emit(newDataLoaded());
+
+    vector<int> numActions = gameData.getNumActions();
+    // cout << "NumActions[0] = " << numActions[0] << endl;
+    vector<int> numTypes = gameData.getNumTypes();
+    // cout << numTypes[0] << endl;
+    int numStates = gameData.getNumStates();
+    // cout << numStates << endl;
+
+    // Set Slider Ranges 
+    for (int player = 0; player < 2; player++) {
+      sliderGroup[3*player]->setRange(0,numActions[player]-1);
+      sliderGroup[3*player+1]->setRange(0,numTypes[player]-1);
+      if (isPrivateVals)
+	sliderGroup[3*player+2]->setRange(0,numStates-1);
+      else
+	sliderGroup[3*player+2]->setRange(0,sqrt(numStates)-1);
+      // cout << "Slider setting completed." << endl;
+    }
+    // Set Sliders to 0
+    for (int i = 0; i < 6; i++) {
+      sliderGroup[i]->setSliderPosition(0);
+      sliderGroup[i]->setSingleStep(1);
+      lineEditGroup[i]->setText("0");
+    }
+  }
+
+  catch (std::exception & e)
+    {
+      qDebug() << "Load solution didnt work :( from BCEDataState" << endl;
+    }
+  isDataLoaded = true;
 }
 
 void BCEDataState::setData(QString dataPath) {
 
-  // Get File Name for GUI's Title
-  string filePath = dataPath.toStdString();
-  // boost::filesystem::path boostPath(filePath);
-  // guiTitle = boostPath.filename().string();
-  QFileInfo info(dataPath);
-  guiTitle = info.fileName().toStdString();
+  try{
+
+    // Get File Name for GUI's Title
+    string filePath = dataPath.toStdString();
+    // boost::filesystem::path boostPath(filePath);
+    // guiTitle = boostPath.filename().string();
+    QFileInfo info(dataPath);
+    guiTitle = info.fileName().toStdString();
 		
-  isPrivateVals = !(gameData.hasProductStructure());
-  // cout << isPrivateVals << endl;
+    isPrivateVals = !(gameData.hasProductStructure());
+    // cout << isPrivateVals << endl;
 
-  // Reset Initial Parameters
-  currentEqmIndex = 0;
-  actions = vector<int>(2,0);
-  types = vector<int>(2,0);
-  values = vector<int>(2,0);
-  state = 0;
+    // Reset Initial Parameters
+    currentEqmIndex = 0;
+    actions = vector<int>(2,0);
+    types = vector<int>(2,0);
+    values = vector<int>(2,0);
+    state = 0;
 
-  for (int player = 0; player < 2; player++)
-    emit(sliderLabelsChanged(isPrivateVals,player));
+    for (int player = 0; player < 2; player++)
+      emit(sliderLabelsChanged(isPrivateVals,player));
 
-  resetManipulatedData();
-  emit(newDataLoaded());
+    resetManipulatedData();
+    emit(newDataLoaded());
 
-  // cout << "prob: " << equilibriumMatrix[0][0] << endl;
+    vector<int> numActions = gameData.getNumActions();
+    // cout << "NumActions[0] = " << numActions[0] << endl;
+    vector<int> numTypes = gameData.getNumTypes();
+    // cout << numTypes[0] << endl;
+    int numStates = gameData.getNumStates();
+    // cout << numStates << endl;
 
-  vector<int> numActions = gameData.getNumActions();
-  // cout << "NumActions[0] = " << numActions[0] << endl;
-  vector<int> numTypes = gameData.getNumTypes();
-  // cout << numTypes[0] << endl;
-  int numStates = gameData.getNumStates();
-  // cout << numStates << endl;
-
-  // Set Slider Ranges 
-  for (int player = 0; player < 2; player++) {
-    sliderGroup[3*player]->setRange(0,numActions[player]-1);
-    sliderGroup[3*player+1]->setRange(0,numTypes[player]-1);
-    if (isPrivateVals)
-      sliderGroup[3*player+2]->setRange(0,numStates-1);
-    else
-      sliderGroup[3*player+2]->setRange(0,sqrt(numStates)-1);
-    // cout << "Slider setting completed." << endl;
+    // Set Slider Ranges 
+    for (int player = 0; player < 2; player++) {
+      sliderGroup[3*player]->setRange(0,numActions[player]-1);
+      sliderGroup[3*player+1]->setRange(0,numTypes[player]-1);
+      if (isPrivateVals)
+	sliderGroup[3*player+2]->setRange(0,numStates-1);
+      else
+	sliderGroup[3*player+2]->setRange(0,sqrt(numStates)-1);
+      // cout << "Slider setting completed." << endl;
+    }
+    // Set Sliders to 0
+    for (int i = 0; i < 6; i++) {
+      sliderGroup[i]->setSliderPosition(0);
+      sliderGroup[i]->setSingleStep(1);
+      lineEditGroup[i]->setText("0");
+    }
   }
-
-  // Set Sliders to 0
-  for (int i = 0; i < 6; i++) {
-    sliderGroup[i]->setSliderPosition(0);
-    sliderGroup[i]->setSingleStep(1);
-    lineEditGroup[i]->setText("0");
-  }
-
-  // setAllEqm();
-
-  // catch (std::exception & e)
-  //   {
-  //     qDebug() << "Load solution didnt work :( from BCEDataState" << endl;
-  //   }
+  catch (std::exception & e)
+    {
+      qDebug() << "Load solution didnt work :( from BCEDataState" << endl;
+    }
+  isDataLoaded = true;
 }
 
 void BCEDataState::setupControlsLayout() {
 
   // Slider, LineEdit, and CheckBox Controls Creation
 
+  QSizePolicy sp(QSizePolicy::MinimumExpanding,QSizePolicy::Expanding);
+  sp.setVerticalStretch(1);
+  sp.setHorizontalStretch(2);
+
+  QSizePolicy sp1(QSizePolicy::Preferred,QSizePolicy::Expanding);
+  sp1.setVerticalStretch(1);
+  sp1.setHorizontalStretch(1);
+
   for (int player = 0; player < 2; player++) {
     sliderGroup.push_back(new BCESlider(Action,player));
+    sliderGroup.back()->setSizePolicy(sp);
     sliderGroup.push_back(new BCESlider(Type,player));
+    sliderGroup.back()->setSizePolicy(sp);
     sliderGroup.push_back(new BCESlider(State,player));
+    sliderGroup.back()->setSizePolicy(sp);
 
     lineEditGroup.push_back(new BCELineEdit(Action,player));
+    lineEditGroup.back()->setSizePolicy(sp1);
     lineEditGroup.push_back(new BCELineEdit(Type,player));
+    lineEditGroup.back()->setSizePolicy(sp1);
     lineEditGroup.push_back(new BCELineEdit(State,player));
-
-    checkBoxGroup.push_back(new BCECheckBox(Action,player));
-    checkBoxGroup.push_back(new BCECheckBox(Type,player));
-    checkBoxGroup.push_back(new BCECheckBox(State,player));
+    lineEditGroup.back()->setSizePolicy(sp1);
   }
 
   for (int widgetIndex = 0; widgetIndex < 6; widgetIndex++) {
@@ -127,19 +186,23 @@ void BCEDataState::setupControlsLayout() {
 	    SIGNAL(valueChanged(int,BCESliderType,int)),
 	    sliderGroup[widgetIndex],
 	    SLOT(changeSliderPosition(int,BCESliderType,int)));
-    connect(checkBoxGroup[widgetIndex],
-	    SIGNAL(boolChanged(bool,BCESliderType,int)),
-	    this,SLOT(setMarginalConditions(bool,BCESliderType,int)));
   }
 
   // Slider Labels
 
   QVector<BCELabel*> sliderLabels;
 
+  QSizePolicy sp2(QSizePolicy::Expanding,QSizePolicy::Expanding);
+  sp2.setVerticalStretch(3);
+  sp2.setHorizontalStretch(2);
+
   for (int player = 0; player < 2; player++) {
     sliderLabels.push_back(new BCELabel(SliderLabel,Action,player));
+    sliderLabels.back()->setSizePolicy(sp2);
     sliderLabels.push_back(new BCELabel(SliderLabel,Type,player));
-    sliderLabels.push_back(new BCELabel(SliderLabel,State,player));	 
+    sliderLabels.back()->setSizePolicy(sp2);
+    sliderLabels.push_back(new BCELabel(SliderLabel,State,player));
+    sliderLabels.back()->setSizePolicy(sp2);	 
   }
 
 
@@ -148,9 +211,6 @@ void BCEDataState::setupControlsLayout() {
     connect(this,SIGNAL(sliderLabelsChanged(bool,int)),
 	    sliderLabels[labelIt],SLOT(displayStateOrValues(bool,int)));
   }
-
-  for (int i = 0; i < 2; i++)
-    checkBoxGroup[3*i]->setChecked(true);
 
   // Slider, LineEdit, and CheckBox Layout Creation
 
@@ -164,7 +224,6 @@ void BCEDataState::setupControlsLayout() {
       subLayoutWithLabels.push_back(new QVBoxLayout());
       gridSubLayouts[3*i+j]->addWidget(sliderGroup[3*i+j]);
       gridSubLayouts[3*i+j]->addWidget(lineEditGroup[3*i+j]);
-      gridSubLayouts[3*i+j]->addWidget(checkBoxGroup[3*i+j]);
       subLayoutWithLabels[3*i+j]->addWidget(sliderLabels[3*i+j]);
       subLayoutWithLabels[3*i+j]->addLayout(gridSubLayouts[3*i+j]);
       controlsGrid->addLayout(subLayoutWithLabels[3*i+j],j,i); // Layout Matrix
@@ -180,6 +239,9 @@ void BCEDataState::setupControlsLayout() {
 void BCEDataState::setSliderValue(int value,
 				  BCESliderType st,
 				  int player) {
+  if (isDataLoaded == false)
+    return;
+
   switch(st) {
   case Action: actions[player] = value;
     break;
@@ -209,24 +271,6 @@ void BCEDataState::setSliderValue(int value,
   resetManipulatedData(st,player);
 }
 
-void BCEDataState::setMarginalConditions(bool newBool,BCESliderType st,int player) {
-  switch(st) {
-  case Action:
-    margA[player]=newBool;
-    break;
-  case Type: 
-    margT[player]=newBool;
-    break;
-  case State: {
-    if (player==0)
-      margS0 = newBool;
-    else 
-      margS1 = newBool;
-  }
-    break;
-  }
-}
-
 void BCEDataState::resetManipulatedData(BCESliderType st,int player) {
   switch(st) {
   case Action: setObjectiveVals(player);
@@ -246,6 +290,9 @@ void BCEDataState::resetManipulatedData() {
 }
 
 void BCEDataState::modifyEqmFocus(double x,double y) {
+
+  if (isDataLoaded==false)
+    return;
 
   int newEqmIndex = 0;
   double smallestEuclidianDistance = 5000.0000; // This just needs to be large
