@@ -67,6 +67,11 @@ bool BCEPayoffTableModel::setData(const QModelIndex & index,
       QRegExp rx("[, ]");
       QStringList list = value.toString().split(rx,QString::SkipEmptyParts);
 
+      if (list.size() != game->getNumObjectives()) {
+	data(index,role);
+	return false;
+      }
+
       int numObjectives = game->getNumObjectives();
       for (int objs = 0; objs < numObjectives; objs++)
 	game->setObjective(state,cellLocation,objs,list.at(objs).toDouble());

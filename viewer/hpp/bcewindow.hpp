@@ -55,12 +55,6 @@ private:
   QThread *solverWorkerThread;
   //! solverWorker Object for Solving Games
   BCEGurobiSolverWorker *solverWorker;
-  //! Sets resolution width
-  int resWidth = 1920;
-  //! Sets resolution height
-  int resHeight = 1080;
-  //! Passes resolution to classes creating layouts.
-  void setResolution(int resWidth,int resHeight);
 
 private slots:
 

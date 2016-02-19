@@ -1,11 +1,9 @@
 #include "bceplothandler.hpp"
 
-BCEPlotHandler::BCEPlotHandler(int resW,int resH):
+BCEPlotHandler::BCEPlotHandler():
   deviationBarGraphs(0)
 {
-  resWidth = resW;
-  resHeight = resH;
-  guiData = new BCEDataState(resW,resH);
+  guiData = new BCEDataState();
   screenShotPath=QString("../examples/screenshots/");
   setupLayout();
 
@@ -103,7 +101,6 @@ void BCEPlotHandler::setupLayout() {
   conditionalMarginalPlot->setSizePolicy(sp);
 
   BCELabel *colorMapTitle = new BCELabel(HeatMap);
-  // colorMapTitle->setMaximumHeight(resHeight/54);
   connect(guiData,SIGNAL(newStateSignal(int,int,int,bool)),
 	  colorMapTitle,SLOT(changeDisplayedState(int,int,int,bool)));
 
@@ -113,7 +110,6 @@ void BCEPlotHandler::setupLayout() {
   conditionalMarginalPlot->addPlottable(colorMap);
   conditionalMarginalPlot->setInteractions(QCP::iRangeDrag|QCP::iRangeZoom);
   conditionalMarginalPlot->axisRect()->setupFullAxesBox(true);
-  // conditionalMarginalPlot->setMinimumWidth(resWidth/2); // 1080p 
   conditionalMarginalPlot->xAxis->setLabel("Player 0");
   conditionalMarginalPlot->yAxis->setLabel("Player 1");
 
@@ -147,7 +143,6 @@ void BCEPlotHandler::setupLayout() {
   rightSide->addWidget(conditionalMarginalPlot);
   QVBoxLayout *leftSide = new QVBoxLayout();
   QSplitter *leftSideSplitter = new QSplitter(Qt::Vertical);
-  leftSideSplitter->setSizePolicy(sp);
   QWidget *topQSplit = new QWidget();
   topQSplit->setLayout(topLeftPanel);
   topQSplit->setSizePolicy(sp);
@@ -156,6 +151,7 @@ void BCEPlotHandler::setupLayout() {
   bottomQSplit->setSizePolicy(sp1);
   leftSideSplitter->addWidget(topQSplit);
   leftSideSplitter->addWidget(bottomQSplit);
+  leftSideSplitter->setSizePolicy(sp);
 
   QVBoxLayout *colorMapWithTitle = new QVBoxLayout();
   colorMapWithTitle->addWidget(colorMapTitle);
@@ -212,7 +208,6 @@ void BCEPlotHandler::plotEqm() {
 void BCEPlotHandler::plotBCEValueSet() {
 
   // Erase Current Contents
-  cout << "Plot BCE Value Set Hit" << endl;
   setOfBCEPlot->clearGraphs();
   setOfBCEPlot->clearPlottables();
   setOfBCEPlot->addGraph();

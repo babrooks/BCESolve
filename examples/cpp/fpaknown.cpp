@@ -15,8 +15,8 @@ int main(int argc, char ** argv)
   // int nbids=50;
   double entryCost=0.0;
   double reservePrice=0.0;
-  int nvals=2;
-  int nbids=10;
+  int nvals=3;
+  int nbids=25;
   double lowbid = 0.0;
 
   solveFPA(nvals,nbids,entryCost,reservePrice,false);
@@ -33,7 +33,7 @@ void solveFPA(int nvals, int nbids,
   vector< vector<double> > devObjectives;
 
   stringstream filename;
-  filename << "fpaknown_nv=" << nvals << "_nb=" << nbids;
+  filename << "fpaknown_nv=" << nvals << "_nb=" << nbids << ".bce";
 
   bool verbose = true;
   double highbid = 1.0;
@@ -69,23 +69,10 @@ void solveFPA(int nvals, int nbids,
 
       vector< vector<double> > expObj;
       soln.getExpectedObjectives(expObj);
-      
-      cout << endl
-	   << "Expected objectives: " << endl;
-      for (vector< vector<double> >::const_iterator it = expObj.begin();
-	   it != expObj.end();
-	   ++it)
-	{
-	  for (vector<double>::const_iterator it2 = it->begin();
-	       it2 != it->end();
-	       ++it2)
-	    {
-	      cout << *it2 << " ";
-	    }
-	  cout << endl;
-	}
 
-      BCESolution::save(soln,"mysolution.bce");
+      string fileNameStr = filename.str();
+      const char * fnameC = fileNameStr.c_str();
+      BCESolution::save(soln,fnameC);
     }
   catch (BCEException & err)
     {
