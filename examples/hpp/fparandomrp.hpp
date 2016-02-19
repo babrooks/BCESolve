@@ -8,52 +8,41 @@
 #include "bce.hpp"
 #include <math.h>
 
-class FPARandomRP : public BCEAbstractGame {
-
+class FPARandomRP : public BCEAbstractGame
+{
 private:
-  double reservePrice;
   // vector<vector<double> > cdf;
   // int rpPrecision;
+  double ub;
   double highBid;
+  double postedPrice;
+  double postedPriceProb;
   
+  double rpcdf(double x) const
+  {
+    double lb = 0.0;
+    double ub2 = 0.175;
+    if (x<lb)
+      return 0;
+    if (x<ub2)
+      return pow((x-lb)/(ub2-lb),2);
+    return 1;
+
+    if (x<0.125)
+      return 0;
+    return 1;
+  }
+
 public:
   FPARandomRP(int nv,
 	      int na,
-	      double _rp):
+	      double _ub):
     BCEAbstractGame(nv,na,1,3),
-    reservePrice(_rp),
-    highBid(0.5)
-  {
-    // rpPrecision = 1000;
-    // // rp*rpPrecision will be a non-decimal for rp no more precise
-    // // than rpPrecision => actionsUnderRP0 is an int.
-    // // e.g. rpPrecision = 1000 => no more precise than 1000ths place.
-    // int actionsUnderRP0 = numActions[0]*reservePrice*rpPrecision;
-    // int actionsUnderRP1 = numActions[1]*reservePrice*rpPrecision;
-    // cdf = vector<vector<double> > (2,vector<double>
-    // 				   (max(actionsUnderRP0,actionsUnderRP1),0.0));
-
-    // double acc0 = 1.00/actionsUnderRP0;
-    // // Create a uniform distn
-    // for (int action = 0; action < actionsUnderRP0; action++) {
-    //   cdf[0][action]=acc0;
-    //   acc0 = acc0 + 1.00/actionsUnderRP0;
-    // }
-    // cout << "cdf0Max (should be 1): " << cdf[0][actionsUnderRP0-1] << endl;
-
-    // double acc1 = 1.00/actionsUnderRP1;
-    // for (int action = 0; action < actionsUnderRP1; action++) {
-    //   cdf[1][action]=acc1;
-    //   acc1 += 1.00/actionsUnderRP1;
-    // }
-    // cout << "cdf1Max (should be 1): " << cdf[1][actionsUnderRP1-1] << endl;
-
-    // //A Few Tests
-    // cout << "test1: " << cdf[0][floor(na/2)*rpPrecision];
-    // cout << "test2: " << cdf[0][ceil(na/4)*rpPrecision];
-    // cout << "test3: " << cdf[0][floor(na/5)*rpPrecision];
-    // cout << "test4: " << cdf[0][floor(na/2.5)*rpPrecision];
-  }
+    highBid(0.5),
+    ub(_ub),
+    postedPrice(0.2),
+    postedPriceProb(0.0)
+  {}
 
   double prior (int state, const vector<int> & types) const {
     return 1.0/numStates;    
@@ -68,28 +57,20 @@ public:
 	double val = static_cast<double>(state)/(numStates-1);
 	double ownBid = highBid*static_cast<double>(actions[obj])/(numActions[obj]-1);
 	double otherBid = highBid*static_cast<double>(actions[1-obj])/(numActions[obj]-1);
+	
+	double payoff = 0;
 
-	if (ownBid == 0)
-	  return 0.0;
+	if (ownBid > otherBid)
+	  payoff += (1.0-postedPriceProb)*(val-ownBid)*rpcdf(ownBid);
+	else if (ownBid == otherBid)
+	  return 0.5*(1.0-postedPriceProb)*(val-ownBid)*rpcdf(ownBid);
 
-	if (ownBid < otherBid)
-	  return 0.0;
-
-	if (ownBid > otherBid) {
-	  if (ownBid < reservePrice) {
-	    return (ownBid/reservePrice)*(val-ownBid);
-	  }
-	  else if (ownBid >= reservePrice)
-	    return val-ownBid;
-	}
-
-	else if (ownBid == otherBid) {
-	  if (ownBid < reservePrice)
-	    return (ownBid/reservePrice)*.5*(val-ownBid);
-	  else if (ownBid >= reservePrice)
-	    return 0.5*(val-ownBid);
-	}
-
+	if (ownBid >= postedPrice && otherBid >= postedPrice)
+	  payoff += 0.5*postedPriceProb*(val-postedPrice);
+	else if (ownBid > postedPrice)
+	  payoff += postedPriceProb*(val-postedPrice);
+	  
+	return payoff;
       } // players' payoffs
     else if (obj==2)
       {
@@ -99,17 +80,14 @@ public:
 	double b1 = highBid*static_cast<double>(actions[1])/(numActions[1]-1);
 
 	double winningBid = b0;
-	int winningPlayer = 0;
-	if (b1 > b0) {
+	if (b1 > b0)
 	  winningBid = b1;
-	  winningPlayer = 1;
-	}
 
-	if (winningBid < reservePrice)
-	  return (winningBid/reservePrice) * winningBid;
-
-	if (winningBid >= reservePrice)
-	  return winningBid;	  
+	double revenue=(1.0-postedPriceProb) * winningBid*rpcdf(winningBid);
+	
+	if (winningBid>=postedPrice)
+	  revenue += postedPriceProb * postedPrice;
+	return revenue;
 
       }
     return 0;

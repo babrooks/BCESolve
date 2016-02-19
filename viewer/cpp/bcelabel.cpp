@@ -13,6 +13,8 @@ BCELabel::BCELabel(LabelType _labelType,int _player):
   QSizePolicy sp = sizePolicy();
   sp.setVerticalStretch(0);
   setSizePolicy(sp);
+
+  dynamicString.precision(2);
     
   setText(title);
   setStyleSheet("background-color: white");
@@ -22,6 +24,7 @@ BCELabel::BCELabel(LabelType _labelType,BCESliderType _sliderType,int _player):
   labelType(_labelType),sliderType(_sliderType),player(_player)
 {
   std::stringstream dynamicString;
+  dynamicString.precision(2);
 
   switch(_sliderType) {
   case Action: {
@@ -79,10 +82,10 @@ void BCELabel::changeText(int emittedPlayer,
 
   if (labelType == DeviationPlot) {
     if (player == emittedPlayer) {
-      dynamicString.str(std::string());
+      dynamicString.str("");
       dynamicString << "Player " << emittedPlayer << "'s Deviation Objectives, "
-		    << "Action = " << action << ", "
-		    << "Type = " << type << ", "
+		    << "A" << action << ", "
+		    << "T" << type << ", "
 		    << "Payoff = " << objectiveValue << ", ";
     }
   }
@@ -96,12 +99,13 @@ void BCELabel::changeProbability(int emittedPlayer,double probability) {
     std::stringstream titleName;
     std::string titleNameNoPrStr = dynamicString.str();
     titleName << titleNameNoPrStr
-	      << "ActionPr/Prior(Given Type) = " << probability;
+	      << "Prob = " 
+	      << std::setprecision(2) << probability;
     std::string titleStr = titleName.str();
     QString title = QString::fromStdString(titleStr);
 
     setText(title);
-    setAlignment(Qt::AlignCenter);
+    setAlignment(Qt::AlignLeft);
 
   }
 }
@@ -140,13 +144,13 @@ void BCELabel::changeDisplayedCoords(double x,double y) {
 
     dynamicString.str(std::string());
     dynamicString << staticString 
-		  << "x = " << std::setprecision(3) << x << ", "
-		  << "y = " << std::setprecision(3) << y;
+		  << "x = " << std::setprecision(2) << x << ", "
+		  << "y = " << std::setprecision(2) << y;
     std::string titleStr = dynamicString.str();
     QString title = QString::fromStdString(titleStr);
 
     setText(title);
-    setAlignment(Qt::AlignCenter);
+    setAlignment(Qt::AlignLeft);
 
   }
 }
@@ -174,6 +178,6 @@ void BCELabel::changeDisplayedState(int value0,
     QString title = QString::fromStdString(titleStr);
 
     setText(title);
-    setAlignment(Qt::AlignCenter);
+    setAlignment(Qt::AlignLeft);
   }
 }

@@ -50,7 +50,7 @@ MAINS=exampleforrobbie \
 	loadingExample hybridentryreserve \
 	hybridauction hybridreserve 
 
-MAINSGRB=revenuelb onesidedrestricted relaxed rcacommon
+MAINSGRB=revenuelb onesidedrestricted relaxed rcacommon randomrprelaxed optauction
 MAINSBCEGRB = surplusbnd allpayauction gurobihybridentryreserve postedprice \
 		fpagurobiunknown fparandomrp duopoly fangmorris fpaknown
 

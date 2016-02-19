@@ -5,50 +5,31 @@
 
 int main() {
 
-  int numBids = 30;
-  int numVals = 30;
-  // if bid < reservePrice, bidder still wins the item with pr reserveProb
-  double reservePrice = .5;
-  // SOLVER SWITCH
-  // CPLEX, set to 0; GUROBI, set to 1;
-  int solverSwitch = 1;
+  int numBids = 75;
+  int numVals = numBids;
+  double ub = 0.33;
 
   FPARandomRP fparrp(numVals,
 		     numBids,
-		     reservePrice);
+		     ub);
 
-  if (solverSwitch == 1) {
+  BCEGurobiSolver solver(fparrp);
+  solver.populate();
 
-    BCEGurobiSolver solver(fparrp);
-    // solver.populate();
-
-    // // GRBLinExpr objective = 0;
-    // // objective += .5 * solver.getObjectiveFunction(0);
-    // // objective += .5 * solver.getObjectiveFunction(1);
-    // // solver.model.setObjective(objective,GRB_MAXIMIZE);
-    solver.model.setObjective(solver.getObjectiveFunction(2),GRB_MINIMIZE);  
-    // solver.model.update();
-
-    // solver.solve();
-
-    // solver.setParameter(BCEGurobiSolver::BoundaryObjective1,0);
-    // solver.setParameter(BCEGurobiSolver::BoundaryObjective2,1);
-
-    solver.solve();
-    solver.mapBoundary("fparandomrp_bndry.dat");
-
-    BCESolution data;
-    solver.getSolution(data);
+  solver.model.setObjective(solver.getObjectiveFunction(2),GRB_MINIMIZE);  
+  solver.model.update();
   
-    stringstream fName;
-    fName << "fparandomrp_nv=" << numVals
-  	  << "_nb=" << numBids
-  	  << "_rp=" << reservePrice << ".bce";
-    string fNameStr = fName.str();
-    const char * fNameC = fNameStr.c_str();
-    BCESolution::save(data,fNameC);
+  solver.solve();
 
-
-  }
+  BCESolution data;
+  solver.getSolution(data);
+  
+  stringstream fName;
+  fName << "fparandomrp_nv=" << numVals
+	<< "_nb=" << numBids
+	<< "_ub=" << ub << ".bce";
+  string fNameStr = fName.str();
+  const char * fNameC = fNameStr.c_str();
+  BCESolution::save(data,fNameC);
 
 }
