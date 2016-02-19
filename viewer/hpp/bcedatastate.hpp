@@ -172,7 +172,7 @@ public:
      Further connects signals and slots when both are 
      contained within this class.
   */
-  BCEDataState(int resWidth,int resHeight);
+  BCEDataState();
 
   //! Sets the solution data to the newly loaded solution.
   void setSolutionData(BCESolution &solution);

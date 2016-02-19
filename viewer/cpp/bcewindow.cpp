@@ -8,16 +8,11 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   // Set the stored logTab equal to the logHandler
   logTab = &logHandler;
 
-  // Sets resolution settings
-  QRect rec = QApplication::desktop()->screenGeometry();
-  resWidth = rec.width();
-  resHeight = rec.height();
-
   // Set the default path for loading examples.
   path=QString("../examples/");
 
-  solutionTab = new BCEPlotHandler(resWidth,resHeight);
-  gameTab = new BCEGameHandler(resWidth,resHeight);
+  solutionTab = new BCEPlotHandler();
+  gameTab = new BCEGameHandler();
 
   // Menu Bar
   QMenu * fileMenu = menuBar()->addMenu(tr("&File"));

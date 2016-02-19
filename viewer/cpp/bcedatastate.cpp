@@ -1,11 +1,9 @@
 #include "bcedatastate.hpp"
 
-BCEDataState::BCEDataState(int resW,int resH):
+BCEDataState::BCEDataState():
   sliderGroup(0),lineEditGroup(0)
 {
   isDataLoaded = false;
-  resWidth = resW;
-  resHeight = resH;
   actions = vector<int>(2,0);
   types = vector<int>(2,0);
   values = vector<int>(2,0);
@@ -171,9 +169,6 @@ void BCEDataState::setupControlsLayout() {
 
   for (int widgetIndex = 0; widgetIndex < 6; widgetIndex++) {
     lineEditGroup[widgetIndex]->setReadOnly(true);
-    // sliderGroup[widgetIndex]->setMaximumHeight(resHeight/54);
-    // sliderGroup[widgetIndex]->setMinimumWidth(resWidth/16);
-    // lineEditGroup[widgetIndex]->setMaximumSize(resWidth/64,resHeight/54);
     sliderGroup[widgetIndex]->setOrientation(Qt::Horizontal);
     connect(sliderGroup[widgetIndex],
 	    SIGNAL(valueChanged(int,BCESliderType,int)),
@@ -207,7 +202,6 @@ void BCEDataState::setupControlsLayout() {
 
 
   for (int labelIt = 0; labelIt < 6; labelIt++) {
-    // sliderLabels[labelIt]->setMaximumHeight(resHeight/54);
     connect(this,SIGNAL(sliderLabelsChanged(bool,int)),
 	    sliderLabels[labelIt],SLOT(displayStateOrValues(bool,int)));
   }

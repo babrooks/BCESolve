@@ -27,7 +27,7 @@ class BCEPlotHandler : public QMainWindow
 
 public:
   //! Constructor
-  BCEPlotHandler(int resW,int resH);
+  BCEPlotHandler();
   //! Destructor
   ~BCEPlotHandler() {
     delete guiData;
@@ -87,10 +87,6 @@ private:
 
   //! Layout for the Plot Handler
   QHBoxLayout *mainTab;
-  //! Screen Resolution Width.
-  int resWidth;
-  //! Screen Resolution Height.
-  int resHeight;
   //! Data state. 
   /*! Stores all data currently held or 
     displayed in the GUI. "Held" data 

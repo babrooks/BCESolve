@@ -1,10 +1,8 @@
 #include "bcegamehandler.hpp"
 
-BCEGameHandler::BCEGameHandler(int resW,int resH):
+BCEGameHandler::BCEGameHandler():
   game(BCEGame())
 {
-  resWidth = resW;
-  resHeight = resH;
   setupLayout();
 }
 
@@ -16,10 +14,12 @@ void BCEGameHandler::setupLayout() {
   numStatesEdit->setSizePolicy(QSizePolicy::Preferred,
 			       QSizePolicy::Preferred);
   numStatesEdit->setReadOnly(true);
+
   QPushButton * addStateButton = new QPushButton("+");
   QPushButton * removeStateButton = new QPushButton(" -");
   QPushButton * nextStateButton = new QPushButton("->");
   QPushButton * prevStateButton = new QPushButton("<-");
+
   QSize buttonSize(50,addStateButton->height());
   addStateButton->resize(buttonSize);
   removeStateButton->resize(buttonSize);
@@ -146,18 +146,14 @@ void BCEGameHandler::setupLayout() {
   solveButton = new QPushButton(tr("Solve"));
   solveButton->setSizePolicy(QSizePolicy::Fixed,
 			     QSizePolicy::Preferred);
-  // solveButton->resize(.2*resWidth,solveButton->height());
 
   cancelButton = new QPushButton(tr("Cancel"));
   cancelButton->setSizePolicy(QSizePolicy::Fixed,
 			      QSizePolicy::Preferred);
-  // cancelButton->resize(.2*resWidth,cancelButton->height());
 
-  // qDebug() << "I got to here!!!" << endl;
-
-  // leftControlLayout->addRow(removeStateButton,
-  // 			    addStateButton);
-  // leftControlLayout->setSpacing(0);
+  clearButton = new QPushButton(tr("Clear Game"));
+  clearButton->setSizePolicy(QSizePolicy::Expanding,
+			      QSizePolicy::Preferred);
 
   for (int player = 0; player < 2; player ++)
     {
@@ -234,6 +230,7 @@ void BCEGameHandler::setupLayout() {
 
   solveLayout->addWidget(solveButton);
   solveLayout->addWidget(cancelButton);
+  solveLayout->addWidget(clearButton);
   
   rightControlLayout->addRow(solveLayout);
 
@@ -341,8 +338,6 @@ void BCEGameHandler::setupLayout() {
   // END ADDING WIDGETS TO QSPLITTER
   //////////////////////////////////
 
-  // tableLayout->setMinimumSize(.9*resWidth,resHeight*4/5);
-
   QVBoxLayout *fullLayout = new QVBoxLayout();
   fullLayout->addWidget(tableLayout);
 
@@ -385,7 +380,21 @@ connect(solveButton,SIGNAL(clicked()),
 	this,
 	SLOT(emitSolveSignal()));
 
-// qDebug() << "Finished sggamehandler constructor" << endl;
+ connect(clearButton,SIGNAL(clicked()),
+	 this,
+	 SLOT(clearCurrentGame()));
+
+ // qDebug() << "Finished sggamehandler constructor" << endl;
+
+ // Set Initial Line-edit Values
+ for (int player=0;player<2;player++) {
+   numActionsEdits[player]
+     ->setText(QString::number(game.getNumActions()[player]));
+   numTypesEdits[player]->setText(QString::number(game.getNumTypes()
+						  [player]));
+ }
+ numStatesEdit->setText(QString::number(game.getNumStates()));
+ numObjectivesEdit->setText(QString::number(game.getNumObjectives()));
 
 }
 
@@ -717,4 +726,24 @@ void BCEGameHandler::stateRemoved()
 
 void BCEGameHandler::emitSolveSignal() {
   emit(startSolveRoutine(weightsModel->getSolverData()));
+}
+
+void BCEGameHandler::clearCurrentGame() {
+  game = BCEGame();
+  conditionalModel->emitLayoutChanged();
+  conditionalTableView->resizeColumnToContents(game.getNumStates());
+  weightsModel->emitLayoutChanged();
+  objWeightsTableView->resizeColumnToContents(game.getNumStates());
+  payoffModel->emitLayoutChanged();
+  payoffTableView->resizeColumnToContents(game.getNumStates());
+  priorModel->emitLayoutChanged();
+  priorTableView->resizeColumnToContents(game.getNumStates());
+  for (int player=0;player<2;player++) {
+    numActionsEdits[player]
+      ->setText(QString::number(game.getNumActions()[player]));
+    numTypesEdits[player]->setText(QString::number(game.getNumTypes()
+						   [player]));
+  }
+  numStatesEdit->setText(QString::number(game.getNumStates()));
+  numObjectivesEdit->setText(QString::number(game.getNumObjectives()));
 }

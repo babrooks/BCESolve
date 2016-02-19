@@ -58,6 +58,8 @@ private:
   QPushButton * solveButton;
   //! Button that cancels solve.
   QPushButton * cancelButton;
+  //! Button that clears currently displayed game.
+  QPushButton *clearButton;
 
   // Edits
 
@@ -83,16 +85,12 @@ private:
   BCETableView* conditionalTableView;
   //! Table for displaying weights data
   BCETableView *objWeightsTableView;
-  //! Resolution Width
-  int resWidth;
-  //! Resolution height
-  int resHeight;
 
 public:
   //! Constructor
   /*! Constructs edits and buttons, connects signals/slots, calls
       BCEGameHandler::initializeModels. */
-  BCEGameHandler(int resW,int resH);
+  BCEGameHandler();
   //! Destructor.
   /*! Destroys table views, models, etc. */
   ~BCEGameHandler();
@@ -161,6 +159,9 @@ private slots:
   void prevState();
   //! Emits the startSolveRoutine signal to BCEWindow.
   void emitSolveSignal();
+  //! Clears the game currently displayed in the game tab.
+  /*! Replaces the cleared game with a new game. */
+  void clearCurrentGame();
 
 signals:
 
