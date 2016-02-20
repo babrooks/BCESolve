@@ -81,16 +81,11 @@ Chicago, Il
 
 /*! \defgroup viewer BCEViewer interface
 
-@brief The interface's central purpose is to display solution objects 
-for solved games. It can also be used to create custom games. These games can be solved 
-from within the interface. Premade games written in C++ can also be loaded into the interface,
-edited, and resolved. Progress and numerical output for all of these solution routines is also
-contained within the interface. 
-
-The interface contains three tabs: a solution tab, a game tab,
+@brief The interface contains three tabs: a solution tab, a game tab,
 and a log tab. The solution tab displays graphs depicting features of the currently
-loaded solution object. The game tab permits creation of custom games
-and editing of premade games. The log tab outputs progress and some numerical solutions
+loaded solution object. The game tab facilitates the both creation of custom games
+and editing of games written in c++. Custom and edited games can be also be solved from
+within the game tab. The log tab outputs progress and numerical solutions
 for any games games solved within the interface. 
 
 The solution tab uses two main classes: BCEPlotHandler and BCEDataState. 

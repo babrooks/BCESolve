@@ -136,6 +136,8 @@ private:
   QVector<BCELabel*> devPlotTitles;
   //! Sets up the layout of the plot handler.
   void setupLayout();
+  //! Indicates if solution data is loaded in the soln tab.
+  bool isSolnDataLoaded;
 
 public:
   //! Returns Layout of the Plot Handler
@@ -149,6 +151,16 @@ public:
   const BCESolution& getSolutionData() const {
     return guiData->getSolution();
   }
+
+private slots:
+
+  //! Sets isSolnDataLoaded to true.
+  /*! Allows usage of color toggles for plots and
+    changing the colormap scale from linear to log.
+    Prevents the program from crashing if user uses
+    these toggles before solution data is loaded.
+   */
+  void indicateDataLoaded();
 
 };
 

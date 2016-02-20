@@ -3,6 +3,7 @@
 BCEPlotHandler::BCEPlotHandler():
   deviationBarGraphs(0)
 {
+  isSolnDataLoaded=false;
   guiData = new BCEDataState();
   screenShotPath=QString("../examples/screenshots/");
   setupLayout();
@@ -20,6 +21,8 @@ void BCEPlotHandler::setupLayout() {
 	  this,SLOT(plotEqm()));
   connect(guiData,SIGNAL(newDataLoaded()),
 	  this,SLOT(setGUITitle()));
+  connect(guiData,SIGNAL(newDataLoaded()),
+	  this,SLOT(indicateDataLoaded()));
   connect(this,SIGNAL(sendingDataPath(QString)),
 	  guiData,SLOT(setData(QString)));
 
@@ -352,6 +355,10 @@ void BCEPlotHandler::plotDeviationObjectives(int player) {
 // View Slots
 
 void BCEPlotHandler::toggleLinearScale(bool checked) {
+  // Prevents Crashing
+  if (isSolnDataLoaded == false)
+    return;
+
   if (checked)
     colorScale->setDataScaleType(QCPAxis::stLinear);
   else 
@@ -360,7 +367,12 @@ void BCEPlotHandler::toggleLinearScale(bool checked) {
 } // Slot to set a linear color scale for the distribution's heat map
 
 void BCEPlotHandler::toggleColorfulTheme(bool checked) {
+  // Prevents Crashing
+  if (isSolnDataLoaded == false)
+    return;
+
   QCPColorGradient *newGradient = new QCPColorGradient();
+
   if (checked)
     colorMap->setGradient(newGradient->gpSpectrum);
   else
@@ -369,6 +381,7 @@ void BCEPlotHandler::toggleColorfulTheme(bool checked) {
 } // Slot to change color theme of heat map for conditional marginal distribution
 
 void BCEPlotHandler::screenShot() {
+
   QString newPath = QFileDialog::getSaveFileName(this, tr("Save PNG"),
 						 screenShotPath, tr("PNG files (*.png)"));
   if (newPath.isEmpty())
@@ -394,4 +407,8 @@ void BCEPlotHandler::setGUITitle() {
 
 void BCEPlotHandler::setSolution(BCESolution &solution) {
   guiData->setSolutionData(solution);
+}
+
+void BCEPlotHandler::indicateDataLoaded() {
+  isSolnDataLoaded=true;
 }

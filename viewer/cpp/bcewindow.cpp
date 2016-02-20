@@ -162,13 +162,14 @@ void BCEWindow::loadGame() {
 void BCEWindow::saveSolution() {
 
   QFileDialog *saveSolnDialog = new QFileDialog();
-  saveSolnDialog->setDefaultSuffix("bce");
   QString newPath = saveSolnDialog->getSaveFileName(this,tr("Save a solution file"),
 						    "../examples/",
 						    tr("BCEViewer solution files (*.bce)"));
 
   if (newPath.isEmpty())
     return;
+
+  newPath = newPath + ".bce";
 
   QFileInfo fi(newPath);
   path = fi.canonicalPath();
@@ -190,13 +191,13 @@ void BCEWindow::saveSolution() {
 void BCEWindow::saveGame() {
 
   QFileDialog *saveGameDialog = new QFileDialog();
-  saveGameDialog->setDefaultSuffix("bgm");
   QString newPath = saveGameDialog->getSaveFileName(this,tr("Save a game file"),
 						    "../examples/",
 						    tr("BCEViewer game files (*.bgm)"));
-
   if (newPath.isEmpty())
     return;
+
+  newPath = newPath + ".bgm";
 
   QFileInfo fi(newPath);
   path = fi.canonicalPath();
