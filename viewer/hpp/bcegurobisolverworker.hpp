@@ -6,6 +6,7 @@
 #include "bce.hpp"
 #include <QObject>
 #include "bcegurobisolver.hpp"
+#include "bcegurobicallback.hpp"
 
 //! Class for solving games created in the game tab.
 /*! Contains a game and a solution object. When
@@ -52,6 +53,7 @@ public slots:
   void startSolve() {
 
     BCEGurobiSolver solver(game);
+    BCEGurobiCallback callback;
 
     solver.populate();
 
@@ -68,6 +70,7 @@ public slots:
     }
 
     solver.model.setObjective(expr,GRB_MAXIMIZE);
+    solver.model.setCallback(&callback);
 
     solver.solve();
 

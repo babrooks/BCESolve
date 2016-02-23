@@ -58,7 +58,8 @@ bcewindow.hpp \
 bcelogstream.hpp \
 bceloghandler.hpp \
 bceobjweightstablemodel.hpp \
-bcegurobisolverworker.hpp
+bcegurobisolverworker.hpp \
+bcegurobicallback.hpp
 
 SOURCES += main.cpp \
 bceplothandler.cpp \

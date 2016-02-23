@@ -225,8 +225,6 @@ void BCEWindow::runSolve(vector<double> & weightData) {
       logTab->logText->append(QString(""));
       logTab->logText->append(QString("..........STARTING A NEW COMPUTATION.........."));
       logTab->logText->append(QString(""));
-
-      // std::cout << "Testing cout Redirect from runSolve()" << std::endl;
       
       // Reimplement when adding cancelGame()
       // cancelSolveFlag = false;
@@ -246,10 +244,6 @@ void BCEWindow::runSolve(vector<double> & weightData) {
       connect(solverWorkerThread,SIGNAL(finished()),
       	      solverWorker,SLOT(deleteLater()));
       solverWorkerThread->start();
-      
-      // timer.restart();
-      
-      // emit startIteration();
     }
   catch (exception & e)
     {
