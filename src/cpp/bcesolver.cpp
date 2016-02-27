@@ -1,7 +1,6 @@
 #include "bce.hpp"
-#include "bcegurobisolver.hpp"
 
-BCEGurobiSolver::BCEGurobiSolver ():
+BCESolver::BCESolver ():
   env(),
   model(env),
   variables(),
@@ -14,7 +13,7 @@ BCEGurobiSolver::BCEGurobiSolver ():
   displayLevel(1)
 {} // Default constructor
 
-BCEGurobiSolver::BCEGurobiSolver (BCEAbstractGame & _game):
+BCESolver::BCESolver (BCEAbstractGame & _game):
   game(&_game),
   env(),
   model(env),
@@ -37,7 +36,7 @@ BCEGurobiSolver::BCEGurobiSolver (BCEAbstractGame & _game):
   countActionsTypes();
 } // Constructor that takes arguments for 
 
-void BCEGurobiSolver::countActionsTypes()
+void BCESolver::countActionsTypes()
 {
   // Set the numActions_total and numTypes_total
   int playerCounter;
@@ -57,12 +56,12 @@ void BCEGurobiSolver::countActionsTypes()
     }
 }
 
-void BCEGurobiSolver::clear()
+void BCESolver::clear()
 {
   model.reset();
 }
 
-void BCEGurobiSolver::setParameter(BCEGurobiSolver::DoubleParameter param, double arg)
+void BCESolver::setParameter(BCESolver::DoubleParameter param, double arg)
 {
   switch (param)
     {
@@ -78,7 +77,7 @@ void BCEGurobiSolver::setParameter(BCEGurobiSolver::DoubleParameter param, doubl
     } // switch
 } // setParameter
 
-void BCEGurobiSolver::setParameter(BCEGurobiSolver::IntParameter param, int arg)
+void BCESolver::setParameter(BCESolver::IntParameter param, int arg)
 {
   switch (param)
     {
@@ -106,7 +105,7 @@ void BCEGurobiSolver::setParameter(BCEGurobiSolver::IntParameter param, int arg)
     } // switch
 }
 
-void BCEGurobiSolver::setParameter(BCEGurobiSolver::BoolParameter param, bool arg)
+void BCESolver::setParameter(BCESolver::BoolParameter param, bool arg)
 {
   switch (param)
     {
@@ -115,7 +114,7 @@ void BCEGurobiSolver::setParameter(BCEGurobiSolver::BoolParameter param, bool ar
     } // switch
 }
 
-double BCEGurobiSolver::getParameter(BCEGurobiSolver::DoubleParameter param)
+double BCESolver::getParameter(BCESolver::DoubleParameter param)
 {
   switch (param)
     {
@@ -126,7 +125,7 @@ double BCEGurobiSolver::getParameter(BCEGurobiSolver::DoubleParameter param)
     } // switch
 } // getParameter
 
-int BCEGurobiSolver::getParameter(BCEGurobiSolver::IntParameter param)
+int BCESolver::getParameter(BCESolver::IntParameter param)
 {
   switch (param)
     {
@@ -143,7 +142,7 @@ int BCEGurobiSolver::getParameter(BCEGurobiSolver::IntParameter param)
     } // switch
 }
 
-bool BCEGurobiSolver::getParameter(BCEGurobiSolver::BoolParameter param)
+bool BCESolver::getParameter(BCESolver::BoolParameter param)
 {
   switch (param)
     {
@@ -153,14 +152,14 @@ bool BCEGurobiSolver::getParameter(BCEGurobiSolver::BoolParameter param)
 }
 
 // Sets the expressions for the boundary objectives
-void BCEGurobiSolver::setBndryObjective(int index, const GRBLinExpr & expr)
+void BCESolver::setBndryObjective(int index, const GRBLinExpr & expr)
 {
   bndryObjectives[index] = expr;
 }
 
 
 // Constructs the constraint matrix and objective function
-void BCEGurobiSolver::populate ()
+void BCESolver::populate ()
 {
   const int numPlayers = 2;
   const int numStates = game->getNumStates();
@@ -181,9 +180,6 @@ void BCEGurobiSolver::populate ()
   int row, col;
   vector<int>::iterator numICConstraintsIterator;
 
-
-  // cplex.end();
-
   numProbabilityVariables=0;
   numProbabilityConstraints=0;
   nonZeroVariableLocations.clear();
@@ -192,7 +188,6 @@ void BCEGurobiSolver::populate ()
   if (displayLevel) {
     string printStr = "Starting populate routine";
     cout << printStr << endl;
-    // emit(updateLog(printStr));
   }
 
   // Probability variables are conditional on the state and type. 
@@ -285,16 +280,6 @@ void BCEGurobiSolver::populate ()
       cout << "numICConstraints_total=" << numICConstraints_total << endl;
     }
 
-  // // Add variables and constraints.
-  // for (int var=0; var < numProbabilityVariables; var++) {
-  //   variables.addVar(0.0,1.0,1.0,GRB_CONTINUOUS);
-  // }
-  // // variables.addVars(IloNumVarArray(env,numProbabilityVariables,0.0,1.0));
-  // for (int var = 0; var < numICConstraints_total; var++) {
-  //   variables.addVar(0.0,GRB.INFINITY,1.0,GRB_CONTINUOUS);
-  // }
-  // // variables.addVars(IloNumVarArray(env,numICConstraints_total,0.0,IloInfinity));
-
   variables = model.addVars(numProbabilityVariables+numICConstraints_total);
   model.update();
   for (int prVars = 0; prVars < numProbabilityVariables; prVars++) {
@@ -306,10 +291,6 @@ void BCEGurobiSolver::populate ()
     variables[countIC].set(GRB_DoubleAttr_UB,GRB_INFINITY);
   }
 
-  // constraints = model.addConstrs(numProbabilityVariables+numICConstraints_total);
-  // model.update();
-  //   constraints.add(IloRangeArray(env,numICConstraints_total,0.0,0.0));
-  // constraints.add(IloRangeArray(env,numProbabilityConstraints,1.0,1.0));
   constraints = vector<GRBLinExpr>(numICConstraints_total+numProbabilityConstraints,0);
   for (int ctr = 0; ctr < numICConstraints_total+numProbabilityConstraints; ctr++)
     constraints[ctr] = 0;
@@ -478,23 +459,14 @@ void BCEGurobiSolver::populate ()
 				+constraintCounter],GRB_EQUAL,1.0);
   }
   std::cout << "Pr Constraints Added" << std::endl;
-  // gurobiObjective=IloMaximize(env);
-  // model.add(gurobiObjective);
-  
-  // cplex=IloCplex(model);
-
-  // gurobiObjective=cplex.getObjective();
-  // gurobiObjective.setExpr(objectiveFunctions[1]);
 
   gurobiObjective = 0;
   gurobiObjective += objectiveFunctions[2];
   model.update();
-  // model.setObjective(gurobiObjective,GRB_MINIMIZE);
-  // model.update();
 
 } // populate
 
-void BCEGurobiSolver::solve()
+void BCESolver::solve()
 {
   map<int,double> solutionEquilibrium;
 
@@ -502,19 +474,6 @@ void BCEGurobiSolver::solve()
   model.getEnv().set(GRB_IntParam_Method,2);
 
   cout << "Display level = " << displayLevel << endl;
-  // cplex.setParam(IloCplex::SimDisplay,displayLevel);
-  // cplex.setParam(IloCplex::BarDisplay,displayLevel);
-  // cplex.setParam(IloCplex::RootAlg, IloCplex::Barrier);
-  // cplex.setParam(IloCplex::BarCrossAlg,-1);
-  // cplex.setParam(IloCplex::EpOpt,1e-9);
-
-  // cplex.solve();
-  // if (displayLevel)
-  //   cout << "Objective = " << setprecision(16) << cplex.getObjValue() << endl;
-  // GRBLinExpr objective = 0;
-  // objective += .5 * getObjectiveFunction(0);
-  // objective += .5 * getObjectiveFunction(1);
-  // model.setObjective(objective,GRB_MAXIMIZE);
 
   model.update();
   model.optimize();
@@ -530,12 +489,12 @@ void BCEGurobiSolver::solve()
   soln.consolidateEquilibria();
 }
 
-void BCEGurobiSolver::mapBoundary()
+void BCESolver::mapBoundary()
 {
   mapBoundary("bndry.dat");
 }
 
-void BCEGurobiSolver::mapBoundary(const char * fname)
+void BCESolver::mapBoundary(const char * fname)
 {
   cout << "mapping objfun1 vs objfun2..." << endl;
 
@@ -588,7 +547,7 @@ void BCEGurobiSolver::mapBoundary(const char * fname)
   model.getEnv().set(GRB_IntParam_OutputFlag,oldOutput);
 }
 
-void BCEGurobiSolver::mapFrontier(int plusOrMinus1, int plusOrMinus2, bool reversePrint)
+void BCESolver::mapFrontier(int plusOrMinus1, int plusOrMinus2, bool reversePrint)
 {
   double objectiveWeight=0, newWeight, alpha;
 
@@ -707,12 +666,12 @@ void BCEGurobiSolver::mapFrontier(int plusOrMinus1, int plusOrMinus2, bool rever
   model.getEnv().set(GRB_DoubleParam_IterationLimit,ItLimDefault);
 } // mapFrontier
 
-void BCEGurobiSolver::getSolution(BCESolution & output)
+void BCESolver::getSolution(BCESolution & output)
 {
   output=soln;
 }
 
-void BCEGurobiSolver::bceToMap(map<int,double> & distribution)
+void BCESolver::bceToMap(map<int,double> & distribution)
 {
   int variable;
   list<int>::const_iterator it;
@@ -735,7 +694,7 @@ void BCEGurobiSolver::bceToMap(map<int,double> & distribution)
 }
 
 
-void BCEGurobiSolver::indexToTypeActionDeviation(int index, int player, int &type, int &action, int &deviation)
+void BCESolver::indexToTypeActionDeviation(int index, int player, int &type, int &action, int &deviation)
 {
   assert(index>=0);
   assert(index<game->getNumTypes()[player]*

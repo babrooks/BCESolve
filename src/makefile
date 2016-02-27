@@ -46,7 +46,7 @@ all: libbce.a
 
 # BCE
 BCEOBJ=bceabstractgame.o bcegame.o bceutilities.o \
-	 bcecounter.o bcesolution.o bcegurobisolver.o #rca.o
+	 bcecounter.o bcesolution.o bcesolver.o #rca.o
 
 $(BCEOBJ): %.o : $(CPPDIR)/%.cpp $(HPPDIR)/%.hpp $(HPPDIR)/bce.hpp
 	$(CXX) $(CFLAGS) $< -c

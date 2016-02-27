@@ -5,7 +5,7 @@
 
 BCEWindow::BCEWindow(BCELogHandler &logHandler) {
 
-  // Set the stored logTab equal to the logHandler
+  // Point the stored logTab pointer at the supplied logHandler
   logTab = &logHandler;
 
   // Set the default path for loading examples.
@@ -237,8 +237,8 @@ void BCEWindow::runSolve(vector<double> & weightData) {
       // cancelSolveFlag = false;
       
       QThread *solverWorkerThread = new QThread(this);
-      solverWorker = new BCEGurobiSolverWorker(gameTab->getGame(),
-					       weightData,*callback);
+      solverWorker = new BCESolverWorker(gameTab->getGame(),
+					 weightData,*callback);
       solverWorker->moveToThread(solverWorkerThread);
       connect(solverWorkerThread,SIGNAL(started()),
 	      solverWorker,SLOT(startSolve()));

@@ -1,8 +1,27 @@
-// class for solving BCE wth gurobi
-// BAB 11-3-2012, RJM update 1-5-2016
+// This file is part of the BCESolve library for games of incomplete
+// information
+// Copyright (C) 2016 Benjamin A. Brooks, Robert J. Minton
+// 
+// BCESolve free software: you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// BCESolve is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see
+// <http://www.gnu.org/licenses/>.
+// 
+// Benjamin A. Brooks
+// ben@benjaminbrooks.net
+// Chicago, IL
 
-#ifndef BCEGUROBISOLVER_HPP
-#define BCEGUROBISOLVER_HPP
+#ifndef BCESOLVER_HPP
+#define BCESOLVER_HPP
 
 #include "bcecommon.hpp"
 #include "bcegame.hpp"
@@ -15,23 +34,23 @@
 
 //! Solves a BCEAbstractGame using gurobi.
 /*! This class contains routines for solving a BCEAbstractGame object using
-  GUROBI. The main method is BCEGurobiSolver::populate, which initializes a
+  GUROBI. The main method is BCESolver::populate, which initializes a
   GUROBI model with the incentive constraints for the BCEAbstractGame, and also
   creates objectives corresponding to the number of objectives in the
   BCEAbstractGame object. The class also contains the method
-  BCEGurobiSolver::mapBoundary, which solves linear programs to trace out
-  the frontier for the objectives in BCEGurobiSolver::BoundaryObjective1 and
-  BCEGurobiSolver::BoundaryObjective2.
+  BCESolver::mapBoundary, which solves linear programs to trace out
+  the frontier for the objectives in BCESolver::BoundaryObjective1 and
+  BCESolver::BoundaryObjective2.
 
   \ingroup src
 */
-class BCEGurobiSolver 
+class BCESolver 
 {
 public:
 
   //! Double parameters
   /*! An enumeration type for parameters of type double. Pass to
-    BCEGurobiSolver::setParam and BCEGurobiSolver::getParam to set or retrieve a
+    BCESolver::setParam and BCESolver::getParam to set or retrieve a
     double parameter value. */ 
   enum DoubleParameter
     {
@@ -42,7 +61,7 @@ public:
     };
   //! Integer parameters
   /*! An enumeration type for parameters of type int. Pass to
-    BCEGurobiSolver::setParam and BCEGurobiSolver::getParam to set or retrieve a
+    BCESolver::setParam and BCESolver::getParam to set or retrieve a
     double parameter value. */ 
   enum IntParameter
     {
@@ -51,7 +70,7 @@ public:
       //! Control algorithm output
       /*! Controls the frequency and detail with which progress of the
 	algorithm is reported. 0 corresponds to no output, 1 is some
-	output. Is also passed to the BCEGurobiSolver::cplex solver, so it
+	output. Is also passed to the BCESolver::cplex solver, so it
 	controls the level of output of CPLEX. */
       DisplayLevel, 
       //! The first objective used when mapping the boundary. 
@@ -62,7 +81,7 @@ public:
   
   //! Bool parameters
   /*! An enumeration type for parameters of type bool. Pass to
-    BCEGurobiSolver::setParam and BCEGurobiSolver::getParam to set or retrieve a
+    BCESolver::setParam and BCESolver::getParam to set or retrieve a
     double parameter value. Will be replaced by new BCEAbstractGame
     architecture with a constraint checker. */ 
   enum BoolParameter
@@ -102,14 +121,14 @@ protected:
   // Cplex components
 
   GRBEnv env;  
-  //! The objective for BCEGurobiSolver::cplex.
+  //! The objective for BCESolver::cplex.
   GRBLinExpr gurobiObjective; 
 
   // Cplex variables and constraints.
 
-  //! The variables for BCEGurobiSolver::model.
+  //! The variables for BCESolver::model.
   GRBVar* variables; 
-  //! The constraints for BCEGurobiSolver::model. 
+  //! The constraints for BCESolver::model. 
   vector<GRBLinExpr> constraints; 
 
   // We allow the user to define any number of objective functions.
@@ -143,7 +162,7 @@ protected:
 
   //! Minimum angle increment when mapping boundary
   /*! The minimum increment of the angle for
-    BCEGurobiSolver::mapBoundary. */
+    BCESolver::mapBoundary. */
   double minAngleIncrement;
   //! Index of the current objective. Not currently being used. 
   int currentObjective;
@@ -155,12 +174,12 @@ protected:
   // Lists for storing equilibria and boundary points.
   //! X coordinates of frontier.
   /*! List of x-coordinates of boundary points traced out by the
-    BCEGurobiSolver::mapBoundary routine. */
+    BCESolver::mapBoundary routine. */
   list<double> boundaryXs;
   //! Y coordinates of frontier.
   /*! List of y-coordinates of boundary
     points traced out by the
-    BCEGurobiSolver::mapBoundary routine. */
+    BCESolver::mapBoundary routine. */
   list<double> boundaryYs; 
   //! BCESolution object for serializing output of the algorithm.
   BCESolution soln; 
@@ -181,19 +200,19 @@ protected:
 
 public:
   //! Default constructor.
-  /*! Creates a  new BCEGurobiSolver object. */
-  BCEGurobiSolver(); 
+  /*! Creates a  new BCESolver object. */
+  BCESolver(); 
 
   //! Constructor
-  /*! Creates a new BCEGurobiSolver object and initializes it with the given
+  /*! Creates a new BCESolver object and initializes it with the given
     game. */
-  BCEGurobiSolver(BCEAbstractGame & _game);
+  BCESolver(BCEAbstractGame & _game);
 
   //! The GUROBI model. 
   GRBModel model;
 
   //! Destructor
-  ~BCEGurobiSolver()
+  ~BCESolver()
   { delete[] variables; } 
 
   // Main routines
@@ -209,13 +228,13 @@ public:
 
   //! Maps the frontier
   /*! Maps the frontier for the boundary objectives indicated in
-    BCEGurobiSolver::boundaryObjective1 and BCEGurobiSolver::boundaryObjective2,
+    BCESolver::boundaryObjective1 and BCESolver::boundaryObjective2,
     and stores the calculated frontier in a file created at
     fname. */
   void mapBoundary(const char * fname);
 
   //! Maps the frontier
-  /*! Calls BCEGurobiSolver::mapBoundary(const char*) with a default file
+  /*! Calls BCESolver::mapBoundary(const char*) with a default file
     name. */
   void mapBoundary();
 
@@ -230,24 +249,24 @@ public:
   void bceToMap(map<int,double> & distribution);
   
   // Get methods
-  //! Returns the BCEGurobiSolver::cplex object.
+  //! Returns the BCESolver::cplex object.
   GRBModel& getModel() { return model; }
   //! Returns the \f$n\f$th objective function. 
   GRBLinExpr& getObjectiveFunction (int n) { return objectiveFunctions[n]; }
-  //! Returns the objective for BCEGurobiSolver::cplex.
+  //! Returns the objective for BCESolver::cplex.
   GRBLinExpr& getObjective() { return gurobiObjective; }
 
   // Clear
-  //! Clears the BCEGurobiSolver?
+  //! Clears the BCESolver?
   void clear();
 
   // Set methods
   //! Set double parameter.
-  void setParameter(BCEGurobiSolver::DoubleParameter, double arg);
+  void setParameter(BCESolver::DoubleParameter, double arg);
   //! Set integer parameter.
-  void setParameter(BCEGurobiSolver::IntParameter, int arg);
+  void setParameter(BCESolver::IntParameter, int arg);
   //! Set bool parameter.
-  void setParameter(BCEGurobiSolver::BoolParameter, bool arg);
+  void setParameter(BCESolver::BoolParameter, bool arg);
   //! Set objective function.
   void setObfun(int n) { gurobiObjective = objectiveFunctions[n]; }
   //! Set boundary objective.
@@ -255,11 +274,11 @@ public:
 
   // get methods
   //! Get double parameter.
-  double getParameter(BCEGurobiSolver::DoubleParameter);
+  double getParameter(BCESolver::DoubleParameter);
   //! Get integer parameter
-  int getParameter(BCEGurobiSolver::IntParameter);
+  int getParameter(BCESolver::IntParameter);
   //! Get bool parameter.
-  bool getParameter(BCEGurobiSolver::BoolParameter);
+  bool getParameter(BCESolver::BoolParameter);
 
   // Can't believe this doesn't exist in ANSI C++
   //! returns \f$base^{exponent}\f$.

@@ -1,5 +1,4 @@
 #include "hybridentryreserve.hpp"
-#include "bcegurobisolver.hpp"
 
 int main() {
 
@@ -15,7 +14,7 @@ int main() {
 			  reservePrice,
 			  entryFee);
 
-  BCEGurobiSolver solver(hera);
+  BCESolver solver(hera);
   
   solver.populate();
   

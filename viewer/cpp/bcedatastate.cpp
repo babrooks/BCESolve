@@ -34,7 +34,6 @@ void BCEDataState::setSolutionData(BCESolution &solution) {
     gameData = BCEGame(solutionData.getGame());
 
     isPrivateVals = !(gameData.hasProductStructure());
-    // cout << isPrivateVals << endl;
 
     // Reset Initial Parameters
     currentEqmIndex = 0;
@@ -50,11 +49,8 @@ void BCEDataState::setSolutionData(BCESolution &solution) {
     emit(newDataLoaded());
 
     vector<int> numActions = gameData.getNumActions();
-    // cout << "NumActions[0] = " << numActions[0] << endl;
     vector<int> numTypes = gameData.getNumTypes();
-    // cout << numTypes[0] << endl;
     int numStates = gameData.getNumStates();
-    // cout << numStates << endl;
 
     // Set Slider Ranges 
     for (int player = 0; player < 2; player++) {
@@ -64,7 +60,6 @@ void BCEDataState::setSolutionData(BCESolution &solution) {
 	sliderGroup[3*player+2]->setRange(0,numStates-1);
       else
 	sliderGroup[3*player+2]->setRange(0,sqrt(numStates)-1);
-      // cout << "Slider setting completed." << endl;
     }
     // Set Sliders to 0
     for (int i = 0; i < 6; i++) {
@@ -76,7 +71,7 @@ void BCEDataState::setSolutionData(BCESolution &solution) {
 
   catch (std::exception & e)
     {
-      qDebug() << "Load solution didnt work :( from BCEDataState" << endl;
+      qDebug() << "setSolutionData error :( from BCEDataState" << endl;
     }
   isDataLoaded = true;
 }
@@ -87,13 +82,10 @@ void BCEDataState::setData(QString dataPath) {
 
     // Get File Name for GUI's Title
     string filePath = dataPath.toStdString();
-    // boost::filesystem::path boostPath(filePath);
-    // guiTitle = boostPath.filename().string();
     QFileInfo info(dataPath);
     guiTitle = info.fileName().toStdString();
 		
     isPrivateVals = !(gameData.hasProductStructure());
-    // cout << isPrivateVals << endl;
 
     // Reset Initial Parameters
     currentEqmIndex = 0;
@@ -109,11 +101,8 @@ void BCEDataState::setData(QString dataPath) {
     emit(newDataLoaded());
 
     vector<int> numActions = gameData.getNumActions();
-    // cout << "NumActions[0] = " << numActions[0] << endl;
     vector<int> numTypes = gameData.getNumTypes();
-    // cout << numTypes[0] << endl;
     int numStates = gameData.getNumStates();
-    // cout << numStates << endl;
 
     // Set Slider Ranges 
     for (int player = 0; player < 2; player++) {
@@ -123,7 +112,6 @@ void BCEDataState::setData(QString dataPath) {
 	sliderGroup[3*player+2]->setRange(0,numStates-1);
       else
 	sliderGroup[3*player+2]->setRange(0,sqrt(numStates)-1);
-      // cout << "Slider setting completed." << endl;
     }
     // Set Sliders to 0
     for (int i = 0; i < 6; i++) {
@@ -134,7 +122,7 @@ void BCEDataState::setData(QString dataPath) {
   }
   catch (std::exception & e)
     {
-      qDebug() << "Load solution didnt work :( from BCEDataState" << endl;
+      qDebug() << "setData error :( from BCEDataState" << endl;
     }
   isDataLoaded = true;
 }

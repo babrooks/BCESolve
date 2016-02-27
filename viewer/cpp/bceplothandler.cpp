@@ -330,7 +330,6 @@ void BCEPlotHandler::plotDeviationObjectives(int player) {
       xCoordIndiff.push_back(i);
       yCoordIndiff.push_back(yData[i]);
     }
-    // cout << (yData[i]-recValue)/recValue << endl;
   }
 
   QCPBars *indiffAction = new QCPBars(deviationBarGraphs[player]->xAxis,

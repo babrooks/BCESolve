@@ -46,7 +46,7 @@ void solveFPA(int nvals, int nbids,
       fpa.distribution.push_back(new vToTheAlpha(1.0),1.0); // uniform
 
 
-      BCEGurobiSolver solver(fpa);
+      BCESolver solver(fpa);
 
       if (verbose)
 	cout << "Constructor finished" << endl;
@@ -55,8 +55,10 @@ void solveFPA(int nvals, int nbids,
       if (verbose)
 	cout << "Done populating" << endl;
 
+      solver.model.setObjective(solver.getObjectiveFunction(2),GRB_MINIMIZE);
       if (verbose)
       	cout << "Objective function set" << endl;
+
       solver.solve();
       // solver.mapBoundary("fpaknown.dat");
 

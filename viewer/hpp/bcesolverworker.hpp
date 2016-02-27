@@ -1,3 +1,25 @@
+// This file is part of the BCESolve library for games of incomplete
+// information
+// Copyright (C) 2016 Benjamin A. Brooks, Robert J. Minton
+// 
+// BCESolve free software: you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// BCESolve is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see
+// <http://www.gnu.org/licenses/>.
+// 
+// Benjamin A. Brooks
+// ben@benjaminbrooks.net
+// Chicago, IL
+
 #ifndef BCESOLVERWORKER_HPP
 #define BCESOLVERWORKER_HPP
 
@@ -5,14 +27,15 @@
 #include "bcegame.hpp"
 #include "bce.hpp"
 #include <QObject>
-#include <ilcplex/ilocplex.h>
+#include "bcegurobicallback.hpp"
 
 //! Class for solving games created in the game tab.
 /*! Contains a game and a solution object. When
   the solverWorker is created, a BCEGame is supplied in its
-  constructor. Once the solve routine has completed, the
-  default solution is replaced with the solution from
-  the game.
+  constructor. The solverWorker solves the game, and the
+  private solution member is set to the solution of the solved
+  game. A signal sends a pointer to the solution to the BCEWindow
+  object, which sends the solution to BCEPlotHandler for plotting.
 
   \ingroup viewer
  */
@@ -27,12 +50,16 @@ private:
   BCESolution solution;
   //! Weights on the objectives, as supplied by the user in the game tab.
   vector<double> weightData;
+  //! Callback, allows communication with solver.
+  BCEGurobiCallback callback; 
 
 public:
 
   //! Constructor
-  BCESolverWorker(BCEGame &_game,vector<double>& _weightData):
-    game(_game), weightData(_weightData) 
+  BCESolverWorker(BCEGame _game,
+			vector<double> _weightData,
+			BCEGurobiCallback &_callback):
+    game(_game), weightData(_weightData), callback(_callback)
   {}
 
   //! Returns a reference to the solution object.
@@ -51,40 +78,11 @@ public slots:
    */
   void startSolve() {
 
-    double minAngleIncrement = 0.05;
-
     BCESolver solver(game);
-
-    solver.setParameter(BCESolver::MinAngleIncrement,minAngleIncrement);
-    solver.setParameter(BCESolver::DisplayLevel,1);
 
     solver.populate();
 
-    solver.setParameter(BCESolver::BoundaryObjective1,0);
-    solver.setParameter(BCESolver::BoundaryObjective2,1);
-
-    IloCplex cplex = solver.getCplex();
-    cplex.setOut(std::cout);
- 
-    // Code if players have same number of values
-    // ADD CASE FOR JUST ONE STATE
-    int numStatesPerPlayer = sqrt(game.getNumStates())-1;
-    for (int player = 0; player < 2; player++)
-      {
-    	for (int val = 0; val < numStatesPerPlayer; val++)
-    	  {
-    	    cplex.getModel()
-    	      .add(solver.getObjectiveFunction(5+val+player*2)>=0.0);
-    	  } // val
-      }
-
-    cplex.setParam(IloCplex::RootAlg,IloCplex::Barrier);
-    cplex.setParam(IloCplex::SimDisplay,0);
-    solver.setParameter(BCESolver::DisplayLevel,1);
-
-    cplex.getObjective().setSense(IloObjective::Maximize);
-
-    IloNumExpr expr = weightData[0]*solver.getObjectiveFunction(0);
+    GRBLinExpr expr = weightData[0]*solver.getObjectiveFunction(0);
     int numObjs = game.getNumObjectives();
 
     if (numObjs == 2) {
@@ -96,11 +94,9 @@ public slots:
 	expr += weightData[obj]*solver.getObjectiveFunction(obj);
     }
 
-    cplex.getObjective().setExpr(expr);
+    solver.model.setObjective(expr,GRB_MAXIMIZE);
+    solver.model.setCallback(&callback);
 
-
-    cplex.setParam(IloCplex::Threads,4);
-  
     solver.solve();
 
     solver.getSolution(solution);
