@@ -60,9 +60,9 @@ public:
 
     if (obj<2)
       {
-	double val = static_cast<double>(state)/numStates;
-	double ownBid = static_cast<double>(actions[obj])/numActions[obj];
-	double otherBid = static_cast<double>(actions[1-obj])/numActions[obj];
+	double val = static_cast<double>(state)/(numStates-1);
+	double ownBid = static_cast<double>(actions[obj])/(numActions[obj]-1);
+	double otherBid = static_cast<double>(actions[1-obj])/(numActions[obj]-1);
 
 	if (ownBid == 0)
 	  return 0.0;
@@ -81,8 +81,8 @@ public:
       {
 	// revenue
 	
-	double b0 = static_cast<double>(actions[0])/numActions[0];
-	double b1 = static_cast<double>(actions[1])/numActions[1];
+	double b0 = static_cast<double>(actions[0])/(numActions[0]-1);
+	double b1 = static_cast<double>(actions[1])/(numActions[1]-1);
 
 	double entryFeeRevenue = ceil(b0)*entryFee + ceil(b1)*entryFee;
 
