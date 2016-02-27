@@ -19,14 +19,7 @@ int main() {
   
   solver.populate();
   
-  // cplex.getObjective().setSense(IloObjective::Minimize);
-  // cplex.getObjective().setExpr(solver.getObjectiveFunction(2));
-  // GRBLinExpr objective = 0;
-  // objective += .5 * solver.getObjectiveFunction(0);
-  // objective += .5 * solver.getObjectiveFunction(1);
-  // solver.model.setObjective(objective,GRB_MAXIMIZE);
   solver.model.setObjective(solver.getObjectiveFunction(2),GRB_MINIMIZE);  
-  solver.model.update();
 
   solver.solve();
 

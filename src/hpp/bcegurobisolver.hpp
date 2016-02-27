@@ -194,7 +194,7 @@ public:
 
   //! Destructor
   ~BCEGurobiSolver()
-  { delete variables; } 
+  { delete[] variables; } 
 
   // Main routines
 

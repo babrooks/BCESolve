@@ -20,11 +20,12 @@ private:
 public:
 
   //! Constructor
-  BCEPushButton(int _player, QString _label):
+  BCEPushButton(int _player, QString _label, QWidget *parent):
     QPushButton(_label),player(_player)
   {
     connect(this,SIGNAL(clicked()),
 	    this,SLOT(bceClick()));
+    setParent(parent);
   }
 
 signals:

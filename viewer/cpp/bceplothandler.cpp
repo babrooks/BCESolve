@@ -1,12 +1,13 @@
 #include "bceplothandler.hpp"
 
-BCEPlotHandler::BCEPlotHandler():
+BCEPlotHandler::BCEPlotHandler(QWidget *parent):
   deviationBarGraphs(0)
 {
   isSolnDataLoaded=false;
   guiData = new BCEDataState();
   screenShotPath=QString("../examples/screenshots/");
   setupLayout();
+  setParent(parent);
 
 } // constructor
 
@@ -65,8 +66,6 @@ void BCEPlotHandler::setupLayout() {
 	    SLOT(changeProbability(int,double)));
   }
 
-  QGridLayout *controlsGrid = guiData->controlsLayout;
-
   QSizePolicy sp2(QSizePolicy::Expanding,QSizePolicy::Expanding);
   sp.setVerticalStretch(1);
   sp.setHorizontalStretch(3);
@@ -81,16 +80,14 @@ void BCEPlotHandler::setupLayout() {
   setOfBCEPlotWithTitle->addWidget(setOfBCEPlotTitle);
   setOfBCEPlotWithTitle->addWidget(setOfBCEPlot);
 
-  QWidget *controlsGridWidget = new QWidget();
-  controlsGridWidget->setLayout(controlsGrid);
-  controlsGridWidget->setSizePolicy(sp3);
   QWidget *setOfBCEWidget = new QWidget();
   setOfBCEWidget->setLayout(setOfBCEPlotWithTitle);
   setOfBCEWidget->setSizePolicy(sp2);
 
   QHBoxLayout *topLeftPanel = new QHBoxLayout();
   topLeftPanel->addWidget(setOfBCEWidget);
-  topLeftPanel->addWidget(controlsGridWidget);
+  guiData->controlsLayout->setSizePolicy(sp3);
+  topLeftPanel->addWidget(guiData->controlsLayout);
 
   // Left Viewer Panel, Bar Plots and Slider Box
   QVBoxLayout *leftSectorDivide = new QVBoxLayout();
@@ -176,7 +173,7 @@ void BCEPlotHandler::setupLayout() {
 
 void BCEPlotHandler::plotEqm() {
 
-  vector< vector<double> > eqmMatrix = guiData->getEqmMatrix();
+  const vector< vector<double> > eqmMatrix(guiData->getEqmMatrix());
 
   colorMap->clearData();
   int nx = eqmMatrix.size();
@@ -218,7 +215,7 @@ void BCEPlotHandler::plotBCEValueSet() {
 
   // Getting Data
 
-  const vector< vector<double> > & allEqm = guiData->getAllEqm();
+  const vector< vector<double> > allEqm(guiData->getAllEqm());
   QVector<double> objective0Payoffs;
   QVector<double> objective1Payoffs;
   vector<int> playerObjectives;
@@ -289,7 +286,7 @@ void BCEPlotHandler::plotDeviationObjectives(int player) {
   deviationBarGraphs[player]->addPlottable(barGraph);
   barGraph->setName("Expected Payoffs from Deviation");
 
-  vector< vector<double> > objectiveValues = guiData->getObjectiveValues();
+  const vector< vector<double> > objectiveValues(guiData->getObjectiveValues());
 
   QVector<double> yData;
 

@@ -26,8 +26,7 @@ public:
   BCEWindow(BCELogHandler &logHandler);
   //! Destructor
   ~BCEWindow() {
-    delete gameTab;
-    delete solutionTab;
+    delete callback;
   }
 
 signals:
@@ -46,7 +45,7 @@ private:
   //! Contains all information for the solution tab.
   BCEPlotHandler *solutionTab;
   //! Pointer to the logTab in main.cpp
-  QPointer<BCELogHandler> logTab;
+  BCELogHandler *logTab;
   //! Widget holding layouts for game, solution, and log tabs.
   QTabWidget *tabWidget;
   //! Default Path to data
@@ -55,6 +54,8 @@ private:
   QThread *solverWorkerThread;
   //! solverWorker Object for Solving Games
   BCEGurobiSolverWorker *solverWorker;
+  //! Callback object for communicating with solver.
+  BCEGurobiCallback *callback;
 
 private slots:
 
@@ -73,6 +74,8 @@ private slots:
   void saveGame();
   //! Interacts with BCEGameHandler and BCESolverWorker to solve a game.
   void runSolve(vector<double> & weightData);
+  //! Interacts with solver to abort the solve routine.
+  void cancelSolve();
   //! Switches the current tab to the solution tab.
   void tabToSolution(BCESolution *soln);
 

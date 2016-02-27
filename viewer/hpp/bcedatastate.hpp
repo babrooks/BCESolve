@@ -26,7 +26,7 @@
 
   \ingroup viewer
 */
-class BCEDataState : public QObject
+class BCEDataState : public QMainWindow
 {
   Q_OBJECT;
 
@@ -178,7 +178,7 @@ public:
   void setSolutionData(BCESolution &solution);
 
   //! Layout Holding Sliders and Other Data Controls
-  QGridLayout *controlsLayout;
+  QWidget *controlsLayout;
 
   //! Shares basic game data (e.g. numActions) with BCEWindow.
   /*! Returns basic properties of currently stored BCEData
@@ -340,10 +340,6 @@ private: //functions
    */
   double euclidianDistance(double x1,double x2,double y1,double y2) {
     return sqrt(pow((y2-y1),2)+pow((x2-x1),2));
-  }
-
-  void setControlsLayout(QGridLayout *layout) {
-    controlsLayout = layout;
   }
 
   void setupControlsLayout();

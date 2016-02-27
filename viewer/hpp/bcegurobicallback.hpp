@@ -7,33 +7,47 @@ using namespace std;
 
 class BCEGurobiCallback: public GRBCallback
 {
+private:
+  int cancelFlag;
+
 public:
   double lastiter;
   BCEGurobiCallback() {
-    lastiter = -GRB_INFINITY;
+    cancelFlag = 0;
   }
+
+  void setCancelFlag() {
+    cancelFlag = 1;
+    abort();
+    cout << "set cancel flag hit" << endl;
+  }
+
 protected:
 
-  template<typename T> void printElement(T t, const int& width)
-  {
-    cout << left << setw(width) << setfill(' ') << t;
-  }
-
   void callback () {
-    try{
-      if (where == GRB_CB_MESSAGE) {
-
-	string algorithmOutput = getStringInfo(GRB_CB_MSG_STRING);
-	// Will be redirected to log file by bcelogstream.
-	cout << algorithmOutput << endl;
+    if (where == GRB_CB_BARRIER) {
+      cout << "barrier callback" << endl;
+      if (cancelFlag == 1) {
+	abort();
+	cout << "abort hit" << endl;
       }
     }
-    catch (GRBException e) {
-      cout << "Error number: " << e.getErrorCode() << endl;
-      cout << e.getMessage() << endl;
-    } 
-    catch (...) {
-      cout << "Error during callback" << endl;
+
+    else{
+      try{
+	if (where == GRB_CB_MESSAGE) {
+	  string algorithmOutput = getStringInfo(GRB_CB_MSG_STRING);
+	  // Will be redirected to log file by bcelogstream.
+	  cout << algorithmOutput << endl;
+	}
+      }
+      catch (GRBException e) {
+	cout << "Error number: " << e.getErrorCode() << endl;
+	cout << e.getMessage() << endl;
+      } 
+      catch (...) {
+	cout << "Error during callback" << endl;
+      }
     }
   }
 };

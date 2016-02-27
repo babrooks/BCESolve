@@ -20,7 +20,9 @@ BCELabel::BCELabel(LabelType _labelType,int _player):
   setStyleSheet("background-color: white");
 }
 
-BCELabel::BCELabel(LabelType _labelType,BCESliderType _sliderType,int _player):
+BCELabel::BCELabel(LabelType _labelType,
+		   BCESliderType _sliderType,
+		   int _player):
   labelType(_labelType),sliderType(_sliderType),player(_player)
 {
   std::stringstream dynamicString;

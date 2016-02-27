@@ -17,9 +17,7 @@ public:
   {}
 
   double prior (int state,const vector<int> & types) const {
-
     return 1.0/numStates;
-
   }
 
   double objective (int state,
@@ -43,15 +41,11 @@ public:
 
       } // players' payoffs
     else if (obj==2)
-      {
-	// revenue
-	
+      {	
 	double b0 = static_cast<double>(actions[0])/(numActions[0]-1.0);
 	double b1 = static_cast<double>(actions[1])/(numActions[1]-1.0);
-
 	return b0 + b1;
-
-      }
+      } // seller's revenue
     
     return 0.0;
   } // objective

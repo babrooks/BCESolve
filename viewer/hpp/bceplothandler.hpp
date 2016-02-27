@@ -27,7 +27,7 @@ class BCEPlotHandler : public QMainWindow
 
 public:
   //! Constructor
-  BCEPlotHandler();
+  BCEPlotHandler(QWidget *parent);
   //! Destructor
   ~BCEPlotHandler() {
     delete guiData;

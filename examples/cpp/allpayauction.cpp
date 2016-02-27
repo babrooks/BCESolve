@@ -2,8 +2,8 @@
 
 int main() {
 
-  int numBids = 35;
-  int numVals = 35;
+  int numBids = 45;
+  int numVals = 45;
 
   AllPayAuction apa(numVals,numBids);
 
@@ -11,8 +11,14 @@ int main() {
   
   solver.populate();
 
+  // Minimize Revenue by default.
+  // Objective function 0 is player 0 payoff.
+  // Objective function 1 is player 1 payoff.
+  // Objective function 2 is seller revenue.
   solver.model.setObjective(solver.getObjectiveFunction(2),GRB_MINIMIZE);
+
   solver.solve();
+  // solver.mapBoundary();
 
   BCESolution soln;
 

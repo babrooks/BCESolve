@@ -28,12 +28,16 @@ private:
   BCESolution solution;
   //! Weights on the objectives, as supplied by the user in the game tab.
   vector<double> weightData;
+  //! Callback, allows communication with solver.
+  BCEGurobiCallback callback; 
 
 public:
 
   //! Constructor
-  BCEGurobiSolverWorker(BCEGame _game,vector<double> _weightData):
-    game(_game), weightData(_weightData) 
+  BCEGurobiSolverWorker(BCEGame _game,
+			vector<double> _weightData,
+			BCEGurobiCallback &_callback):
+    game(_game), weightData(_weightData), callback(_callback)
   {}
 
   //! Returns a reference to the solution object.
@@ -53,7 +57,6 @@ public slots:
   void startSolve() {
 
     BCEGurobiSolver solver(game);
-    BCEGurobiCallback callback;
 
     solver.populate();
 

@@ -29,7 +29,7 @@
 
   \ingroup viewer
  */
-class BCEGameHandler : public QObject
+class BCEGameHandler : public QMainWindow
 {
   Q_OBJECT;
   friend class BCEPlotHandler;
@@ -90,7 +90,7 @@ public:
   //! Constructor
   /*! Constructs edits and buttons, connects signals/slots, calls
       BCEGameHandler::initializeModels. */
-  BCEGameHandler();
+  BCEGameHandler(QWidget *parent);
   //! Destructor.
   /*! Destroys table views, models, etc. */
   ~BCEGameHandler();
@@ -167,6 +167,8 @@ signals:
 
   //! Signals that the user has clicked the solve button.
   void startSolveRoutine(vector<double>& weightData);
+  //! Signals that the user has clicked the cancel solve button.
+  void cancelSolveRoutine();
 
 };
 

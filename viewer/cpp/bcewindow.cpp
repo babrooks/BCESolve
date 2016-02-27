@@ -11,8 +11,10 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   // Set the default path for loading examples.
   path=QString("../examples/");
 
-  solutionTab = new BCEPlotHandler();
-  gameTab = new BCEGameHandler();
+  // Initialization of Pointers
+  solutionTab = new BCEPlotHandler(this);
+  gameTab = new BCEGameHandler(this);
+  callback = new BCEGurobiCallback();
 
   // Menu Bar
   QMenu * fileMenu = menuBar()->addMenu(tr("&File"));
@@ -59,14 +61,16 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   // Solve Routine Connections
   connect(gameTab,SIGNAL(startSolveRoutine(vector<double>&)),
 	  this,SLOT(runSolve(vector<double>&)));
+  connect(gameTab,SIGNAL(cancelSolveRoutine()),
+	  this,SLOT(cancelSolve()));
 
   // Layout Setup
-  tabWidget = new QTabWidget();
-  QWidget *solutionTabWidget = new QWidget();
+  tabWidget = new QTabWidget(this);
+  QWidget *solutionTabWidget = new QWidget(this);
   solutionTabWidget->setLayout(solutionTab->getLayout());
-  QWidget *gameTabWidget = new QWidget();
+  QWidget *gameTabWidget = new QWidget(this);
   gameTabWidget->setLayout(gameTab->getLayout());
-  QWidget *logTabWidget = new QWidget();
+  QWidget *logTabWidget = new QWidget(this);
   logTabWidget->setLayout(logTab->getLayout());
 
   tabWidget->addTab(solutionTabWidget,"Solution");
@@ -76,7 +80,7 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   QHBoxLayout *mainLayout = new QHBoxLayout();
   mainLayout->addWidget(tabWidget);
 
-  QWidget *mainPanel = new QWidget();
+  QWidget *mainPanel = new QWidget(this);
   mainPanel->setLayout(mainLayout);
 
   // Set Default Tab 
@@ -219,6 +223,9 @@ void BCEWindow::saveGame() {
 void BCEWindow::runSolve(vector<double> & weightData) {
   try
     {
+      delete callback;
+      callback = new BCEGurobiCallback();
+
       // Switch to the Log Tab (the third tab, so indexed at 2).
       tabWidget->setCurrentIndex(2);
 
@@ -229,9 +236,9 @@ void BCEWindow::runSolve(vector<double> & weightData) {
       // Reimplement when adding cancelGame()
       // cancelSolveFlag = false;
       
-      QThread *solverWorkerThread = new QThread();
-      solverWorker = new BCEGurobiSolverWorker(gameTab->getGame(),weightData);
-
+      QThread *solverWorkerThread = new QThread(this);
+      solverWorker = new BCEGurobiSolverWorker(gameTab->getGame(),
+					       weightData,*callback);
       solverWorker->moveToThread(solverWorkerThread);
       connect(solverWorkerThread,SIGNAL(started()),
 	      solverWorker,SLOT(startSolve()));
@@ -251,6 +258,11 @@ void BCEWindow::runSolve(vector<double> & weightData) {
 			    tr("CPLEX was not able to solve your game."),
 			    QMessageBox::Ok);
     }
+}
+
+void BCEWindow::cancelSolve() {
+  callback->setCancelFlag();
+  cout << "cancel hit bcewindow" << endl;
 }
 
 void BCEWindow::tabToSolution(BCESolution *soln) {

@@ -224,7 +224,8 @@ void BCEDataState::setupControlsLayout() {
     } 
   }
 
-  controlsLayout = controlsGrid;
+  controlsLayout = new QWidget(this);
+  controlsLayout->setLayout(controlsGrid);
 
   // End Slider, LineEdit, CheckBox Creation
   //////////////////////////////////////////
