@@ -92,11 +92,6 @@ public slots:
   void toggleLinearScale(bool checked);
   //! Toggles color gradient between blue and gpSpectrum themes.
   void toggleColorfulTheme(bool checked);
-  //! Takes a screenshot and opens a save file menu.
-  /* The .png file name ending must be entered manually
-     upon saving for proper save action functionality.
-  */
-  void screenShot();
   //! Receives location of new data from BCEWindow
   void loadData(QString location) {
     emit(sendingDataPath(location));
@@ -121,10 +116,6 @@ private:
     functions.
   */
   BCEDataState *guiData;
-  //! Default path to gui screenshots (*.png files).
-  /*! Currently set as ../examples/screenshots/
-   */
-  QString screenShotPath;
   //! Heatmap template.
   /*! Stores the colorMap plottable, which
     contains data in BCEDataState's 

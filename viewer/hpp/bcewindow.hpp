@@ -72,6 +72,10 @@ private:
   QTabWidget *tabWidget;
   //! Default Path to data
   QString path;
+  //! Default path to gui screenshots (*.png files).
+  /*! Currently set as ../examples/screenshots/
+   */
+  QString screenShotPath;
   //! Thread for solverWorker
   QThread *solverWorkerThread;
   //! solverWorker Object for Solving Games
@@ -100,6 +104,11 @@ private slots:
   void cancelSolve();
   //! Switches the current tab to the solution tab.
   void tabToSolution(BCESolution *soln);
+  //! Takes a screenshot and opens a save file menu.
+  /* The .png file name ending must be entered manually
+     upon saving for proper save action functionality.
+  */
+  void screenshot();
 
 };
 

@@ -5,7 +5,6 @@ BCEPlotHandler::BCEPlotHandler(QWidget *parent):
 {
   isSolnDataLoaded=false;
   guiData = new BCEDataState();
-  screenShotPath=QString("../examples/screenshots/");
   setupLayout();
   setParent(parent);
 
@@ -375,17 +374,6 @@ void BCEPlotHandler::toggleColorfulTheme(bool checked) {
     colorMap->setGradient(newGradient->inverted());
   plotEqm();
 } // Slot to change color theme of heat map for conditional marginal distribution
-
-void BCEPlotHandler::screenShot() {
-
-  QString newPath = QFileDialog::getSaveFileName(this, tr("Save PNG"),
-						 screenShotPath, tr("PNG files (*.png)"));
-  if (newPath.isEmpty())
-    return;
-  newPath = newPath + ".png";
-  QFileInfo fi(newPath);
-  grab().save(newPath);
-}
 
 void BCEPlotHandler::setGUITitle() {
 

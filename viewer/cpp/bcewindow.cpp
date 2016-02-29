@@ -10,6 +10,7 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
 
   // Set the default path for loading examples.
   path=QString("../examples/");
+  screenShotPath=QString("../examples/screenshots/");
 
   // Initialization of Pointers
   solutionTab = new BCEPlotHandler(this);
@@ -52,7 +53,7 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   connect(quitAction,SIGNAL(triggered()),this,SLOT(close()));
   connect(linearScale,SIGNAL(toggled(bool)),solutionTab,SLOT(toggleLinearScale(bool)));
   connect(colorfulDistn,SIGNAL(toggled(bool)),solutionTab,SLOT(toggleColorfulTheme(bool)));
-  connect(screenShotAction,SIGNAL(triggered()),solutionTab,SLOT(screenShot()));
+  connect(screenShotAction,SIGNAL(triggered()),this,SLOT(screenshot()));
 
   // Loading Connection
   connect(this,SIGNAL(dataPathChanged(QString)),
@@ -268,4 +269,14 @@ void BCEWindow::cancelSolve() {
 void BCEWindow::tabToSolution(BCESolution *soln) {
   solutionTab->setSolution(*soln);
   tabWidget->setCurrentIndex(0);
+}
+
+void BCEWindow::screenshot() {
+  QString newPath = QFileDialog::getSaveFileName(this, tr("Save PNG"),
+						 screenShotPath, tr("PNG files (*.png)"));
+  if (newPath.isEmpty())
+    return;
+  newPath = newPath + ".png";
+  QFileInfo fi(newPath);
+  this->grab().save(newPath);
 }
