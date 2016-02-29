@@ -39,12 +39,15 @@ class BCELogHandler : public QObject {
 
 private:
 
+  //! Layout for the log handler.
   QVBoxLayout *layout;
 
 public:
 
+  //! Text edit contained in the log handler.
   QTextEdit *logText;
 
+  //! Constructor
   BCELogHandler() {
 
     logText = new QTextEdit();
@@ -55,7 +58,8 @@ public:
     layout->addWidget(logText);
   }
 
-  QVBoxLayout* getLayout() {
+  //! Returns a pointer to the log handler's layout
+  QVBoxLayout* getLayout() const {
     return layout;
   }
 

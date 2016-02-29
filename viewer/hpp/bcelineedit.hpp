@@ -51,7 +51,10 @@ public:
 
 public slots:
 
-  //! Ensures slider is set to the changed value (REIMPLEMENT).
+  //! Ensures slider is set to the changed value.
+  /*! For common state games, ensures both state
+    sliders move upon interaction with just one.
+   */
   void changeDisplayValue(int newValEmitted,
 			  BCESliderType typeEmitted,
 			  int playerEmitted) {

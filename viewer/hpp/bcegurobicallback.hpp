@@ -21,23 +21,24 @@
 // Chicago, IL
 
 #include "gurobi_c++.h"
-#include <fstream>
-#include <cmath>
-#include <iomanip>
 
 using namespace std;
 
+//! Callback object to communicate with the gurobi solver.
 class BCEGurobiCallback: public GRBCallback
 {
 private:
+  //! Contains if user has cancelled the solve ("1" if cancel has been hit).
   int cancelFlag;
 
 public:
-  double lastiter;
+
+  //! Constructor
   BCEGurobiCallback() {
     cancelFlag = 0;
   }
 
+  //! Sets cancel flag to 1 and attempts to abort the solve.
   void setCancelFlag() {
     if (cancelFlag != 1)
       cancelFlag = 1;
@@ -47,10 +48,10 @@ public:
 
 protected:
 
+  //! Sends algorithm output to the log file.
   void callback () {
     try {
       if (where == GRB_CB_BARRIER) {
-	cout << "barrier callback" << endl;
 	if (cancelFlag == 1) {
 	  abort();
 	  cout << "abort hit" << endl;

@@ -51,11 +51,12 @@ public:
   }
 
 signals:
-  //! Signals when a player has clicked a BCEPushButton
+  //! Signals the player associated with a BCEPushButton
   void clickedForPlayer(int player);
 
 public slots:
 
+  //! Emits the clickedForPlayer(_) signal.
   void bceClick() {
     emit(clickedForPlayer(player));
   }

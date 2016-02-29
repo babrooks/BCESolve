@@ -37,7 +37,7 @@
 
 //! This class handles the widgets for editing/displaying the game.
 /*! All of the widgets in the game tab and their slots are members of
-  this class. It also contains the pointer to the BCEGame, and handles
+  this class. It also contains the BCEGame and handles
   the interfaces to the game objects.
 
   The class contains table models for editing the game, which
@@ -68,7 +68,7 @@ private:
   BCEPayoffTableModel* payoffModel;
   //! Model for interfacing with prior
   BCEPriorTableModel* priorModel;
-  //! Model for interfacing with conditional distn of types
+  //! Model for interfacing with conditional distribution of types
   BCEConditionalTableModel * conditionalModel;
   //! Model for setting weights on objectives
   BCEObjWeightsTableModel * weightsModel;

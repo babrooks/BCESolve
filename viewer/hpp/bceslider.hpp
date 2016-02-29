@@ -59,9 +59,11 @@ signals:
   void valueChanged(int newValue,BCESliderType type,int player);
 
 public slots:
+  //! Changes value of the slider
   void changeValue(int newValue)
   { emit(valueChanged(newValue,sliderType,player)); }
      
+  //! Changes position of the slider
   void changeSliderPosition(int newValEmitted,
 			    BCESliderType typeEmitted,
 			    int playerEmitted) {

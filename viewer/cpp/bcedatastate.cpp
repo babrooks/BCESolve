@@ -28,7 +28,7 @@ int BCEDataState::shareDataProperties(BCESliderType st,int player) {
   }
 }
 
-void BCEDataState::setSolutionData(BCESolution &solution) {
+void BCEDataState::setSolutionData(const BCESolution &solution) {
   try{
     solutionData = BCESolution(solution);
     gameData = BCEGame(solutionData.getGame());

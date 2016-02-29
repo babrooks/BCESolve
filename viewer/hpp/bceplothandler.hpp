@@ -35,9 +35,7 @@
 using namespace std;
 
 //! This class handles all the plotting in the solution tab.
-/*! Handles plotting and layout of the solution tab. Connects
-  user interaction in the solution tab with BCEDataState to
-  modify data elements for plotting. Gets data from
+/*! Handles plotting and layout of the solution tab. Gets data from
   BCEDataState for plotting. Connects data change signals
   in BCEDataState with slots to change plot titles dynamically.
 
@@ -61,14 +59,14 @@ signals:
 
 public slots:
 
-  //! colorMap,conditionalMarginalPlot plotting function.
+  //! Plots Bayes Correlated Equilibria.
   /*! Removes currently plotted data, gets new data from 
     BCEDataState, and plots the new data in a heat map.
     Slot is triggered when the equilibrium matrix is 
     changed in BCEDataState.
   */
   void plotEqm();
-  //! deviationBarGraphs plotting function.
+  //! Plots Bar Graphs for Player Deviation Objectives.
   /*! Removes currently plotted data, gets new data from 
     BCEDataState, and plots the new data in a bar graph.
     Contains additional plottables for highlighting
@@ -78,18 +76,17 @@ public slots:
     BCEDataState.
   */
   void plotDeviationObjectives(int player);
-  //! payoffPlot plotting function.
+  //! Plots set of equilibria player payoffs.
   /*! Slot triggered when the vector of BCEquilibria is
     updated after loading or when a new equilibrium index
-    is selected. Contains additional plottable to highlight
+    is selected. Contains additional plottables to highlight
     the currently selected equilibrium.
+
+    There is only one equilibrium unless mapBoundary() has 
+    been called in the loaded example's .cpp file.
   */
   void plotBCEValueSet();
   //! Sets a new title for the GUI using fileName information.
-  /*! Gets guiTitle from BCEDataState and sets the main window
-    title << "BCE Solution Viewer, Current File = "
-    << getGUITitle_output
-  */
   void setGUITitle();
   //! Toggles colorScale between linear and log scales.
   void toggleLinearScale(bool checked);
@@ -167,7 +164,7 @@ public:
     return mainTab;
   }
   //! Sets the current BCESolution in BCEDataState
-  void setSolution(BCESolution &solution);
+  void setSolution(const BCESolution &solution);
 
   //! Returns the current BCESolution in BCEDataState
   const BCESolution& getSolutionData() const {

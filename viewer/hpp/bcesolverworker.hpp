@@ -33,9 +33,11 @@
 /*! Contains a game and a solution object. When
   the solverWorker is created, a BCEGame is supplied in its
   constructor. The solverWorker solves the game, and the
-  private solution member is set to the solution of the solved
+  private member "solution" is set to the solution of the solved
   game. A signal sends a pointer to the solution to the BCEWindow
   object, which sends the solution to BCEPlotHandler for plotting.
+  BCEWindow also automatically switches the tab currently displayed
+  to the solution window after the solution has been plotted.
 
   \ingroup viewer
  */
@@ -46,11 +48,11 @@ private:
 
   //! Game
   BCEGame game;
-  //! Solution, either default or to the game (see class description).
+  //! Solution, either default or the custom game (see class description).
   BCESolution solution;
   //! Weights on the objectives, as supplied by the user in the game tab.
   vector<double> weightData;
-  //! Callback, allows communication with solver.
+  //! Callback, allows communication with Gurobi solver.
   BCEGurobiCallback callback; 
 
 public:
@@ -63,18 +65,18 @@ public:
   {}
 
   //! Returns a reference to the solution object.
-  BCESolution& getSolution() {
+  const BCESolution& getSolution() const {
     return solution;
   }
 
 public slots:
 
   //! Triggered when the user clicks the "Solve" button in the game tab.
-  /*! Uses CPLEX and BCESolver to solve a BCEGame. Objectives are
+  /*! Uses GUROBI and BCESolver to solve a BCEGame. Objectives are
     multiplied by their respective weights, and then the sum of these
     objectives is maximized. The weights should sum, in magnitude, to 1.
     If weights are negative, then the solver is maxing the negative of an 
-    objective.
+    objective, i.e. minimizing. 
    */
   void startSolve() {
 
@@ -110,7 +112,7 @@ signals:
 
   //! Signals that the solve routine has ended.
   void workFinished();
-  //! Signals the solution found by the solver.
+  //! Signals a pointer to the solution found by the solver.
   void sendSolution(BCESolution *soln);
 
 };

@@ -18,12 +18,15 @@
 class BCELogStream : public std::basic_streambuf<char>
 {
 public:
+  //! Constructor
   BCELogStream(std::ostream &stream, QTextEdit* text_edit) : m_stream(stream)
   {
     log_window = text_edit;
     m_old_buf = stream.rdbuf();
     stream.rdbuf(this);
   }
+
+  //! Destructor
   ~BCELogStream()
   {
     // output anything that is left
@@ -74,12 +77,15 @@ protected:
   }
 
 private:
+  //! Text Edit where redirected stout/stderr will be sent
+  QTextEdit* log_window;
+
+  //! Type of ostream redirected (e.g. "cout," "cerr," etc.)
   std::ostream &m_stream;
   std::streambuf *m_old_buf;
   std::string m_string;
 
 
-  QTextEdit* log_window;
 };
 
 #endif

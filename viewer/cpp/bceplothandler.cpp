@@ -382,6 +382,7 @@ void BCEPlotHandler::screenShot() {
 						 screenShotPath, tr("PNG files (*.png)"));
   if (newPath.isEmpty())
     return;
+  newPath = newPath + ".png";
   QFileInfo fi(newPath);
   grab().save(newPath);
 }
@@ -401,7 +402,7 @@ void BCEPlotHandler::setGUITitle() {
   this->setWindowTitle(newTitle);
 }
 
-void BCEPlotHandler::setSolution(BCESolution &solution) {
+void BCEPlotHandler::setSolution(const BCESolution &solution) {
   guiData->setSolutionData(solution);
 }
 

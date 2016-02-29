@@ -30,7 +30,7 @@
 #include "bceloghandler.hpp"
 #include "bcesolverworker.hpp"
 
-//! Assembles BCEGameHandler, BCEPlotHandler, and BCESolverWorker into a Unified GUI.
+//! Assembles BCEGameHandler, BCEPlotHandler, and BCELogHandler into a Unified GUI.
 /*! Sets up a menu bar and assembles bcegamehandler, bceplothandler, 
   and bcesolverworker objects into a tab widget. This tab
   widget is set as the layout of the GUI. Contains methods

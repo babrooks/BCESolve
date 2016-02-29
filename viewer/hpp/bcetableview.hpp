@@ -26,7 +26,7 @@
 #include <QtWidgets>
 #include <QAbstractItemView>
 
-//! Specialized table view for SGViewer
+//! Specialized table view for BCEViewer
 /*! Reimplements various sizing methods and configures the size policy
   and selection mode. 
 
@@ -43,7 +43,6 @@ public:
     setSelectionMode(QAbstractItemView::ContiguousSelection);
     setEditTriggers(QAbstractItemView::AllEditTriggers);
     setSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::MinimumExpanding);
-    // horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
   }
 
   //! Reimplement column size to be slightly smaller

@@ -46,36 +46,41 @@ private:
   int player;
   //! Type of label (i.e. "DeviationPlot," "SliderLabel," etc.).
   LabelType labelType;
-  //! Type of Slider associated with a slider label.
+  //! Type of Slider associated with a slider label (i.e. "Type," "Action," "State").
   BCESliderType sliderType;
-
+  //! String manipulated when data is changed.
   std::stringstream dynamicString;
 
 public:
 
-  //! Constructs the plot titles for the deviation bar graphs.
+  //! Constructs plot titles for the deviation bar graphs.
   BCELabel(LabelType _labelType,int _player);
 
   //! Constructs slider labels for controls layout.
   BCELabel(LabelType _labelType,BCESliderType _sliderType,int _player);
 
-  //! Constructs plot titles for heatmap (right panel) and set of BCE plot (top left).
+  //! Constructs plot titles for heatmap and plot of equilibria player payoffs (top left plot).
   BCELabel(LabelType _labelType);
 
 public slots:
 
+  //! Changes non-probability elements of the deviation plot titles
   void changeText(int emittedPlayer,
 		  int action,
 		  int type,
 		  double objectiveValue);
 
+  //! Changes probability element of the deviation plot titles
   void changeProbability(int emittedPlayer,double probability);
 
+  //! Sets the state slider label to reflect if game has common or private states.
   void displayStateOrValues(bool isPrivateVals,
 			    int emittedPlayer);
 
+  //! Sets current equilibrium coordinates for the current eqm index.
   void changeDisplayedCoords(double x,double y);
 
+  //! Sets current state displayed in the heatmap plot title.
   void changeDisplayedState(int value0,
 			    int value1,
 			    int state,
