@@ -27,22 +27,21 @@ using namespace std;
 //! Callback object to communicate with the gurobi solver.
 class BCEGurobiCallback: public GRBCallback
 {
-private:
+public:
   //! Contains if user has cancelled the solve ("1" if cancel has been hit).
-  int cancelFlag;
+  bool cancelFlag;
 
 public:
 
   //! Constructor
-  BCEGurobiCallback() {
-    cancelFlag = 0;
-  }
+  BCEGurobiCallback():
+    cancelFlag(false)
+  {}
 
   //! Sets cancel flag to 1 and attempts to abort the solve.
   void setCancelFlag() {
-    if (cancelFlag != 1)
-      cancelFlag = 1;
-    abort();
+    // if (cancelFlag != 1)
+    cancelFlag = true;
     cout << "set cancel flag hit" << endl;
   }
 
@@ -52,13 +51,15 @@ protected:
   void callback () {
     try {
       if (where == GRB_CB_BARRIER) {
-	if (cancelFlag == 1) {
+	cout << "Here I am" << endl;
+	cout << cancelFlag << endl;
+	if (cancelFlag) {
 	  abort();
 	  cout << "abort hit" << endl;
 	}
       }
       else if (where == GRB_CB_SIMPLEX) {
-	if (cancelFlag == 1) {
+	if (cancelFlag) {
 	  abort();
 	  cout << "abort hit" << endl;
 	}

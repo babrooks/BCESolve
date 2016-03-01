@@ -53,14 +53,14 @@ private:
   //! Weights on the objectives, as supplied by the user in the game tab.
   vector<double> weightData;
   //! Callback, allows communication with Gurobi solver.
-  BCEGurobiCallback callback; 
+  BCEGurobiCallback * callback; 
 
 public:
 
   //! Constructor
   BCESolverWorker(BCEGame _game,
 			vector<double> _weightData,
-			BCEGurobiCallback &_callback):
+			BCEGurobiCallback * _callback):
     game(_game), weightData(_weightData), callback(_callback)
   {}
 
@@ -97,7 +97,7 @@ public slots:
     }
 
     solver.model.setObjective(expr,GRB_MAXIMIZE);
-    solver.model.setCallback(&callback);
+    solver.model.setCallback(callback);
 
     solver.solve();
 
