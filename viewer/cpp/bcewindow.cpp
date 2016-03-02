@@ -256,7 +256,7 @@ void BCEWindow::runSolve(vector<double> & weightData) {
   catch (exception & e)
     {
       QMessageBox::critical(this,tr("Solver failed"),
-			    tr("CPLEX was not able to solve your game."),
+			    tr("Gurobi was not able to solve your game."),
 			    QMessageBox::Ok);
     }
 }
