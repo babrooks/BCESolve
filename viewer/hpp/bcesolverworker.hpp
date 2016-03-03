@@ -101,9 +101,12 @@ public slots:
 
     solver.solve();
 
-    solver.getSolution(solution);
+    // 11 signals that the solve routine
+    if (solver.model.get(GRB_IntAttr_Status)!=11) {
+      solver.getSolution(solution);
+      emit(sendSolution(&solution));
+    }
 
-    emit(sendSolution(&solution));
     emit(workFinished());
 
   }

@@ -19,15 +19,20 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
 
   // Menu Bar
   QMenu * fileMenu = menuBar()->addMenu(tr("&File"));
-  QMenu * viewMenu = menuBar()->addMenu(tr("&View"));
   QAction * loadSolutionAction = new QAction(tr("&Load Solution"),this);
   QAction * loadGameAction = new QAction(tr("&Load Game"),this);
   QAction * saveSolutionAction = new QAction(tr("&Save Solution"),this);
   QAction * saveGameAction = new QAction(tr("&Save Game"),this);
+  QAction * quitAction = new QAction(tr("&Quit GUI"),this);
+  QMenu * viewMenu = menuBar()->addMenu(tr("&View"));
   QAction * linearScale = new QAction(tr("&Linear/Log Color Scale Toggle"),this);
   QAction * colorfulDistn = new QAction(tr("&Colorful/Blue Theme Toggle"),this);
   QAction * screenShotAction = new QAction(tr("&Save a screen shot"),this);
-  QAction * quitAction = new QAction(tr("&Quit GUI"),this);
+  QMenu * toolMenu = menuBar()->addMenu(tr("&Tools"));
+  QAction * generateHAGame = new QAction(tr("&Generate Hybrid Auction"),this);
+  QAction * solveOption = new QAction(tr("&Solve Game"),this);
+  QAction * cancelOption = new QAction(tr("&Cancel Game"),this);
+
   fileMenu->addAction(loadSolutionAction);
   fileMenu->addAction(loadGameAction);
   fileMenu->addAction(saveSolutionAction);
@@ -40,6 +45,9 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   colorfulDistn->setCheckable(true);
   colorfulDistn->setChecked(true);
   viewMenu->addAction(screenShotAction);
+  toolMenu->addAction(generateHAGame);
+  toolMenu->addAction(solveOption);
+  toolMenu->addAction(cancelOption);
   loadSolutionAction->setShortcut(tr("Ctrl+L"));
   screenShotAction->setShortcut(tr("Ctrl+P"));
   quitAction->setShortcut(tr("Ctrl+W"));
@@ -54,16 +62,21 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   connect(linearScale,SIGNAL(toggled(bool)),solutionTab,SLOT(toggleLinearScale(bool)));
   connect(colorfulDistn,SIGNAL(toggled(bool)),solutionTab,SLOT(toggleColorfulTheme(bool)));
   connect(screenShotAction,SIGNAL(triggered()),this,SLOT(screenshot()));
+  connect(generateHAGame,SIGNAL(triggered()),this,SLOT(generateHybridAuction()));
+  connect(solveOption,SIGNAL(triggered()),this,SLOT(runSolve()));
+  connect(cancelOption,SIGNAL(triggered()),this,SIGNAL(setCancelFlag()));
 
   // Loading Connection
   connect(this,SIGNAL(dataPathChanged(QString)),
   	  solutionTab,SLOT(loadData(QString)));
 
   // Solve Routine Connections
-  connect(gameTab,SIGNAL(startSolveRoutine(vector<double>&)),
-	  this,SLOT(runSolve(vector<double>&)));
+  connect(gameTab,SIGNAL(startSolveRoutine()),
+	  this,SLOT(runSolve()));
   connect(gameTab,SIGNAL(cancelSolveRoutine()),
-	  this,SLOT(cancelSolve()));
+	  this,SIGNAL(setCancelFlag()));
+  connect(this,SIGNAL(setCancelFlag()),
+	  callback,SLOT(setCancelFlagTrue()));
 
   // Layout Setup
   tabWidget = new QTabWidget(this);
@@ -213,7 +226,7 @@ void BCEWindow::saveGame() {
       const char * newPath_c = ba.data();
 
       BCEGame::save(gameTab->getGame(),
-		   newPath_c);
+		    newPath_c);
     }
   catch (std::exception & e)
     {
@@ -221,11 +234,15 @@ void BCEWindow::saveGame() {
     }
 } // saveGame
 
-void BCEWindow::runSolve(vector<double> & weightData) {
+void BCEWindow::runSolve() {
+
   try
     {
       delete callback;
       callback = new BCEGurobiCallback();
+
+      connect(this,SIGNAL(setCancelFlag()),
+	      callback,SLOT(setCancelFlagTrue()));
 
       // Switch to the Log Tab (the third tab, so indexed at 2).
       tabWidget->setCurrentIndex(2);
@@ -239,7 +256,8 @@ void BCEWindow::runSolve(vector<double> & weightData) {
       
       QThread *solverWorkerThread = new QThread(this);
       solverWorker = new BCESolverWorker(gameTab->getGame(),
-					 weightData,callback);
+					 gameTab->getWeightsOnObjectives(),
+					 callback);
       solverWorker->moveToThread(solverWorkerThread);
       connect(solverWorkerThread,SIGNAL(started()),
 	      solverWorker,SLOT(startSolve()));
@@ -248,9 +266,9 @@ void BCEWindow::runSolve(vector<double> & weightData) {
       connect(solverWorker,SIGNAL(sendSolution(BCESolution*)),
 	      this,SLOT(tabToSolution(BCESolution*)));
       connect(solverWorkerThread,SIGNAL(finished()),
-      	      solverWorkerThread,SLOT(deleteLater()));
+	      solverWorkerThread,SLOT(deleteLater()));
       connect(solverWorkerThread,SIGNAL(finished()),
-      	      solverWorker,SLOT(deleteLater()));
+	      solverWorker,SLOT(deleteLater()));
       solverWorkerThread->start();
     }
   catch (exception & e)
@@ -259,11 +277,7 @@ void BCEWindow::runSolve(vector<double> & weightData) {
 			    tr("Gurobi was not able to solve your game."),
 			    QMessageBox::Ok);
     }
-}
-
-void BCEWindow::cancelSolve() {
-  callback->setCancelFlag();
-  cout << "cancel hit bcewindow" << endl;
+  
 }
 
 void BCEWindow::tabToSolution(BCESolution *soln) {
@@ -279,4 +293,53 @@ void BCEWindow::screenshot() {
   newPath = newPath + ".png";
   QFileInfo fi(newPath);
   this->grab().save(newPath);
+}
+
+void BCEWindow::generateHybridAuction() {
+
+  QDialog dialog(this);
+  QFormLayout form(&dialog);
+
+  form.addRow(new QLabel("Set Parameters for the Common Values Hybrid First-price/Second-price Auction:"));
+
+  int numParams = 6;
+  vector<QLineEdit *> fields(numParams);
+  for(int i = 0; i < numParams; ++i) {
+    QLineEdit *lineEdit = new QLineEdit(&dialog);
+    fields[i] = lineEdit;
+  }
+
+  form.addRow(QString("Number of Values (Integer)"), fields[0]);
+  form.addRow(QString("Number of Actions (Integer)"), fields[1]);
+  form.addRow(QString("Weight on Bid, 1 = FPA, 0 = SPA (Double in [0,1])"), fields[2]);
+  form.addRow(QString("Reserve Price (Double in [0,1])"), fields[3]);
+  form.addRow(QString("Entry Fee (Double in [0,1])"), fields[4]);
+  form.addRow(QString("High Bid (Double in [0,1])"), fields[5]);
+
+  QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+  			     Qt::Horizontal, &dialog);
+  form.addRow(&buttonBox);
+  QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
+  QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
+
+  dialog.exec();
+  qDebug() << "Dialog Closed" << endl;
+
+  vector<int> intParams(2);
+  vector<double> doubleParams(4);
+
+  for (int i=0; i < numParams; i++) {
+    if (i<2)
+      intParams[i] = fields[i]->text().toInt();
+    else
+      doubleParams[i-2] = fields[i]->text().toDouble();
+  }
+
+  HybridEntryReserve her(intParams[0],intParams[1],doubleParams[0],
+  		     doubleParams[1],doubleParams[2],doubleParams[3]);
+
+  // HybridEntryReserve her(30,30,1,.1,0,.75);
+  gameTab->setGame(her);
+  tabWidget->setCurrentIndex(1);
+
 }

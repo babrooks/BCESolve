@@ -23,6 +23,7 @@ INCLUDEPATH += /usr/local/include \
 ../src/hpp \
 ../viewer/cpp \
 ../viewer/hpp \
+../examples/hpp \
 /usr/include/boost
 
 VPATH += ../src/cpp \

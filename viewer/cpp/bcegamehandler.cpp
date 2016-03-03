@@ -429,7 +429,9 @@ void BCEGameHandler::setGame(const BCEGame & _game)
     numTypesEdits[player]
       ->setText(QString::number(game.getNumTypes()[player]));
   }
-  
+  numStatesEdit->setText(QString::number(game.getNumStates()));
+  numObjectivesEdit->setText(QString::number(game.getNumObjectives()));  
+
   initializeModels();
 
   // qDebug() << "Finished setting game" << endl;
@@ -733,7 +735,7 @@ void BCEGameHandler::stateRemoved()
 } // stateRemoved
 
 void BCEGameHandler::emitSolveSignal() {
-  emit(startSolveRoutine(weightsModel->getSolverData()));
+  emit(startSolveRoutine());
 }
 
 void BCEGameHandler::clearCurrentGame() {
@@ -754,4 +756,8 @@ void BCEGameHandler::clearCurrentGame() {
   }
   numStatesEdit->setText(QString::number(game.getNumStates()));
   numObjectivesEdit->setText(QString::number(game.getNumObjectives()));
+}
+
+const vector<double>& BCEGameHandler::getWeightsOnObjectives() {
+  return weightsModel->getSolverData();
 }

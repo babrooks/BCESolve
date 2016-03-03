@@ -142,6 +142,8 @@ public:
   /*! Switches all of the models over to new state and updates table
       views. */
   void setState(int state);
+  //! Returns weights on objectives.
+  const vector<double>& getWeightsOnObjectives();
   
 private:
   //! Delete old data models and create new ones.
@@ -188,7 +190,7 @@ private slots:
 signals:
 
   //! Signals that the user has clicked the solve button.
-  void startSolveRoutine(vector<double>& weightData);
+  void startSolveRoutine();
   //! Signals that the user has clicked the cancel solve button.
   void cancelSolveRoutine();
 

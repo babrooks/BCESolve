@@ -37,17 +37,20 @@ private:
   double weightOnOwnBid;
   double reservePrice;
   double entryFee;
+  double highBid;
   
 public:
   HybridEntryReserve(int nv,
 		     int na,
 		     double _weightOnOwnBid,
 		     double _reservePrice,
-		     double _entryFee):
+		     double _entryFee,
+		     double _highBid):
     BCEAbstractGame(nv,na,1,3),
     weightOnOwnBid(_weightOnOwnBid),
     reservePrice(_reservePrice),
-    entryFee(_entryFee)
+    entryFee(_entryFee),
+    highBid(_highBid)
   { }
 
   double prior (int state, const vector<int> & types) const {
@@ -61,8 +64,8 @@ public:
     if (obj<2)
       {
 	double val = static_cast<double>(state)/(numStates-1);
-	double ownBid = static_cast<double>(actions[obj])/(numActions[obj]-1);
-	double otherBid = static_cast<double>(actions[1-obj])/(numActions[obj]-1);
+	double ownBid = highBid*static_cast<double>(actions[obj])/(numActions[obj]-1);
+	double otherBid = highBid*static_cast<double>(actions[1-obj])/(numActions[obj]-1);
 
 	if (ownBid == 0)
 	  return 0.0;
@@ -81,8 +84,8 @@ public:
       {
 	// revenue
 	
-	double b0 = static_cast<double>(actions[0])/(numActions[0]-1);
-	double b1 = static_cast<double>(actions[1])/(numActions[1]-1);
+	double b0 = highBid*static_cast<double>(actions[0])/(numActions[0]-1);
+	double b1 = highBid*static_cast<double>(actions[1])/(numActions[1]-1);
 
 	double entryFeeRevenue = ceil(b0)*entryFee + ceil(b1)*entryFee;
 

@@ -21,14 +21,17 @@
 // Chicago, IL
 
 #include "gurobi_c++.h"
+#include <QObject>
 
 using namespace std;
 
 //! Callback object to communicate with the gurobi solver.
-class BCEGurobiCallback: public GRBCallback
+class BCEGurobiCallback: public QObject, public GRBCallback
 {
-public:
-  //! Contains if user has cancelled the solve ("1" if cancel has been hit).
+  Q_OBJECT
+
+private:
+  //! Flags if user has cancelled the solve ("true" if cancel has been hit).
   bool cancelFlag;
 
 public:
@@ -38,11 +41,11 @@ public:
     cancelFlag(false)
   {}
 
-  //! Sets cancel flag to 1 and attempts to abort the solve.
-  void setCancelFlag() {
-    // if (cancelFlag != 1)
+public slots:
+
+  //! Sets cancel flag to 1.
+  void setCancelFlagTrue() {
     cancelFlag = true;
-    cout << "set cancel flag hit" << endl;
   }
 
 protected:
@@ -51,11 +54,9 @@ protected:
   void callback () {
     try {
       if (where == GRB_CB_BARRIER) {
-	cout << "Here I am" << endl;
 	cout << cancelFlag << endl;
 	if (cancelFlag) {
 	  abort();
-	  cout << "abort hit" << endl;
 	}
       }
       else if (where == GRB_CB_SIMPLEX) {

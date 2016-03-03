@@ -85,8 +85,6 @@ void BCESolution::getExpectedObjectives(vector< vector<double> > &values) const
 
   vector<double> currentObjectiveValues;
 
-  cout << equilibria.size() << endl;
-
   for (eq=0; eq<equilibria.size(); eq++)
     {
       getExpectedObjectives(values[eq],

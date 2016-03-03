@@ -29,6 +29,7 @@
 #include "bceplothandler.hpp"
 #include "bceloghandler.hpp"
 #include "bcesolverworker.hpp"
+#include "hybridentryreserve.hpp"
 
 //! Assembles BCEGameHandler, BCEPlotHandler, and BCELogHandler into a Unified GUI.
 /*! Sets up a menu bar and assembles bcegamehandler, bceplothandler, 
@@ -59,6 +60,8 @@ signals:
     new data.
   */
   void dataPathChanged(QString newPath);
+  //! Signals the callback object to cancel optimization.
+  void setCancelFlag();
 
 private:
 
@@ -99,9 +102,7 @@ private slots:
   //! Interacts with BCEGameHandler and BCEPlotHandler to save a game.
   void saveGame();
   //! Interacts with BCEGameHandler and BCESolverWorker to solve a game.
-  void runSolve(vector<double> & weightData);
-  //! Interacts with solver to abort the solve routine.
-  void cancelSolve();
+  void runSolve();
   //! Switches the current tab to the solution tab.
   void tabToSolution(BCESolution *soln);
   //! Takes a screenshot and opens a save file menu.
@@ -109,6 +110,8 @@ private slots:
      upon saving for proper save action functionality.
   */
   void screenshot();
+  //! Starts the routine to build the default custom game.
+  void generateHybridAuction();
 
 };
 
