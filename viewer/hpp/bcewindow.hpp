@@ -30,6 +30,7 @@
 #include "bceloghandler.hpp"
 #include "bcesolverworker.hpp"
 #include "hybridentryreserve.hpp"
+#include "commonvalueauction.hpp"
 
 //! Assembles BCEGameHandler, BCEPlotHandler, and BCELogHandler into a Unified GUI.
 /*! Sets up a menu bar and assembles bcegamehandler, bceplothandler, 
@@ -110,8 +111,10 @@ private slots:
      upon saving for proper save action functionality.
   */
   void screenshot();
-  //! Starts the routine to build the default custom game.
+  //! Starts the routine to build the default hybrid auction.
   void generateHybridAuction();
+  //! Builds the default common values auction.
+  void generateCommonValueAuction();
 
 };
 

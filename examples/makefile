@@ -52,7 +52,8 @@ MAINS=exampleforrobbie \
 
 MAINSGRB=revenuelb onesidedrestricted relaxed rcacommon randomrprelaxed optauction
 MAINSBCEGRB = surplusbnd allpayauction gurobihybridentryreserve postedprice \
-		fpagurobiunknown fparandomrp duopoly fangmorris fpaknown
+		fpagurobiunknown fparandomrp duopoly fangmorris fpaknown \
+		randomwinner commonvalueauction
 
 RCAMAINS=rcatest2
 

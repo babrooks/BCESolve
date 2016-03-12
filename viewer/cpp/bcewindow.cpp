@@ -30,6 +30,7 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   QAction * screenShotAction = new QAction(tr("&Save a screen shot"),this);
   QMenu * toolMenu = menuBar()->addMenu(tr("&Tools"));
   QAction * generateHAGame = new QAction(tr("&Generate Hybrid Auction"),this);
+  QAction * generateCVGame = new QAction(tr("&Generate Common Value Auction"),this);
   QAction * solveOption = new QAction(tr("&Solve Game"),this);
   QAction * cancelOption = new QAction(tr("&Cancel Game"),this);
 
@@ -46,6 +47,7 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   colorfulDistn->setChecked(true);
   viewMenu->addAction(screenShotAction);
   toolMenu->addAction(generateHAGame);
+  toolMenu->addAction(generateCVGame);
   toolMenu->addAction(solveOption);
   toolMenu->addAction(cancelOption);
   loadSolutionAction->setShortcut(tr("Ctrl+L"));
@@ -63,6 +65,7 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   connect(colorfulDistn,SIGNAL(toggled(bool)),solutionTab,SLOT(toggleColorfulTheme(bool)));
   connect(screenShotAction,SIGNAL(triggered()),this,SLOT(screenshot()));
   connect(generateHAGame,SIGNAL(triggered()),this,SLOT(generateHybridAuction()));
+  connect(generateCVGame,SIGNAL(triggered()),this,SLOT(generateCommonValueAuction()));
   connect(solveOption,SIGNAL(triggered()),this,SLOT(runSolve()));
   connect(cancelOption,SIGNAL(triggered()),this,SIGNAL(setCancelFlag()));
 
@@ -300,7 +303,7 @@ void BCEWindow::generateHybridAuction() {
   QDialog dialog(this);
   QFormLayout form(&dialog);
 
-  form.addRow(new QLabel("Set Parameters for the Common Values Hybrid First-price/Second-price Auction:"));
+  form.addRow(new QLabel("Common Values Hybrid Auction"));
 
   int numParams = 6;
   vector<QLineEdit *> fields(numParams);
@@ -339,6 +342,48 @@ void BCEWindow::generateHybridAuction() {
   		     doubleParams[1],doubleParams[2],doubleParams[3]);
 
   // HybridEntryReserve her(30,30,1,.1,0,.75);
+  gameTab->setGame(her);
+  tabWidget->setCurrentIndex(1);
+
+}
+
+void BCEWindow::generateCommonValueAuction() {
+
+  QDialog dialog(this);
+  QFormLayout form(&dialog);
+
+  form.addRow(new QLabel("Common Values Auction, Values~v^alpha"));
+
+  int numParams = 4;
+  vector<QLineEdit *> fields(numParams);
+  for(int i = 0; i < numParams; ++i) {
+    QLineEdit *lineEdit = new QLineEdit(&dialog);
+    fields[i] = lineEdit;
+  }
+
+  form.addRow(QString("Alpha (Double > 0)"), fields[0]);
+  form.addRow(QString("High Bid (Double in [0,1])"), fields[1]);
+  form.addRow(QString("Reserve Price (Double in [0,1]"), fields[2]);
+  form.addRow(QString("Entry Fee (Double in [0,1])"), fields[3]);
+
+  QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+  			     Qt::Horizontal, &dialog);
+  form.addRow(&buttonBox);
+  QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
+  QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
+
+  dialog.exec();
+  qDebug() << "Dialog Closed" << endl;
+
+  vector<double> doubleParams(4);
+
+  for (int i=0; i < numParams; i++) {
+    doubleParams[i] = fields[i]->text().toDouble();
+  }
+
+  CommonValueAuction her(50,50,doubleParams[0],doubleParams[1],
+			 doubleParams[2],doubleParams[3]);
+
   gameTab->setGame(her);
   tabWidget->setCurrentIndex(1);
 

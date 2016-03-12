@@ -54,7 +54,6 @@ protected:
   void callback () {
     try {
       if (where == GRB_CB_BARRIER) {
-	cout << cancelFlag << endl;
 	if (cancelFlag) {
 	  abort();
 	}

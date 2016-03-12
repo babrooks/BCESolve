@@ -26,8 +26,7 @@ int main() {
 
   stringstream fName;
   fName << "allpayauction_nv=" << numVals
-	<< "_nb=" << numBids
-	<< "_nv=" << numVals << ".bce";
+	<< "_nb=" << numBids << ".bce";
   string fNameStr = fName.str();
   const char * fNameC = fNameStr.c_str();
   BCESolution::save(soln,fNameC);
