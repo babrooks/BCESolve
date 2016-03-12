@@ -200,11 +200,11 @@ double BCESolution::getDeviationObjectives(int player, int action, int type,
       
     } // distribution
 
-  for (devs[player]=0;
-       devs[player]<game.getNumActions()[player];
-       devs[player]++)
-    assert(values[player][devs[player]]
-	   <=values[player][action]+1e-4);
+  // for (devs[player]=0;
+  //      devs[player]<game.getNumActions()[player];
+  //      devs[player]++)
+  //   assert(values[player][devs[player]]
+  // 	   <=values[player][action]+1e-4);
   
   if (probSum)
     {

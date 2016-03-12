@@ -70,12 +70,17 @@ public:
 	double ownBid = static_cast<double>(actions[obj])/(numActions[obj]-1.0);
 	double otherBid = static_cast<double>(actions[1-obj])/(numActions[obj]-1.0);
 
-	if (actions[obj]>actions[1-obj])
-	  return val-ownBid;
-	else if (actions[obj]==actions[1-obj])
-	  return 0.5*(val-ownBid);
-	else if (actions[obj] < actions[1-obj])
-	  return 0;
+	if (ownBid < reservePrice)
+	  return ceil(ownBid)*entryCost;
+	else {
+	  if (actions[obj]>actions[1-obj])
+	    return val-ownBid-entryCost;
+	  else if (actions[obj]==actions[1-obj])
+	    return 0.5*(val-ownBid)-entryCost;
+	  else if (actions[obj] < actions[1-obj])
+	    return -entryCost;
+	}
+	
 
       } // players' payoffs
     else if (obj==2)
@@ -88,7 +93,12 @@ public:
 	  winningBid = b1;
 	}
 
-	return winningBid;
+	if (winningBid >= reservePrice)
+	  return winningBid + entryCost;
+
+	else 
+	  return ceil(winningBid)*entryCost;
+
       } // seller's revenue
     
     return 0.0;

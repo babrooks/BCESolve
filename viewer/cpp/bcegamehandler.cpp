@@ -334,6 +334,11 @@ void BCEGameHandler::setupLayout() {
   QSizePolicy policy(QSizePolicy::Expanding,QSizePolicy::Expanding);
   tableLayout->setSizePolicy(policy);
 
+  tableLayout->setStretchFactor(0,8);
+  tableLayout->setStretchFactor(1,2);
+  tableLayout->setStretchFactor(2,1);
+  tableLayout->setStretchFactor(3,1);
+
   // tableLayout->setVerticalStretch(1);
 
   // END ADDING WIDGETS TO QSPLITTER
@@ -342,8 +347,8 @@ void BCEGameHandler::setupLayout() {
   QVBoxLayout *fullLayout = new QVBoxLayout();
   fullLayout->addWidget(tableLayout);
 
-  layout->addLayout(fullLayout);
   layout->addLayout(controlLayout);
+  layout->addLayout(fullLayout);
 
   ////////////////////////
   // SLOT CONNECTION SETUP

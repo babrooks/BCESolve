@@ -150,18 +150,21 @@ void BCEPlotHandler::setupLayout() {
   bottomQSplit->setSizePolicy(sp1);
   leftSideSplitter->addWidget(topQSplit);
   leftSideSplitter->addWidget(bottomQSplit);
-  leftSideSplitter->setSizePolicy(sp);
 
   QVBoxLayout *colorMapWithTitle = new QVBoxLayout();
   colorMapWithTitle->addWidget(colorMapTitle);
   colorMapWithTitle->addWidget(conditionalMarginalPlot);
   QWidget *rightSideWidget = new QWidget();
   rightSideWidget->setLayout(colorMapWithTitle);
-  rightSideWidget->setSizePolicy(sp);
+
+  QSplitter *mainSplitter = new QSplitter();
+  mainSplitter->addWidget(leftSideSplitter);
+  mainSplitter->addWidget(rightSideWidget);
+  mainSplitter->setStretchFactor(0,1);
+  mainSplitter->setStretchFactor(1,4);
 
   mainTab = new QHBoxLayout();
-  mainTab->addWidget(leftSideSplitter);
-  mainTab->addWidget(rightSideWidget);
+  mainTab->addWidget(mainSplitter);
 
   // End Plot Initializations and Organization
   /////////////////////////////////////////////// 
