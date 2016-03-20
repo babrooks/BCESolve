@@ -46,7 +46,7 @@ public:
 
   //! Constructor
   BCELineEdit(BCESliderType _type, int _player):
-    sliderType(_type), player(_player)
+    sliderType(_type),player(_player),QLineEdit()
   {}
 
 public slots:

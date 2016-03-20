@@ -60,13 +60,13 @@ void solveFPA(int nvals, int nbids,
       	cout << "Objective function set" << endl;
 
       solver.solve();
-      // solver.mapBoundary("fpaknown.dat");
+      solver.mapBoundary("fpaknown.dat");
 
       BCESolution soln;
       solver.getSolution(soln);
 
       vector< vector<double> > expObj;
-      soln.getExpectedObjectives(expObj);
+      // soln.getExpectedObjectives(expObj);
 
       string fileNameStr = filename.str();
       const char * fnameC = fileNameStr.c_str();

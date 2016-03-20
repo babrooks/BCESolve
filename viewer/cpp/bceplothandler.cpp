@@ -37,6 +37,13 @@ void BCEPlotHandler::setupLayout() {
   // Payoff Plot Initialization
   BCELabel *setOfBCEPlotTitle = new BCELabel(ValueSetPlot);
   setOfBCEPlot = new BCEValueSetPlot();
+  // QCPPlotTitle *setOfBCETitleText = new QCPPlotTitle(setOfBCEPlot);
+  // setOfBCETitleText->setText(setOfBCEPlotTitle);
+  // setOfBCEPlot->plotLayout()->insertRow(0);
+  // setOfBCEPlot->
+  //   plotLayout()->
+  //   addElement(0,0,setOfBCETitleText);
+
   setOfBCEPlot->xAxis->setLabel("Player 0");
   setOfBCEPlot->yAxis->setLabel("Player 1");
   connect(setOfBCEPlot,SIGNAL(newEqmCoordinates(double,double)),

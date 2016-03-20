@@ -1,12 +1,13 @@
-// This file is part of the SGSolve library for stochastic games
-// Copyright (C) 2016 Benjamin A. Brooks
+// This file is part of the BCESolve library for games of incomplete
+// information
+// Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton
 // 
-// SGSolve free software: you can redistribute it and/or modify it
+// BCESolve free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 // 
-// SGSolve is distributed in the hope that it will be useful, but
+// BCESolve is distributed in the hope that it will be useful, but
 // WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // General Public License for more details.
@@ -20,7 +21,7 @@
 // Chicago, IL
 
 /*!
-  \mainpage SGSolve Documentation
+  \mainpage BCESolve Documentation
 
   \section introsec Introduction
 
@@ -61,14 +62,13 @@ payoffs of the players.
   1.53; and on OS X using LLVM version 7.0.2 and Boost 1.57. In both
   cases, the BCEViewer was compiled using Qt 5.5. The class BCESolver
   uses Gurobi for linear programming, and the code was compiled with
-  Gurobi 5.63 on Linux and Gurobi 6.50 on OS X. To compile the code
-  yourself, you need to change the relevant variables in src/makefile
-  and examples/makefile to direct the compiler to Boost. If you wish
-  to compile the examples using Gurobi, you also need to change the
-  directories in grb.mk. You can then build the desired examples by
-  calling "make" in either the src or examples directories. After you
-  build the source, you can build SGViewer program from the viewer
-  directory by first calling "qmake" and then "make".
+  Gurobi 5.63 on Linux and Gurobi 6.50 on OS X. To compile the source and example code
+  yourself, you need to change the relevant variables in cplex.mk 
+  to direct the compiler to Boost and GUROBI. You can then build the desired examples by calling 
+  "make examplename" (the .cpp or .hpp ending is not included) in 
+  the example dirctory. After you
+  build the source, you can build BCEViewer program from the viewer directory
+  by updating "conditional.mk," first calling "qmake," and then running "make".
 
   \section solversec Overview of the solver library
 
@@ -94,12 +94,12 @@ payoffs of the players.
 
   \section viewersec Overview of the graphical interface
 
-  BCESolve also includes an accompanying viewer. It is capable of displaying
+  BCESolve includes an accompanying graphical interface. It is capable of displaying
   data in a BCESolution object. This includes plotting player payoffs for
   all equilibria, plotting deviation objectives for each player,
-  and plotting the probability distribution of player actions given the state.
+  and plotting the Bayes correlated equilibrium.
   It also includes a tab for creating custom games, using the class BCEGame,
-  which is derived from BCEAbstractGame. The user can control the conditional
+  which is derived from BCEAbstractGame. The user can set the conditional
   distribution of types, objective payoffs, the prior over the states, and
   weights on the objectives for maximization. The user can solve these
   custom games within the viewer. Output is displayed in a log tab, and the 
@@ -108,39 +108,30 @@ payoffs of the players.
 
   The interface contains three tabs: a solution tab, a game tab,
   and a log tab. The solution tab displays graphs depicting features of the currently
-  loaded solution object. The game tab facilitates the both creation of custom games
+  loaded solution object. The game tab facilitates both creation of custom games
   and editing of games written in c++. Custom and edited games can be also be solved from
   within the game tab. The log tab outputs progress and numerical solutions
   for any games games solved within the interface. 
 
-  The solution tab uses two main classes: BCEPlotHandler and BCEDataState. 
+  The solution tab largely runs using two classes: BCEPlotHandler and BCEDataState. 
   BCEDataState contains solution data for the currently loaded solution and
   has methods for manipulating that data. It also contains the user controls
-  in the solution tab. These controls make use of the BCELineEdit, BCECheckBox,
-  and BCESlider classes. When users interact with these controls, data is 
+  in the solution tab. These controls make use of the BCELineEdit and
+  BCESlider classes. When users interact with these controls, data is 
   manipulated to reflect new parameters, and signals are sent to BCEPlotHandler
-  that data has been updated. BCEPlotHandler receives signals from BCEDataState
-  to plot data. Its methods are largely aimed at configuring the various plots
-  displayed in the solution tab. It makes use of the custom plot class BCEValueSetPlot,
+  that data has been updated. Slots in BCEPlotHandler receives signals from BCEDataState
+  and run routines to plot data. BCEPlotHandler makes use of the custom plot class BCEValueSetPlot,
   which adds the abilities to retrieve mouse-over graph coordinates and interact
   by clicking on the plot. It also uses the custom label class BCELabel, which
   serves to label all plots in the solution tab (some of them dynamically, as titles
   change when data is manipulated).
 
-  The game tab uses a number of large classes. The overarching class that 
-  manages the many objects within the tab is the BCEGameHandler. BCEGameHandler uses
-  the class BCEPushButton to implement user controls. The tables seen within the gametab
+  The game tab is constructed by the class BCEGameHandler. The tables seen within the gametab
   are, from left to right, a BCEPayoffTableModel, a BCEConditionalTableModel,
-  a BCEPriorTableModel, and a BCEObjWeightsTableModel. These all inherit from the 
-  BCETableModel class, which sets general settings used by all the models. When data in these models is changed, the currently loaded BCEGame object is altered to reflect the changes, and the model retrieves that new data from the 
-  game to display in the model. In other words, data entered into the model is not the
-  data that the user sees; that entered data is entered into the game, and the model
-  updates the data it displays with that new data from the game. Entering data into the model thus also reveals if the data was properly entered into
-  the game object. BCETableView is also used by the BCEGameHandler. It sets general
-  settings for displaying the models in the game tab. BCEGameHandler also uses BCESolverWorker
-  for solving games. When the solve button is clicked by the user, a BCESolverWorker object
-  is initialized and used to solve the game. Progress of the solve routine is sent to
-  the log tab.
+  a BCEPriorTableModel, and a BCEObjWeightsTableModel. When data in these models is changed, the currently loaded BCEGame object is altered to 
+  reflect the changes, and the model retrieves that new data from the game to display 
+  in the model. Entering data into the model thus also reveals if the data was properly 
+  entered into the game object. BCEGameHandler makes use of BCESolverWorker to solve games. When the solve button is clicked by the user, a BCESolverWorker object is initialized, moved to a new thread in order to preserve functionality of the program, and used to solve the game. Progress of the solve routine is sent to the log tab.
 
   The log tab layout is created by BCELogHandler. BCELogStream, which is initilized in
   main.cpp, serves to redirect all cout in the program to the log tab. 
@@ -155,30 +146,22 @@ payoffs of the players.
   \section examplesec Examples
 
   For the benefit of the user, we have included several examples of
-  how to use the SGSolve package. The file pd.cpp is an example of a
-  two-state game, where the stage game in each state takes the form of
-  a prisoner's dilemma. This is the example in Table 1 of Abreu,
-  Brooks, and Sannikov (2016). Thsi file shows how to construct an
-  SGGame by specifying the payoffs and transition probabilities as
-  arrays. A second example in abreusannikov.cpp generates and solves a
-  one state game from Abreu and Sannikov (2014).
+  how to use the BCESolve package. The file allpayauction.cpp is an example of a
+  standard, common-values all pay auction in which bidders pay their bids, irrespective of winning.
+  The accompanying header file, allpayauction.hpp, shows how to construct a simple BCEGame by specifying the objectives and prior over the states (uniform, in this example). The example commonvalueauction.hpp specifies a prior over values distributed according to the CDF v^alpha, where v denotes the value in [0,1].
 
-  The third example is risksharing.cpp and risksharing.hpp. These
-  files construct a risk sharing game a la Kocherlakota (1996), in
-  which the two players have stochastic endowments and concave
-  utility, and can insure one another against income shocks with
-  transfers. The file risksharing.hpp constructs a risk sharing game
-  by deriving from the SGAbstractGame class, and risksharing.cpp uses
-  that class to solve for a variety of parameter values. These files
-  generate the analysis for Section 6 of Abreu, Brooks, and Sannikov
-  (2016).
-
-  The final example is abs_jyc.cpp, which compares the algorithm of
-  Abreu, Brooks, and Sannikov (2016) to a generalized version of the
-  algorithm of Judd, Yeltekin, and Conklin (2003) that was implemented
-  using Gurobi.
+  The example fpaknown.hpp formulates a private-values first-price auction.
+  The header file shows to how implement private values within the library's
+  state framework. The file fpaknown.cpp assumes that bidders know their own
+  values. This file features the mapBoundary method, which traces out 
+  the boundary for equilibria payoffs and allow the user to view different
+  equilibria in the BCEViewer. This payoff set is saved in a data file, "fpaknown.dat,"
+  so that it can also be analyzed elsewhere. The file fpaunknown.cpp assumes
+  that bidders do not know their own values. 
 
   \section conclusionsec Final thoughts
+
+  UPDATE FOR BCE. CURRENTLY SG.
 
   The package has many more features that the user will no doubt
   discover. Within the src folder is a src/MATLAB subfolder, that
@@ -254,163 +237,65 @@ payoffs of the players.
 
   The source module is comprised of a library of classes for
   specifying, solving, and exploring the solutions of two player
-  stochastic games with perfect monitoring and public randomization. A
+  games with incomplete information. A
   list of classes is contained here: \ref src. This page provides an
   overview of the object model, with additional details in the
   respective class pages. 
 
-  \section srcgamesec Specifying a stochastic game
+  \section srcgamesec Specifying a game
   
-  The first step in using the SGSolve library is translating the
-  abstract formulation of a stochastic game into a format that can be
+  The first step in using the BCESolve library is translating the
+  abstract formulation of a game into a format that can be
   understood by the library. This translation is facilitated by the
-  SGGame class. SGGame has private data members that store the
-  discount factor, the stage game payoffs, and the transition
-  probabilities as a function of the state and the pair of
-  actions. SGGame has multiple constructors. One way to construct an
-  SGGame is to pass the payoffs, transition probabilities, and other
-  data as stl containers, in particular std::vectors of
-  std::vectors. 
+  BCEAbstractGame and BCEGame classes. 
 
-  There are two additional parameters that one can pass to the SGGame
-  constructor which deserve special mention. The first is called
-  "unconstrained", which is a vector of two bools, one for each
-  player, indicating whether or not to impose incentive
-  constraints. By default, unconstrained is false for both
-  players. This parameter can be used in a couple of different
-  ways. If the user wants to compute just the feasible payoffs for the
-  game, and not the subgame perfect Nash equilibrium payoffs, then the
-  user can specify that neither player is incentive constrained. On
-  the other hand, if one of the players can commit to an action for
-  reasons outside the model, then only that player's unconstrained
-  value can be set to true.
+BCEAbstractGame has protected data members that store the
+number of actions, number of states, number of types, number of objectives, and whether the game has a product structure. BCEAbstractGame has multiple constructors. The default constructor is used primarily for creating "blank" games within the graphical interface. The second constructor takes four integer inputs, each specifying one of the above-mentioned parameters, and creates a game where each player has the same number of types and actions. The third constructor instead takes two-element vectors of actions and types. This constructor allows players to have different numbers of actions and types.
 
-  The second parameter worth special mention is a vector of lists of
-  equilibrium actions. By default, the algorithm will compute the
-  payoffs in equilibria in which any action profile may be used on the
-  equilibrium path. This argument can be used to restrict attention to
-  a subset of the equilibria where only the listed action profiles are
-  used in equilibrium. For example, in the decentralized insurance
-  example in risksharing.cpp, both players are allowed to make
-  transfers of their endowment to one another. It is obviously without
-  loss of generality, however, to restrict attention to those action
-  profiles in which at most one player is making a positive
-  transfer. This is accomplished by setting the equilibrium actions
-  parameter to list only those action profiles which are used in
-  equilibrium. Note that even if the equilibrium action profiles are
-  restricted, players are implicitly allowed to deviate to any action
-  that is available in the given state.
+  There are two parameters in the BCEAbstract
+  class which deserve special mention. The first is called
+  "hasProductStructureData," which...
 
-  SGGame has another constructor, which accepts a reference of type
-  SGAbstractGame. An alternative, and potentially more useful way of
-  specifying the game, is to derive from the SGAbstractGame class. The
-  principle is that it is often easier to specify the <i>rule</i> by
-  which payoffs or transition probabilities are generated, rather than
-  simply denumerating them for all cases. The SGAbstractGame class has
-  a pure virtual method SGAbstractGame::payoffs which returns the
-  players' flow utilities for a given state and action pair. When the
-  user derives from SGAbstractGame, they provide a definition of this
-  method that implicitly defines the payoff rule. An example of how to
-  construct an SGGame by deriving from SGAbstractGame is provided in
-  risksharing.hpp.
+  The second is the "objectiveLabels" member, which enables the user to name
+  the objectives of the game. These labels will be displayed in the graphical
+  interface when the game is loaded. If no names are provided, the first two 
+  objectives will be called "Player 0 Payoff" and "Player 1 Payoff" by default.
+  Subsequent objectives are denoted "Objective k."
 
-  SGGame objects can be serialized and deserialized through static
-  SGGame::save and SGGame::load methods. See risksharing.cpp for an
-  example. Serialized SGGame objects can be loaded by SGViewer.
+  The BCEGame class derives from BCEAbstractGame. Its private members include
+  the payoffs for each objective, the prior over each state, the conditional 
+  distribution of types, data for dominated actions, and data for feasible deviations.
+
+  BCEGame objects can be serialized and deserialized through static
+  BCEGame::save and BCEGame::load methods. See allpayauction.cpp for an
+  example. Serialized BCEGame objects can be loaded by BCEViewer.
 
   \section srcsolversec Solving a game
 
   Once one has specified the game, the next step is to solve that game
-  by constructing an SGSolver. In addition to the game, the
-  constructor for SGSolver accepts an object of type SGEnv (i.e., an
-  SG environment). The SGEnv class manages parameters for the behavior
-  of the algorithm. For more details, see its class page. Once the
-  SGSolver is constructed, the computation of equilibrium payoffs is
-  invoked using SGSolver::solve.
+  by constructing a BCESolver. The BCESolver constructor requires the input 
+  of a BCEAbstractGame or a BCEAbstractGame derived object, such as a BCEGame. Once the
+  BCESolver is constructed, the computation of the Bayes correlated equilibrium is
+  invoked first by calling BCESolver::populate(), which populates probability and incentive constraints, and then by calling using BCESolver::solve, which uses Gurobi to solve the resulting linear program.
 
-  The SGSolver itself is actually a quite small. Most of the heavy
-  lifting for the computation is done in the SGApprox class. One can
-  think of this class as describing the state of the computation at a
-  given iteration, as specified in Abreu, Brooks, and Sannikov. Thus,
-  this class contains as private data members a pivot tuple of
-  payoffs, a current direction, current threat payoffs, a list of
-  extreme binding continuation values for each action, and the past
-  trajectory of the pivot. SGApprox also contains methods for
-  computing the next approximation. This includes (i) updating the
-  extreme binding continuation values, (ii) computing the shallowest
-  direction, and (iii) updating the pivot. These steps are broken up
-  into several methods. 
-
-  Within SGApprox, the work of computing the extreme binding
-  continuation values at each iteration falls to the SGAction
-  class. The SGApprox maintains a list of SGAction objects for each
-  state. Each SGAction object is associated with a particular state
-  and action pair. The SGAction class contains methods for computing
-  minimum incentive compatible continuation values, given a game and a
-  list of extreme payoff tuples that describe the current feasible
-  set, and for computing the extreme binding continuation
-  values. These methods are controlled by parameters in the SGEnv
-  object. (SGAction is in fact derived from another class
-  SGBaseAction, which has essentially the same data members but lacks
-  the SGEnv object and the methods for recomputing payoffs. The reason
-  for this was so that the data related to the action can be
-  serialized without the environment.)
-
-  The whole process of updating the approximation is managed by the
-  method SGApprox::generate, which returns the distance between the
-  new approximation and the previous one. SGSolver::solve constructs
-  an SGApprox object and iteratively calls the generate method until
-  the error tolerance is below the level specified in the SGEnv. The
-  data from the computation is stored in an SGSolution object, which
-  is a member of the SGSolver. 
-
-  The class SGJYCSolver is an alternate solver routine that implements
-  a generalized version of the algorithm of Judd, Yeltekin, and
-  Conklin (2003). This method approximates the equilibrium payoff
-  correspondence by a series of bounding hyperplanes in a fixed set of
-  directions. The algorithm iteratively recomputes this approximation
-  by solving a series of linear programming problems. For the linear
-  programming portion of the procedure, we have used the commercial
-  optimization package Gurobi. For more details, see the class page
-  for SGJYCSolver.
+  MapBoundary/mapFrontier section...
 
   \section srcsolutionsec Using the solution
 
   The output of the algorithm is stored in an object of type
-  SGSolution, which is a member of SGSolver and can be accessed using
-  the SGSolver::getSolution method. The SGSolution contains a copy of
-  the solved game, the trajectory of the pivot (represented as a list
-  of SGTuple objects), and a list of SGIteration objects that describe
-  how the algorithm behaved at each iteration. It is possible to
-  change settings in the SGEnv object so that no iterations are
-  stored, or so that iterations are only stored on the last revolution
-  of the pivot. (In this latter case, the algorithm iterates to
-  convergence, and the runs one extra revolution storing the
-  iterations.)
+  BCESolution, which is a member of BCESolver and can be accessed using
+  the BCESolver::getSolution method. 
 
-  The SGIteration objects describe in detail how the pivot at a given
-  iteration was generated, and how the next direction and
-  corresponding substitution was chosen. In particular, the
-  SGIteration contains private data members for an actionTuple and a
-  regimeTuple, which correspond to the basic pair described in Abreu,
-  Brooks, and Sannikov (2016). The SGIteration also contains an array
-  of SGBaseAction objects which indicate the extreme binding
-  continuation values available for each action. There is one
-  SGBaseAction object for each action pair which can still be
-  supported at the current iteration. All of these data members can be
-  accessed using the appropriate get methods. See the SGIteration
-  class page for details. 
+  BCESolution contains methods for accessing data of interest within
+  the solution and accompanying game objects. BCECounter is used to handle linear indexing of
+  data vectors seamlessly. The getExpectedObjectives method, for example,
+  uses a BCECounter object to search through a deserialized game and retrieve
+  the expected objectives under the current equilibrium.
 
-  The class SGSimulator can be used to forward simulate an equilibrium
-  starting from the payoffs associated with a given
-  SGIteration. SGSimulator simulates for a fixed number of periods and
-  tracks the empirical distribution of states, extreme tuples, and
-  action pairs. For more details, see the corresponding class page.
-
-  For the user's convenience, SGSolution contains static methods for
-  serialization (SGSolution::save) and deserialization
-  (SGSolution::load). See risksharing.cpp for an example of how these
-  are used. Serialized SGSolution objects can be loaded by SGViewer.
+  For the user's convenience, BCESolution contains static methods for
+  serialization (BCESolution::save) and deserialization
+  (BCESolution::load). See allpayauction.cpp for an example of how these
+  are used. Serialized BCESolution objects can be loaded by BCEViewer.
 
   \section srcfurthertopics Further topics
   
@@ -420,15 +305,15 @@ payoffs of the players.
   all data members are private or protected and can only be accessed
   through public mutator methods.
   
-  This library provides the core functionality underling the SGViewer
+  This library provides the core functionality underling the BCEViewer
   program which is described in \ref viewerpage. Please see that
   section of the documentation for a detailed description of the
-  SGViewer object model. 
+  BCEViewer object model. 
 
  */
 
-/*! \page viewerpage The SGViewer graphical interface
-  @brief An detailed description of the SGViewer graphical interface.
+/*! \page viewerpage The BCEViewer graphical interface
+  @brief An detailed description of the BCEViewer graphical interface.
   \section vieweroverviewsec Introduction
   
   The BCEViewer module is a graphical interface for specifying,
@@ -443,10 +328,10 @@ payoffs of the players.
   class. This class constructs the rest of the interface and handles
   the high level functions that have generalized effects on the
   program: loading and saving games and solutions, solving games, and
-  keyboard commands. The layout has three tabs: these are the "game
-  tab", the "solution tab", and the "log tab". The game tab is for
-  specifying and viewing stochastic games, and the solution tab is for
-  exploring the solution of stochastic games. The log tab's function
+  keyboard commands. The layout has three tabs: these are the "solution
+  tab", the "game tab", and the "log tab". The solution tab is for
+  exploring the solution of games, and the game tab is for
+  specifying and viewing games. The log tab's function
   is primarily for displaying the progress of the algorithm during
   computation. Each of the game and solution tabs has a separate class
   associated with handling the functionality of that tab. 
@@ -455,34 +340,41 @@ payoffs of the players.
 
   The game tab is managed by an object of the BCEGameHandler class. The
   game handler contains a copy of a game, and handles the interface
-  between various tables and controls for editing payoffs and
-  transition probabilities. Basically, the game tab displays the
-  payoff matrix and transiiton probabilities for one state at a
-  time. This state is selected using controls at the top of the
-  tab. 
+  between various tables and controls for editing payoffs, the prior, the conditional
+  distribution of types, and weights on objectives for optimization. The game tab displays the payoffs and conditional distribution of types for one state at a time. Different states are selected using controls at the top of the tab. 
 
   The editing of payoffs and probabilities is implemented using Qt's
   model-view framework. The tables themselves are of the type
-  SGTableView derived from QTableView. Each table has a model
-  associated with it. All models are derived from SGTableModel, which
-  is derived from QAbstractTableModel. SGTableModel adds private
-  members: a pointer to an associated SGGame object and an int "state"
+  BCETableView derived from QTableView. Each table has a model
+  associated with it. All models are derived from BCETableModel, which
+  is derived from QAbstractTableModel. BCETableModel adds private
+  members: a pointer to an associated BCEGame object and an int "state"
   member, which is the state that is currently being edited. For
-  payoff tables, the model is SGPayoffTableModel, which adds methods
+  payoff tables, the model is BCEPayoffTableModel, which adds methods
   for generating header data to indicate action profiles and also
-  defines setData/getData methods for interfacing with the SGGame
-  object. For probability tables, the model is
-  SGProbabilityTableModel, which derives from SGPayoffTableModel. This
-  class adds a new data member, which is the tomorrow's state, and
-  redefines setData and getData to access the relevant probability
-  data in SGGame. When the current state is changed by the user,
-  SGGameHandler simply updates the state parameters of all of the
-  table models and sends out signals to update the displayed
-  data. 
+  defines setData/getData methods for interfacing with the BCEGame
+  object. The table displaying the conditional distribution of types, a 
+  BCEConditionalTableModel, replicates the functionality of the payoff
+  table model. It handles modifying data related to the distribution of types in the
+  BCEGame object. Correspondingly, the table displaying the prior over the states,
+  a BCEPriorTableModel, handles modifying the prior data in the BCEGame
+  object. The final table, BCEObjWeightsTableModel, manages its data internally,
+  since the BCEGame object contains no data pertaining to which objectives
+  will be maximized or minimized when the solve routine is run. Instead, when the solve
+  routine is run, BCEGameHandler retrieves the objective weights from the
+  BCEObjWeightsTableModel object.
 
-  The game tab also has controls for changing the numbers of actions
-  and states. When these options are selected, SGGameHandler simply
-  invokves the corresponding method in the SGGame class.
+  Since some table models are state dependent, when the current state is changed by the user,
+  BCEGameHandler simply updates the state parameters of all of the
+  table models and sends out signals to update the displayed
+  data. Data displayed in the payoff table model and the conditional table
+  model will reflect the new state. The prior table model and objective weights
+  table model exist independently of the state and will not change.
+
+  The game tab also has controls for changing the numbers of actions,
+  states, and types. When these options are selected, BCEGameHandler simply
+  invokves the corresponding method in the BCEGame class and signals that the models
+  need to update their layouts.
   
   Finally, the game tab has a "Solve" push button which triggers the
   solve routine, and a "Cancel" push button for interrupting the
@@ -491,105 +383,66 @@ payoffs of the players.
   \section viewersolvesec Solving a game
 
   When the user presses the "Solve" button on the game tab, the signal
-  is handled by the SGMainWindow class which begins a computation
+  is handled by the BCEWindow class which begins a computation
   using the algorithm. This computation is handled via an intermediary
-  class called SGSolverWorker. To start the algorithm, the main window
-  constructs an SGSolverWorker and moves it to a new thread so as not
+  class called BCESolverWorker. To start the algorithm, the main window
+  constructs a BCESolverWorker and moves it to a new thread so as not
   to freeze the program while the computation progresses. The worker
-  constructs an SGApprox object for the given game. The main window
+  constructs a BCESolver object for the given game. The main window
   and the worker communicate back and forth to manage the progress of
-  the algorithm. The main window invokes the iterate slot in the
-  worker to call SGApprox::generate to run a single iteration of the
-  algorithm. When this iteration finishes, the worker signals back to
-  the main window that the iteration has finished. SGMainWindow then
-  prints a status update to the log tab and depending on the outcome
-  of the iteration and the status of the program either terminates the
-  computation or signals to the worker to begin another iteration. The
-  computation will end if either the algorithm has converged, an error
-  occurred in SGApprox::generate, or if the user pressed cancel (in
-  which case a cancel flag is set that is observed by the main
-  window. The main window and the worker communicate back and forth in
+  the algorithm and output via a BCEGurobiCallback object. The callback
+  object checks periodically to determine if the user has triggered the cancel
+  flag, either by hitting the cancel button in the game tab or by clicking "Cancel
+  Solve" in the tools menu of the menu bar at the top of the graphical interface. 
+  At each of these periodic checks, the callback object uses std::cout to emit
+  information about the progress of the alorithm solving the linear program.
+  The main window and the worker communicate back and forth in
   this manner until the computation terminates, at which point the
-  SGSolution object generated by the computation is copied to
-  SGSolutionHandler and the worker is destroyed.
+  BCESolution object generated by the computation is copied to
+  BCEPlotHandler and the worker is destroyed.
 
   \section viewersolutionsec Interacting with the solution
 
-  When a solution is loaded through SGMainWindow or when one is
-  produced by solving a game, it is passed to SGSolutionHandler, which
+  When a solution is loaded through BCEWindow or when one is
+  produced by solving a game, it is passed to BCEPlotHandler, which
   is the class that controls the solution tab. This tab contains
   various plots for visualizing the computations performed by the
-  algorithm and the final solution of the game. 
+  algorithm and the final solution of the game. BCEPlotHandler also
+  passes the solution to BCEDataState, which contains methods for manipulating
+  the BCESolution into vectors and matrices easily amenable to plotting.
 
-  On the right-hand side are a series of SGCustomPlot objects, which
-  are derived from QCustomPlot, and whose purpose is to simultaneously
-  view payoffs across different states. On the left-hand side is
-  another SGCustomPlot for providing a larger and more detailed view
-  of payoffs in a single state. SGCustomPlot adds several kinds of
-  functionality to QCustomPlot. The most important is adding the
-  ability for the user to right click on a point in the plot to bring
-  up a context menu which has options for inspecting a particular
-  point and for forward simulating the equilibrium that generates a
-  particular payoff vector. See the class page for more details on
-  SGCustomPlot. 
-  
-  The primary function of the SGSolutionHandler is to handle the
-  plotting of the data from its SGSolution member. The way in which
+  The solution tab presents a series of BCEValueSetPlot objects, which
+  are derived from QCustomPlot. These serve to add tooltip functionality
+  such as displaying coordinates when hovering the mouse over the plot. A right-click
+  on the plots opens a menu with options to save a single plot as a .png or .pdf. 
+  A click on points in the plot in the top left of the GUI will select new equilibria, if more
+  than one equilibrium is contained within the solution object. 
+
+  The primary function of the BCEPlotHandler is to handle the
+  plotting of the data from its BCEDataState member. Which part of
   the solution is plotted depends on a number of parameters that are
   controlled by the user through various widgets. These widgets
-  control the plots indirectly through an SGPlotController
-  object. This object aggregates all of the settings in the widgets
-  into one set of parameters that tell SGSolutionHandler how to
-  plot. In particular, when one of the controls is changed, the
-  corresponding signal is connected to a slot in SGPlotController that
-  updates the parameter value, and then signals to SGSolutionHandler
-  to replot.
-  
-  SGPlotController maintains pointers to the controlling
-  widgets. There are two controls that deserve special mention. There
-  are two combo boxes that allow the user to select a particular state
-  and action pair to display. The user can use these combos to plot
-  the test directions that are generated by a particular action pair
-  at a given iteration. Only those action pairs are listed that can
-  still be incentivized at the current iteration. The list of states
-  is controlled by the class SGStateComboModel, and the list of action
-  pairs is controlled by an SGActionComboModel.
-
-  The main method for plotting data from the solution is
-  SGSolutionHandler::plot. Plotting is in fact broken up into two
-  overloaded versions of this method, one of which plots basic
-  features, such as the trajectory of the pivot and the title of the
-  plot, whereas the other plots the detailed features on the left-hand
-  display. These methods' operation depends on a mode which is
-  selected from a combo box at the top of the tab, and whose value is
-  stored in SGPlotController. When the mode is set to "Progress", the
-  tab will plot the sequence of iterations between a user defined
-  "start" and "end". For the current iteration, the program will plot
-  in the left-hand SGCustomPlot the test directions which are
-  generated by a given action pair. By default, the action pair is
-  initialized to the one that generates the next direction. The start
-  and end iterations are controlled through sliders at the bottom of
-  the tab.
-
-  In "Final" mode, only the final revolution of the pivot will be
-  plotted. In this mode, the start slider is disabled, and the end
-  slider can be used to select a particular iteration to decompose. In
-  either mode, the user can select a particular payoff to display in
-  detail by right-clicking on that payoff and selecting "Inspect
-  point" from the context menu.
+  control the plots indirectly through the BCEDataState object. 
+  This object aggregates all of the settings in the widgets
+  into one set of parameters and manipulates relevant data for plotting. 
+  In particular, when one of the controls is changed, the
+  corresponding signal is connected to a slot in BCEDataState that
+  updates the parameter value, manipulates relevant data for plotting,
+  and then signals to BCEPlotHandler to replot.
   
   \section viewerotherfeatures Other features of the viewer
 
-  There are two other features of SGViewer which we will mention. The
-  behavior of the algorithm depends on a number of parameters. These
-  parameters can be controlled using the SGSettingsHandler widget,
-  which appears as a pop-up when the user selects Tools->Settings. 
-
-  In addition, the SGSolve library has the ability to forward simulate
-  the equilibrium that generates a particular payoff using the
-  SGSimulator class. Simulations are run using the SGSimulationHandler
-  widget, which can be constructed by the user by right-clicking on
-  the payoffs of interest in any of the plots on the solution tab, and
-  selecting "Simulate equilibrium" from the resulting context menu.
+  There is one other feature of the BCEViewer which we will mention. 
+  Two examples are built in to the tools menu in the menu bar. The 
+  hybrid auction provides a parameter to control the "weight on bidder
+  1's bid." A weight of 1 means bidder 1 pays 100% of his bid when he wins.
+  A weight of 2 likewise means bidder 1 pays only the bid of the other bidder
+  if he wins. The intermediary region thus lies between a first- and second-price
+  auction. Other parameters in the generation menu for this game include a reserve
+  price, entry fee, and highBid. Setting the highBid parameter below 1, the standard,
+  allows more detailed (higher resolution) of the relevant bid region without 
+  increasing the number of iterations the solver needs to run through. The 
+  second example is a common-value auction where the prior is governed
+  by a CDF of the form v^alpha, where v is the common value in [0,1]. 
   
  */

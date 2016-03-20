@@ -1,6 +1,6 @@
 // This file is part of the BCESolve library for games of incomplete
 // information
-// Copyright (C) 2016 Benjamin A. Brooks, Robert J. Minton
+// Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton
 // 
 // BCESolve free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by
@@ -33,18 +33,41 @@
   click retrieves the coordinates of the click.
 
     \ingroup viewer
- */
+*/
 class BCEValueSetPlot : public QCustomPlot {
   Q_OBJECT;
+
+private:
+
+  //! Pointer to QAction for saving PNG files
+  QAction *savePNGAction;
+  //! Pointer to QAction for saving PDF files
+  QAction *savePDFAction;
+  //! Path to screenshots
+  QString path;
 
 public:
 
   //! Constructor
-  BCEValueSetPlot() {
-  connect(this,SIGNAL(mouseMove(QMouseEvent*)),
-	  this,SLOT(showPointToolTip(QMouseEvent*)));
-  connect(this,SIGNAL(mousePress(QMouseEvent*)),
-	  this,SLOT(getClickCoordinates(QMouseEvent*)));
+  BCEValueSetPlot(): QCustomPlot() {
+
+    setContextMenuPolicy(Qt::CustomContextMenu);
+
+    path = QString("../");
+
+    savePDFAction = new QAction(tr("Save &PDF"), this);
+    savePNGAction = new QAction(tr("Save P&NG"), this);
+
+    connect(this,SIGNAL(mouseMove(QMouseEvent*)),
+	    this,SLOT(showPointToolTip(QMouseEvent*)));
+    connect(this,SIGNAL(mousePress(QMouseEvent*)),
+	    this,SLOT(getClickCoordinates(QMouseEvent*)));
+    connect(savePDFAction,SIGNAL(triggered()),
+	    this,SLOT(savePDF()));
+    connect(savePNGAction,SIGNAL(triggered()),
+	    this,SLOT(savePNG()));
+    connect(this,SIGNAL(customContextMenuRequested(const QPoint &)),
+	    this,SLOT(ShowContextMenu(const QPoint &)));
   }
 
 signals:
@@ -73,6 +96,54 @@ public slots:
 
   }
 
+private slots:
+
+  //! Slot for showing context menu. 
+  /*! Creates a context menu and shows the actions for saving PDF/PNG
+      files. */
+  void ShowContextMenu(const QPoint & pos)
+  {
+
+    QPoint globalPos = this->mapToGlobal(pos);
+    
+    QMenu contextMenu;
+    contextMenu.addAction(savePDFAction);
+    contextMenu.addAction(savePNGAction);
+    
+    contextMenu.exec(globalPos);
+  }
+
+  //! Saves graph as a PDF.
+  void savePDF()
+  {
+    QString newPath = QFileDialog::getSaveFileName(this, tr("Save PDF"),
+						   path, tr("PDF files (*.pdf)"));
+  
+    if (newPath.isEmpty())
+      return;
+
+    newPath = newPath + ".pdf";
+    QFileInfo fi(newPath);
+    path = fi.canonicalPath();
+
+    savePdf(newPath);
+  }
+
+  //! Saves graph as a PNG.
+  void savePNG()
+  {
+    QString newPath = QFileDialog::getSaveFileName(this, tr("Save PNG"),
+						   path, tr("PNG files (*.png)"));
+  
+    if (newPath.isEmpty())
+      return;
+
+    newPath = newPath+".png";
+    QFileInfo fi(newPath);
+    path = fi.canonicalPath();
+
+    savePng(newPath);
+  }
 
 };
 

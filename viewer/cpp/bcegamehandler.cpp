@@ -339,8 +339,6 @@ void BCEGameHandler::setupLayout() {
   tableLayout->setStretchFactor(2,1);
   tableLayout->setStretchFactor(3,1);
 
-  // tableLayout->setVerticalStretch(1);
-
   // END ADDING WIDGETS TO QSPLITTER
   //////////////////////////////////
 

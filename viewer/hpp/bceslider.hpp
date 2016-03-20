@@ -48,7 +48,7 @@ public:
 
   //! Constructor
   BCESlider(BCESliderType _type,int _player):
-    sliderType(_type), player(_player)
+    sliderType(_type),player(_player),QScrollBar()
   {
     connect(this,SIGNAL(valueChanged(int)),
 	    this,SLOT(changeValue(int)));

@@ -137,10 +137,12 @@ void BCEWindow::loadSolution() {
 
     emit(dataPathChanged(newPath));
 
+    tabWidget->setCurrentIndex(0);
+
     }
   catch (std::exception & e)
     {
-      qDebug() << "Load solution didnt work :( from BCEPlotHandler" << endl;
+      qDebug() << "Load solution didnt work :( from the BCEWindow class" << endl;
     }
 
 }
@@ -168,6 +170,7 @@ void BCEWindow::loadGame() {
     gameTab->setGame(loadedGame);
 
     emit(dataPathChanged(newPath));
+    tabWidget->setCurrentIndex(1);
 
     /* Note that the solution remains the same and isn't
        necessarily associated with the game. */
@@ -175,22 +178,21 @@ void BCEWindow::loadGame() {
     }
   catch (std::exception & e)
     {
-      qDebug() << "Load solution didnt work :( from BCEPlotHandler" << endl;
+      qDebug() << "Load game didnt work :( from the BCEWindow class" << endl;
     }
 
 }
 
 void BCEWindow::saveSolution() {
 
-  QFileDialog *saveSolnDialog = new QFileDialog();
+  QFileDialog *saveSolnDialog = new QFileDialog(this);
+  saveSolnDialog->setDefaultSuffix("bce");
   QString newPath = saveSolnDialog->getSaveFileName(this,tr("Save a solution file"),
 						    "../examples/",
 						    tr("BCEViewer solution files (*.bce)"));
 
   if (newPath.isEmpty())
     return;
-
-  newPath = newPath + ".bce";
 
   QFileInfo fi(newPath);
   path = fi.canonicalPath();
@@ -205,20 +207,19 @@ void BCEWindow::saveSolution() {
     }
   catch (std::exception & e)
     {
-      qDebug() << "Save solution didnt work :(" << endl;
+      qDebug() << "Save solution didnt work :( from BCEWindow" << endl;
     }
 } // saveSolution
 
 void BCEWindow::saveGame() {
 
-  QFileDialog *saveGameDialog = new QFileDialog();
+  QFileDialog *saveGameDialog = new QFileDialog(this);
+  saveGameDialog->setDefaultSuffix("bgm");
   QString newPath = saveGameDialog->getSaveFileName(this,tr("Save a game file"),
 						    "../examples/",
 						    tr("BCEViewer game files (*.bgm)"));
   if (newPath.isEmpty())
     return;
-
-  newPath = newPath + ".bgm";
 
   QFileInfo fi(newPath);
   path = fi.canonicalPath();
