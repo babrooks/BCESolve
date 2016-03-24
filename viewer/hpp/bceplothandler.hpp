@@ -1,6 +1,6 @@
 // This file is part of the BCESolve library for games of incomplete
 // information
-// Copyright (C) 2016 Benjamin A. Brooks, Robert J. Minton
+// Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton
 // 
 // BCESolve free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
 #include "bcevaluesetplot.hpp"
 #include "bceenumeration.hpp"
 #include "bcelabel.hpp"
+#include "bceplottitle.hpp"
 #include <QPointer>
 
 using namespace std;
@@ -143,7 +144,7 @@ private:
   //! Bar Graphs.
   QVector<BCEValueSetPlot*> deviationBarGraphs;
   //! Plot titles for the deviation bar plots.
-  QVector<BCELabel*> devPlotTitles;
+  QVector<BCEPlotTitle*> devPlotTitles;
   //! Sets up the layout of the plot handler.
   void setupLayout();
   //! Indicates if solution data is loaded in the soln tab.

@@ -60,7 +60,8 @@ bcelogstream.hpp \
 bceloghandler.hpp \
 bceobjweightstablemodel.hpp \
 bcesolverworker.hpp \
-bcegurobicallback.hpp
+bcegurobicallback.hpp \
+bceplottitle.hpp
 
 SOURCES += main.cpp \
 bceplothandler.cpp \
@@ -73,7 +74,8 @@ bceconditionaltablemodel.cpp \
 bcewindow.cpp \
 bceobjweightstablemodel.cpp \
 bcesolver.cpp \
-bcelabel.cpp
+bcelabel.cpp \
+bceplottitle.cpp
 
 LIBS += ../lib/libbce.a
 

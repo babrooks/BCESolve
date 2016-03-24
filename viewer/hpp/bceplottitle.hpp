@@ -20,24 +20,25 @@
 // ben@benjaminbrooks.net
 // Chicago, IL
 
-#ifndef BCELABELHANDLER_HPP
-#define BCELABELHANDLER_HPP
+#ifndef BCEPLOTTITLE_HPP
+#define BCEPLOTTITLE_HPP
 
 #include <QtWidgets>
 #include <sstream>
 #include "bceenumeration.hpp"
 #include <iomanip>
+#include "qcustomplot.h"
 
-//! Class handling labeling of controls in the solution tab.
-/*! This class constructs labels for the grid of controls
-  in the solution tab. The class processes whether the game
-  has a product structure or not and labels the state controls
-  accordingly.
+//! Class handling labeling of plots in the solution tab.
+/*! This class has a series of constructors to create labels
+  for plots. Also contains slots to change
+  plot labels after the user alters parameters in the 
+  solution tab.
 
   \ingroup viewer
 
  */
-class BCELabel : public QLabel {
+class BCEPlotTitle : public QCPPlotTitle {
   Q_OBJECT;
 
 private:
@@ -53,14 +54,31 @@ private:
 
 public:
 
-  //! Constructs slider labels for controls layout.
-  BCELabel(LabelType _labelType,BCESliderType _sliderType,int _player);
+  //! Constructs plot titles for the deviation bar graphs.
+  BCEPlotTitle(LabelType _labelType,int _player,QCustomPlot *parentPlot);
+
+  //! Constructs plot titles for heatmap and plot of equilibria player payoffs (top left plot).
+  BCEPlotTitle(LabelType _labelType,QCustomPlot *parentPlot);
 
 public slots:
 
-  //! Sets the state slider label to reflect if game has common or private states.
-  void displayStateOrValues(bool isPrivateVals,
-			    int emittedPlayer);
+  //! Changes non-probability elements of the deviation plot titles
+  void changeText(int emittedPlayer,
+		  int action,
+		  int type,
+		  double objectiveValue);
+
+  //! Changes probability element of the deviation plot titles
+  void changeProbability(int emittedPlayer,double probability);
+
+  //! Sets current equilibrium coordinates for the current eqm index.
+  void changeDisplayedCoords(double x,double y);
+
+  //! Sets current state displayed in the heatmap plot title.
+  void changeDisplayedState(int value0,
+			    int value1,
+			    int state,
+			    bool isPrivateVals);
 
 };
 

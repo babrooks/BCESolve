@@ -1,7 +1,7 @@
 #include "bceplothandler.hpp"
 
 BCEPlotHandler::BCEPlotHandler(QWidget *parent):
-  deviationBarGraphs(0)
+  deviationBarGraphs(2),devPlotTitles(2)
 {
   isSolnDataLoaded=false;
   guiData = new BCEDataState();
@@ -30,19 +30,22 @@ void BCEPlotHandler::setupLayout() {
   /////////////////////////////////////////
   // Plot Initializations and Organization
 
+  QFont font;
+  font.setPointSize(12);
+
   QSizePolicy sp(QSizePolicy::Expanding,QSizePolicy::Expanding);
   sp.setVerticalStretch(1);
   sp.setHorizontalStretch(1);
 
   // Payoff Plot Initialization
-  BCELabel *setOfBCEPlotTitle = new BCELabel(ValueSetPlot);
   setOfBCEPlot = new BCEValueSetPlot();
-  // QCPPlotTitle *setOfBCETitleText = new QCPPlotTitle(setOfBCEPlot);
-  // setOfBCETitleText->setText(setOfBCEPlotTitle);
-  // setOfBCEPlot->plotLayout()->insertRow(0);
-  // setOfBCEPlot->
-  //   plotLayout()->
-  //   addElement(0,0,setOfBCETitleText);
+  BCEPlotTitle *setOfBCEPlotTitle = new BCEPlotTitle(ValueSetPlot,
+						     setOfBCEPlot);
+  setOfBCEPlotTitle->setFont(font);
+  setOfBCEPlot->plotLayout()->insertRow(0);
+  setOfBCEPlot->
+    plotLayout()->
+    addElement(0,0,setOfBCEPlotTitle);
 
   setOfBCEPlot->xAxis->setLabel("Player 0");
   setOfBCEPlot->yAxis->setLabel("Player 1");
@@ -52,16 +55,24 @@ void BCEPlotHandler::setupLayout() {
 	  setOfBCEPlotTitle,SLOT(changeDisplayedCoords(double,double)));
 
   // Bar Plot Initialization 
-  deviationBarGraphs.push_back(new BCEValueSetPlot());
-  deviationBarGraphs.back()->setSizePolicy(sp);
+  deviationBarGraphs[0] = new BCEValueSetPlot();
+  deviationBarGraphs[0]->setSizePolicy(sp);
   deviationBarGraphs[0]->xAxis->setLabel("Player 0's Actions");
-  deviationBarGraphs.push_back(new BCEValueSetPlot());
-  deviationBarGraphs.back()->setSizePolicy(sp);
+  deviationBarGraphs[1] = new BCEValueSetPlot();
+  deviationBarGraphs[1]->setSizePolicy(sp);
   deviationBarGraphs[1]->xAxis->setLabel("Player 1's Actions");
   for (int player = 0; player < 2; player++) {
     deviationBarGraphs[player]->yAxis->setLabel("Expected Payoff");
+    devPlotTitles[player] = new BCEPlotTitle(DeviationPlot,
+					     player,
+					     deviationBarGraphs[player]);
+    devPlotTitles[player]->setFont(font);
 
-    devPlotTitles.push_back(new BCELabel(DeviationPlot,player));
+    deviationBarGraphs[player]->plotLayout()->insertRow(0);
+    deviationBarGraphs[player]->
+      plotLayout()->
+      addElement(0,0,devPlotTitles[player]);
+    
     connect(guiData,
 	    SIGNAL(devPlotTitleChange(int,int,int,double)),
 	    devPlotTitles[player],
@@ -81,34 +92,21 @@ void BCEPlotHandler::setupLayout() {
   sp.setHorizontalStretch(1);
 
   setOfBCEPlot->setSizePolicy(sp2);
-  // BCE Set Plot and Sliders Horizontal Layout
-  QVBoxLayout *setOfBCEPlotWithTitle = new QVBoxLayout();
-  setOfBCEPlotWithTitle->addWidget(setOfBCEPlotTitle);
-  setOfBCEPlotWithTitle->addWidget(setOfBCEPlot);
-
-  QWidget *setOfBCEWidget = new QWidget();
-  setOfBCEWidget->setLayout(setOfBCEPlotWithTitle);
-  setOfBCEWidget->setSizePolicy(sp2);
 
   QHBoxLayout *topLeftPanel = new QHBoxLayout();
-  topLeftPanel->addWidget(setOfBCEWidget);
+  topLeftPanel->addWidget(setOfBCEPlot);
   guiData->controlsLayout->setSizePolicy(sp3);
   topLeftPanel->addWidget(guiData->controlsLayout);
 
   // Left Viewer Panel, Bar Plots and Slider Box
   QVBoxLayout *leftSectorDivide = new QVBoxLayout();
   for (int player = 0; player < 2; player++) {
-    leftSectorDivide->addWidget(devPlotTitles[player]);
     leftSectorDivide->addWidget(deviationBarGraphs[player]);
   }
 
   // Right Viewer Panel, Conditional-Marginal Distribution
   conditionalMarginalPlot = new BCEValueSetPlot();
   conditionalMarginalPlot->setSizePolicy(sp);
-
-  BCELabel *colorMapTitle = new BCELabel(HeatMap);
-  connect(guiData,SIGNAL(newStateSignal(int,int,int,bool)),
-	  colorMapTitle,SLOT(changeDisplayedState(int,int,int,bool)));
 
   // Plot Layout and Interaction Settings
   colorMap = new QCPColorMap(conditionalMarginalPlot->xAxis,
@@ -139,13 +137,22 @@ void BCEPlotHandler::setupLayout() {
   conditionalMarginalPlot->axisRect()->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
   colorScale->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
 
+  BCEPlotTitle *colorMapTitle = new BCEPlotTitle(HeatMap,
+						 conditionalMarginalPlot);
+  colorMapTitle->setFont(font);
+  conditionalMarginalPlot->plotLayout()->insertRow(0);
+  conditionalMarginalPlot->
+    plotLayout()->
+    addElement(0,0,colorMapTitle);
+  connect(guiData,SIGNAL(newStateSignal(int,int,int,bool)),
+	  colorMapTitle,SLOT(changeDisplayedState(int,int,int,bool)));
+
   QSizePolicy sp1(QSizePolicy::Expanding,QSizePolicy::Expanding);
   sp1.setVerticalStretch(2);
   sp1.setHorizontalStretch(1);
 
   // Layout of Left and Right Viewer Panels
   QVBoxLayout *rightSide = new QVBoxLayout();
-  rightSide->addWidget(colorMapTitle);
   rightSide->addWidget(conditionalMarginalPlot);
   QVBoxLayout *leftSide = new QVBoxLayout();
   QSplitter *leftSideSplitter = new QSplitter(Qt::Vertical);
@@ -158,17 +165,14 @@ void BCEPlotHandler::setupLayout() {
   leftSideSplitter->addWidget(topQSplit);
   leftSideSplitter->addWidget(bottomQSplit);
 
-  QVBoxLayout *colorMapWithTitle = new QVBoxLayout();
-  colorMapWithTitle->addWidget(colorMapTitle);
-  colorMapWithTitle->addWidget(conditionalMarginalPlot);
   QWidget *rightSideWidget = new QWidget();
-  rightSideWidget->setLayout(colorMapWithTitle);
+  rightSideWidget->setLayout(rightSide);
 
   QSplitter *mainSplitter = new QSplitter();
   mainSplitter->addWidget(leftSideSplitter);
   mainSplitter->addWidget(rightSideWidget);
   mainSplitter->setStretchFactor(0,1);
-  mainSplitter->setStretchFactor(1,4);
+  mainSplitter->setStretchFactor(1,3);
 
   mainTab = new QHBoxLayout();
   mainTab->addWidget(mainSplitter);
