@@ -131,12 +131,16 @@ int BCESolver::getParameter(BCESolver::IntParameter param)
     {
     case CurrentObjective:
       return currentObjective;
+      break;
     case DisplayLevel:
       return displayLevel;
+      break;
     case BoundaryObjective1:
       return boundaryObjectiveIndex1;
+      break;
     case BoundaryObjective2:
       return boundaryObjectiveIndex2;
+      break;
     default:
       throw(BCEException(BCEException::InvalidParameterName));
     } // switch
@@ -154,6 +158,10 @@ bool BCESolver::getParameter(BCESolver::BoolParameter param)
 // Sets the expressions for the boundary objectives
 void BCESolver::setBndryObjective(int index, const GRBLinExpr & expr)
 {
+  if (index > bndryObjectives.size()-1)
+    throw(BCEException(BCEException::BadArgument));
+
+  else
   bndryObjectives[index] = expr;
 }
 
@@ -345,7 +353,11 @@ void BCESolver::populate ()
 	      counter = BCECounter(numStates,numActions,numTypes,
 				   stateConditions,actionConditions,typeConditions,
 				   stateMarginal,actionMarginal,typeMarginal);
-		      
+		    
+	      if (counter.getActions()[player] != action ||
+		  counter.getTypes()[player] != type)
+		throw(BCEException(BCEException::ConditionFailed));
+  
 	      assert(counter.getActions()[player]==action);
 	      assert(counter.getTypes()[player]==type);
 
@@ -696,6 +708,10 @@ void BCESolver::bceToMap(map<int,double> & distribution)
 
 void BCESolver::indexToTypeActionDeviation(int index, int player, int &type, int &action, int &deviation)
 {
+  if (index < 0 ||
+      index < game->getNumTypes()[player]*
+      game->getNumActions()[player]*game->getNumActions()[player])
+    throw(BCEException(BCEException::BadArgument));
   assert(index>=0);
   assert(index<game->getNumTypes()[player]*
 	 game->getNumActions()[player]*game->getNumActions()[player]);
@@ -706,11 +722,16 @@ void BCESolver::indexToTypeActionDeviation(int index, int player, int &type, int
   index-=action; index/=game->getNumActions()[player];
   type=index;
 
+  if (type < 0 || action < 0 || deviation < 0 ||
+      type >= game->getNumTypes()[player] || action >= game->getNumActions()[player] ||
+      deviation >= game->getNumActions()[player])
+    throw(BCEException(BCEException::BadArgument));
   assert(type>=0);
   assert(action>=0);
   assert(deviation>=0);
   assert(type<game->getNumTypes()[player]);
   assert(action<game->getNumActions()[player]);
   assert(deviation<game->getNumActions()[player]);
+
 }
 

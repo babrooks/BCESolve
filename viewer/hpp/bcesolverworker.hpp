@@ -28,6 +28,7 @@
 #include "bce.hpp"
 #include <QObject>
 #include "bcegurobicallback.hpp"
+#include <QMessageBox>
 
 //! Class for solving games created in the game tab.
 /*! Contains a game and a solution object. When
@@ -99,7 +100,18 @@ public slots:
     solver.model.setObjective(expr,GRB_MAXIMIZE);
     solver.model.setCallback(callback);
 
+    try {
     solver.solve();
+    }
+    catch(BCEException &e) {
+      QMessageBox msgBox;
+      msgBox.setText(QString::fromStdString("A BCEException was thrown with message: " 
+			     + e.getMessage()));
+      msgBox.exec();
+    }
+    catch(std::exception &e) {
+      cout << e.what() << endl;
+    }
 
     // 11 signals that the solve routine
     if (solver.model.get(GRB_IntAttr_Status)!=11) {

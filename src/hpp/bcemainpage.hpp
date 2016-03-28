@@ -30,7 +30,7 @@ analyzing Bayes correlated equilibria (BCE), a solution concept
 that generalized correlated equilibrium to games of incomplete
 information. BCE, like correlated equilibria, are joint
 distributions that satisfy a series of linear constraints. The
-library utilizes GUROBI's linear programming package to solve
+library utilizes Gurobi's linear programming package to solve
 for BCE that maximize a given linear objective, such as expected
 payoffs of the players.
 
@@ -64,7 +64,7 @@ payoffs of the players.
   uses Gurobi for linear programming, and the code was compiled with
   Gurobi 5.63 on Linux and Gurobi 6.50 on OS X. To compile the source and example code
   yourself, you need to change the relevant variables in cplex.mk 
-  to direct the compiler to Boost and GUROBI. You can then build the desired examples by calling 
+  to direct the compiler to Boost and Gurobi. You can then build the desired examples by calling 
   "make examplename" (the .cpp or .hpp ending is not included) in 
   the example dirctory. After you
   build the source, you can build BCEViewer program from the viewer directory
@@ -80,7 +80,7 @@ payoffs of the players.
   payoff functions and the distribution of the state for the
   particular game of interest.
 
-  The BCESolver class uses GUROBI to solve a game represented by an
+  The BCESolver class uses Gurobi to solve a game represented by an
   object derived from the BCEAbstractGame class, by maximizing a particular
   linear objective over all BCE for that game.
 
@@ -148,7 +148,7 @@ payoffs of the players.
   For the benefit of the user, we have included several examples of
   how to use the BCESolve package. The file allpayauction.cpp is an example of a
   standard, common-values all pay auction in which bidders pay their bids, irrespective of winning.
-  The accompanying header file, allpayauction.hpp, shows how to construct a simple BCEGame by specifying the objectives and prior over the states (uniform, in this example). The example commonvalueauction.hpp specifies a prior over values distributed according to the CDF v^alpha, where v denotes the value in [0,1].
+  The accompanying header file, allpayauction.hpp, shows how to construct a simple BCEGame by specifying the objectives and prior over the states (uniform, in this example). The example commonvalueauction.hpp specifies a prior over values distributed according to the CDF \f$ v^{\alpha} \f$, where\f$ v \f$ denotes the value in [0,1].
 
   The example fpaknown.hpp formulates a private-values first-price auction.
   The header file shows to how implement private values within the library's
@@ -196,6 +196,10 @@ payoffs of the players.
   Ben Brooks
   Chicago, IL
   ben@benjaminbrooks.net
+
+  Robbie Minton
+  Chicago, IL
+  rminton@uchicago.edu
 */
 
 /*! \defgroup src BCESolve library

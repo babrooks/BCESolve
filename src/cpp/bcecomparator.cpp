@@ -57,7 +57,9 @@ void BCEComparator::setObjectives(const vector<int> &_obj)
 
 void BCEComparator::setOrigin(const vector<double> & input)
 {
-  assert(input.size()==2);
+  if (input.size() != 2)
+    throw(BCEException(BCEException::BadArgumentBCEComparator));
+  assert(input.size()==2);  
   
   origin=input;
 }

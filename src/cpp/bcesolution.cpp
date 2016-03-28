@@ -186,6 +186,8 @@ double BCESolution::getDeviationObjectives(int player, int action, int type,
       probSum += prob;
 
       devs[1-player] = counter.getActions()[1-player];
+      if (action != counter.getActions()[player])
+	throw(BCEException(BCEException::ConditionFailed));
       assert(action==counter.getActions()[player]);
 
       for (devs[player]=0; 
@@ -200,11 +202,14 @@ double BCESolution::getDeviationObjectives(int player, int action, int type,
       
     } // distribution
 
-  // for (devs[player]=0;
-  //      devs[player]<game.getNumActions()[player];
-  //      devs[player]++)
-  //   assert(values[player][devs[player]]
-  // 	   <=values[player][action]+1e-4);
+
+  for (devs[player]=0;
+       devs[player]<game.getNumActions()[player];
+       devs[player]++)
+    if (values[player][devs[player]] > values[player][action] + 1e-4)
+      throw(BCEException(BCEException::ICConstraintViolated));
+    assert(values[player][devs[player]]
+  	   <=values[player][action]+1e-4);
   
   if (probSum)
     {

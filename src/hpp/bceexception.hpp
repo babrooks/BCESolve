@@ -1,6 +1,6 @@
 // This file is part of the BCESolve library for games of incomplete
 // information
-// Copyright (C) 2016 Benjamin A. Brooks, Robert J. Minton
+// Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton
 // 
 // BCESolve free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by
@@ -37,8 +37,10 @@ public:
     {
       OutOfBounds, /*!< Index out of bounds. */
       ConditionFailed, /*!< A condition was not met. */
+      BCECounterConditionFailed, /*!< A condition was not met in BCECounter. */
+      BCEAbstractGameConditionFailed, /*!< Condition not met in BCEAbstractGame. */
       NoEquilibria, /*!< No equilibria. */
-      /*! CPLEX was not able to calculate an optimum during the
+      /*! Gurobi was not able to calculate an optimum during the
           BCESolver::mapBoundary routine. */
       MapFrontierNotOptimal, 
       FailedOpen, /*!< Could not open file. */
@@ -47,8 +49,12 @@ public:
           sum to one. */
       NotProbDistr, 
       BadArgument, /*!< Generic error code for a bad argument. */
+      BadArgumentBCEComparator, /*!< Bad argument in BCEComparator */
+      BadArgumentBCEUtilities, /*!< Bad argument in BCEUtilities */
+      BadArgumentBCEAbstractGame, /*!< Bad argument in BCEAbstractGame */
       InvalidParameterName, /*!< Unrecognized parameter name. */
-      InvalidParameterValue /*!< Parameter value was invalid. */
+      InvalidParameterValue, /*!< Parameter value was invalid. */
+      ICConstraintViolated /*!< Incentive constraint violated. */
     };
 
   //! Gives the error code for this BCEException.
@@ -65,32 +71,59 @@ public:
     return "BCEException was thrown";
   }
 
-  // //! Returns an error message.
-  // /*! Has not been fully implemented. */
-  // string getMessage()
-  // {
-  //   switch (errorType)
-  //     {
-  //     case OutOfBounds:
-  // 	break;
-  //     case ConditionFailed:
-  // 	break;
-  //     case NoEquilibria:
-  // 	break;
-  //     case MapFrontierNotOptimal:
-  // 	break;
-  //     case FailedOpen:
-  // 	break;
-  //     case NotProbDistr:
-  // 	break;
-  //     case BadArgument:
-  // 	break;
-  //     case InvalidParameterName:
-  // 	break;
-  //     case InvalidParameterValue:
-  // 	break;
-  //     } // switch
-  // }
+  //! Returns an error message.
+  /*! Has not been fully implemented. */
+  string getMessage()
+  {
+    switch (errorType)
+      {
+      case OutOfBounds: 
+	return "An index was out of the provided bounds.";
+      	break;
+      case ConditionFailed: 
+	return "A condition we imposed failed.";
+	break;
+      case BCECounterConditionFailed:
+	return "A condition we imposed in bcecounter.cpp failed.";
+	break;
+      case BCEAbstractGameConditionFailed:
+	return "A condition we imposed in bceabstractgame.cpp failed.";
+	break;
+      case NoEquilibria: 
+	return "There are no equilibria.";
+	break;
+      case MapFrontierNotOptimal: 
+	return "Map frontier is not optimal.";
+	break;
+      case FailedOpen: 
+	return "The file failed to open.";
+	break;
+      case NotProbDistr: 
+	return "Probabilities are misbehaving. At least one is negative or greater than 1, or they do not sum to 1.";
+	break;
+      case BadArgument: 
+	return "A bad argument was received.";
+	break;
+      case BadArgumentBCEComparator:
+	return "A bad argument was received in bcecomparator.cpp.";
+	break;
+      case BadArgumentBCEUtilities:
+	return "A bad argument was received in bceutilities.cpp.";
+	break;
+      case BadArgumentBCEAbstractGame:
+	return "A bad argument was received in bceabstractgame.cpp.";
+	break;
+      case InvalidParameterName: 
+	return "Parameter name wasn't recognized.";
+	break;
+      case InvalidParameterValue: 
+	return "A parameter value is invalid.";
+	break;
+      case ICConstraintViolated:
+	return "An incentive constraint was violated.";
+	break;
+      } // switch
+  }
 };
 
 #endif

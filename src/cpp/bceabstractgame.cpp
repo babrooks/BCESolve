@@ -57,6 +57,10 @@ double BCEAbstractGame::prior(int state, int type, int player) const
   double probability=0.0;
   vector<int> types(numPlayers,0);
 
+  if (state < 0 || type < 0 || player < 0 ||
+      state >= numStates || type >= numTypes[player] ||
+      player >= numPlayers)
+    throw(BCEException(BCEException::BadArgumentBCEAbstractGame));
   assert(state>=0);
   assert(type>=0);
   assert(player>=0);
@@ -99,11 +103,17 @@ double BCEAbstractGame::prior(int state, int type, int player) const
 // Checks if any player has a dominated action/type.
 bool BCEAbstractGame::dominated(const vector<int> &actions, const vector<int> &types) const
 {
+  if (actions.size() != numPlayers || types.size() != numPlayers)
+    throw(BCEException(BCEException::BadArgumentBCEAbstractGame));
   assert(actions.size()==numPlayers);
   assert(types.size()==numPlayers);
 
   for (int playerCounter=0; playerCounter<numPlayers; playerCounter++)
     {
+      if (actions[playerCounter] < 0 || types[playerCounter] < 0 ||
+	  actions[playerCounter] >= numActions[playerCounter] ||
+	  types[playerCounter] >= numTypes[playerCounter])
+	throw(BCEException(BCEException::BadArgumentBCEAbstractGame));
       assert(actions[playerCounter]>=0);
       assert(types[playerCounter]>=0);
       assert(actions[playerCounter]<numActions[playerCounter]);
