@@ -68,10 +68,14 @@ void BCEDataState::setSolutionData(const BCESolution &solution) {
       lineEditGroup[i]->setText("0");
     }
   }
-
+  catch (BCEException & e)
+    {
+      emit(sendException(QString::fromStdString(e.getMessage())));
+    }
   catch (std::exception & e)
     {
-      qDebug() << "setSolutionData error :( from BCEDataState" << endl;
+      string str(e.what());
+      emit(sendException(QString::fromStdString(str)));
     }
   isDataLoaded = true;
 }
@@ -120,9 +124,14 @@ void BCEDataState::setData(QString dataPath) {
       lineEditGroup[i]->setText("0");
     }
   }
+  catch (BCEException & e)
+    {
+      emit(sendException(QString::fromStdString(e.getMessage())));;
+    }
   catch (std::exception & e)
     {
-      qDebug() << "setData error :( from BCEDataState" << endl;
+      string str(e.what());
+      emit(sendException(QString::fromStdString(str)));
     }
   isDataLoaded = true;
 }
@@ -278,7 +287,7 @@ void BCEDataState::modifyEqmFocus(double x,double y) {
     return;
 
   int newEqmIndex = 0;
-  double smallestEuclidianDistance = 5000.0000; // This just needs to be large
+  double smallestEuclidianDistance = 1e10; // This just needs to be large
   double currentEuclidianDistance;
   for (int i = 0; i < allEqm.size(); i++) {
     currentEuclidianDistance = euclidianDistance(x,allEqm[i][objective0],
@@ -293,11 +302,8 @@ void BCEDataState::modifyEqmFocus(double x,double y) {
   currentEqmIndex = newEqmIndex;
   solutionData.setCurrentEquilibrium(currentEqmIndex);
 
-  double xClosest = 0;
-  double yClosest = 0;
-
-  xClosest = allEqm[currentEqmIndex][objective0];
-  yClosest = allEqm[currentEqmIndex][objective1]; 
+  double xClosest = allEqm[currentEqmIndex][objective0];
+  double yClosest = allEqm[currentEqmIndex][objective1]; 
 
   emit(eqmCoordSignal(xClosest,yClosest));
 
@@ -376,5 +382,10 @@ void BCEDataState::setAllEqm() {
   solutionData.getExpectedObjectives(allEqm);
   // cout << "setAllEqm Function Hit" << endl;
   emit(selectedEqmChanged());
+
+  double xClosest = allEqm[currentEqmIndex][objective0];
+  double yClosest = allEqm[currentEqmIndex][objective1]; 
+
+  emit(eqmCoordSignal(xClosest,yClosest));
 
 }

@@ -133,6 +133,8 @@ signals:
     tab.
    */
   void equilibriumMatrixChanged();
+  //! Sends an exception message to BCEWindow to be displayed
+  void sendException(QString message);
 
 
 private: // Private Properties. Private Functions near EOF.

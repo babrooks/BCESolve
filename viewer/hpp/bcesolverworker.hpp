@@ -1,6 +1,6 @@
 // This file is part of the BCESolve library for games of incomplete
 // information
-// Copyright (C) 2016 Benjamin A. Brooks, Robert J. Minton
+// Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton
 // 
 // BCESolve free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by
@@ -83,7 +83,16 @@ public slots:
 
     BCESolver solver(game);
 
-    solver.populate();
+    try {
+      solver.populate();
+    }
+    catch(BCEException &e) {
+      emit(exceptionSignal(QString::fromStdString(e.getMessage())));
+    }
+    catch(std::exception &e) {
+      string str(e.what());
+      emit(exceptionSignal(QString::fromStdString(str)));
+    }
 
     GRBLinExpr expr = weightData[0]*solver.getObjectiveFunction(0);
     int numObjs = game.getNumObjectives();
@@ -101,22 +110,20 @@ public slots:
     solver.model.setCallback(callback);
 
     try {
-    solver.solve();
+      solver.solve();
+
+      // 11 signals that the solve routine
+      if (solver.model.get(GRB_IntAttr_Status)!=11) {
+	solver.getSolution(solution);
+	emit(sendSolution(&solution));
+      }
     }
     catch(BCEException &e) {
-      QMessageBox msgBox;
-      msgBox.setText(QString::fromStdString("A BCEException was thrown with message: " 
-			     + e.getMessage()));
-      msgBox.exec();
+      emit(exceptionSignal(QString::fromStdString(e.getMessage())));
     }
     catch(std::exception &e) {
-      cout << e.what() << endl;
-    }
-
-    // 11 signals that the solve routine
-    if (solver.model.get(GRB_IntAttr_Status)!=11) {
-      solver.getSolution(solution);
-      emit(sendSolution(&solution));
+      string str(e.what());
+      emit(exceptionSignal(QString::fromStdString(str)));
     }
 
     emit(workFinished());
@@ -129,6 +136,8 @@ signals:
   void workFinished();
   //! Signals a pointer to the solution found by the solver.
   void sendSolution(BCESolution *soln);
+  //! Signals an exception thrown during the solve routine.
+  void exceptionSignal(QString message);
 
 };
 

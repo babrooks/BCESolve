@@ -358,8 +358,8 @@ void BCESolver::populate ()
 		  counter.getTypes()[player] != type)
 		throw(BCEException(BCEException::ConditionFailed));
   
-	      assert(counter.getActions()[player]==action);
-	      assert(counter.getTypes()[player]==type);
+	      // assert(counter.getActions()[player]==action);
+	      // assert(counter.getTypes()[player]==type);
 
 	      do
 		{
@@ -688,6 +688,8 @@ void BCESolver::bceToMap(map<int,double> & distribution)
   int variable;
   list<int>::const_iterator it;
   vector<double> gurobiValues(numProbabilityVariables,0.0);
+  // throw(BCEException(BCEException::NoEquilibria));
+  // source of problem in prisoner/battle of sexes game.
   for(int var = 0; var<numProbabilityVariables; var++)
     gurobiValues[var] = variables[var].get(GRB_DoubleAttr_X);
 
@@ -702,6 +704,7 @@ void BCESolver::bceToMap(map<int,double> & distribution)
   	distribution.insert(pair<int,double>(*it,
   					     gurobiValues[variable]));
     }
+  
 
 }
 
@@ -712,9 +715,9 @@ void BCESolver::indexToTypeActionDeviation(int index, int player, int &type, int
       index < game->getNumTypes()[player]*
       game->getNumActions()[player]*game->getNumActions()[player])
     throw(BCEException(BCEException::BadArgument));
-  assert(index>=0);
-  assert(index<game->getNumTypes()[player]*
-	 game->getNumActions()[player]*game->getNumActions()[player]);
+  // assert(index>=0);
+  // assert(index<game->getNumTypes()[player]*
+  // 	 game->getNumActions()[player]*game->getNumActions()[player]);
 
   deviation=index%game->getNumActions()[player];
   index-=deviation; index/=game->getNumActions()[player];
@@ -726,12 +729,12 @@ void BCESolver::indexToTypeActionDeviation(int index, int player, int &type, int
       type >= game->getNumTypes()[player] || action >= game->getNumActions()[player] ||
       deviation >= game->getNumActions()[player])
     throw(BCEException(BCEException::BadArgument));
-  assert(type>=0);
-  assert(action>=0);
-  assert(deviation>=0);
-  assert(type<game->getNumTypes()[player]);
-  assert(action<game->getNumActions()[player]);
-  assert(deviation<game->getNumActions()[player]);
+  // assert(type>=0);
+  // assert(action>=0);
+  // assert(deviation>=0);
+  // assert(type<game->getNumTypes()[player]);
+  // assert(action<game->getNumActions()[player]);
+  // assert(deviation<game->getNumActions()[player]);
 
 }
 

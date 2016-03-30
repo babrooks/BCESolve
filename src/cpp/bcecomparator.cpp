@@ -59,7 +59,7 @@ void BCEComparator::setOrigin(const vector<double> & input)
 {
   if (input.size() != 2)
     throw(BCEException(BCEException::BadArgumentBCEComparator));
-  assert(input.size()==2);  
+  // assert(input.size()==2);  
   
   origin=input;
 }

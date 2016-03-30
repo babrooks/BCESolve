@@ -7,8 +7,8 @@ int indexToVector(int index,
 
   if (index < 0 || sizes.size() <= 0)
     throw(BCEException(BCEException::BadArgumentBCEUtilities));
-  assert(index>=0);
-  assert(sizes.size()>0);
+  // assert(index>=0);
+  // assert(sizes.size()>0);
 
   v.resize(sizes.size(),0);
 
@@ -16,7 +16,7 @@ int indexToVector(int index,
        coordinate < sizes.size();
        coordinate++)
     {
-      assert(sizes.size()>0);
+      // assert(sizes.size()>0);
       v[coordinate] = index % sizes[coordinate];
       index -= v[coordinate]; index /= sizes[coordinate];
     }
@@ -29,7 +29,7 @@ int vectorToIndex(const vector<int> & v,
   int index = 0;
   if (v.size() != sizes.size())
     throw(BCEException(BCEException::BadArgumentBCEUtilities));
-  assert(v.size() == sizes.size());
+  // assert(v.size() == sizes.size());
   for (int coordinate = sizes.size()-1;
        coordinate >= 0;
        coordinate -- )

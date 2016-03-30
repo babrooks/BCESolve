@@ -115,6 +115,8 @@ private slots:
   void generateHybridAuction();
   //! Builds the default common values auction.
   void generateCommonValueAuction();
+  //! Displays exceptions signaled from other classes.
+  void displayException(QString message);
 
 };
 

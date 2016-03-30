@@ -72,6 +72,8 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   // Loading Connection
   connect(this,SIGNAL(dataPathChanged(QString)),
   	  solutionTab,SLOT(loadData(QString)));
+  connect(solutionTab->guiData,SIGNAL(sendException(QString)),
+	  this,SLOT(displayException(QString)));
 
   // Solve Routine Connections
   connect(gameTab,SIGNAL(startSolveRoutine()),
@@ -169,7 +171,6 @@ void BCEWindow::loadGame() {
 
     gameTab->setGame(loadedGame);
 
-    emit(dataPathChanged(newPath));
     tabWidget->setCurrentIndex(1);
 
     /* Note that the solution remains the same and isn't
@@ -263,6 +264,8 @@ void BCEWindow::runSolve() {
 					 gameTab->getWeightsOnObjectives(),
 					 callback);
       solverWorker->moveToThread(solverWorkerThread);
+      connect(solverWorker,SIGNAL(exceptionSignal(QString)),
+	      this,SLOT(displayException(QString)));
       connect(solverWorkerThread,SIGNAL(started()),
 	      solverWorker,SLOT(startSolve()));
       connect(solverWorker,SIGNAL(workFinished()),
@@ -353,7 +356,7 @@ void BCEWindow::generateCommonValueAuction() {
   QDialog dialog(this);
   QFormLayout form(&dialog);
 
-  form.addRow(new QLabel("Common Values Auction, Values~v^alpha"));
+  form.addRow(new QLabel("Common Values Auction, Prior~v^alpha"));
 
   int numParams = 4;
   vector<QLineEdit *> fields(numParams);
@@ -388,4 +391,11 @@ void BCEWindow::generateCommonValueAuction() {
   gameTab->setGame(her);
   tabWidget->setCurrentIndex(1);
 
+}
+
+void BCEWindow::displayException(QString message) {
+  QMessageBox msgBox;
+  msgBox.setText("A BCEException was thrown with message: " 
+		 + message);
+  msgBox.exec();
 }

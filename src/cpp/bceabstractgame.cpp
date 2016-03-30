@@ -61,12 +61,12 @@ double BCEAbstractGame::prior(int state, int type, int player) const
       state >= numStates || type >= numTypes[player] ||
       player >= numPlayers)
     throw(BCEException(BCEException::BadArgumentBCEAbstractGame));
-  assert(state>=0);
-  assert(type>=0);
-  assert(player>=0);
-  assert(state<numStates);
-  assert(type<numTypes[player]);
-  assert(player<numPlayers);
+  // assert(state>=0);
+  // assert(type>=0);
+  // assert(player>=0);
+  // assert(state<numStates);
+  // assert(type<numTypes[player]);
+  // assert(player<numPlayers);
 
   // Fill in player's valuation and type.
   types[player]=type;
@@ -105,8 +105,8 @@ bool BCEAbstractGame::dominated(const vector<int> &actions, const vector<int> &t
 {
   if (actions.size() != numPlayers || types.size() != numPlayers)
     throw(BCEException(BCEException::BadArgumentBCEAbstractGame));
-  assert(actions.size()==numPlayers);
-  assert(types.size()==numPlayers);
+  // assert(actions.size()==numPlayers);
+  // assert(types.size()==numPlayers);
 
   for (int playerCounter=0; playerCounter<numPlayers; playerCounter++)
     {
@@ -114,10 +114,10 @@ bool BCEAbstractGame::dominated(const vector<int> &actions, const vector<int> &t
 	  actions[playerCounter] >= numActions[playerCounter] ||
 	  types[playerCounter] >= numTypes[playerCounter])
 	throw(BCEException(BCEException::BadArgumentBCEAbstractGame));
-      assert(actions[playerCounter]>=0);
-      assert(types[playerCounter]>=0);
-      assert(actions[playerCounter]<numActions[playerCounter]);
-      assert(types[playerCounter]<numTypes[playerCounter]);
+      // assert(actions[playerCounter]>=0);
+      // assert(types[playerCounter]>=0);
+      // assert(actions[playerCounter]<numActions[playerCounter]);
+      // assert(types[playerCounter]<numTypes[playerCounter]);
 
       if (dominated(actions[playerCounter],types[playerCounter],playerCounter))
 	return (true);

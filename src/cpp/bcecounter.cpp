@@ -160,7 +160,7 @@ bool BCECounter::operator++()
       increment = stateConditions[stateIndex] - stateConditions[stateIndex-1];
       if (increment <= 0)
 	throw(BCEException(BCEException::BCECounterConditionFailed));
-      assert(increment > 0);
+      // assert(increment > 0);
 
       variable += increment;
       stateType += increment;
@@ -181,7 +181,7 @@ bool BCECounter::operator++()
 	  increment = actionConditions[player][actionIndices[player]] - actions[player];
 	  if (increment <= 0)
 	    throw(BCEException(BCEException::BCECounterConditionFailed));
-	  assert(increment > 0);
+	  // assert(increment > 0);
 
 	  variable += increment * actionIncrements[player]
 	    - actionDecrements[player];
@@ -214,7 +214,7 @@ bool BCECounter::operator++()
 	  increment = typeConditions[player][typeIndices[player]] - types[player];
 	  if (increment <= 0)
 	    throw(BCEException(BCEException::BCECounterConditionFailed));
-	  assert(increment > 0);
+	  // assert(increment > 0);
 
 	  variable += increment * typeIncrements[player]
 	    - typeDecrements[player];

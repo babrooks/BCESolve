@@ -53,6 +53,21 @@ public:
   ~BCEPlotHandler() {
     delete guiData;
   }
+  //! Data in the current solution object. 
+  /*! Stores all data currently held or 
+    displayed in the GUI. "Held" data 
+    refers to parameters the user supplies 
+    through slider manipulation and loading
+    actions. "Displayed" data refers to 
+    the data BCEDataState has manipulated
+    for plotting.
+
+    Continuously manipulated upon user 
+    interaction. BCEPlotHandler has access to
+    guiData through BCEDataState's "get"
+    functions.
+  */
+  BCEDataState *guiData;
 
 signals:
   //! Sends data path to BCEDataState
@@ -102,21 +117,6 @@ private:
 
   //! Layout for the Plot Handler
   QHBoxLayout *mainTab;
-  //! Data state. 
-  /*! Stores all data currently held or 
-    displayed in the GUI. "Held" data 
-    refers to parameters the user supplies 
-    through slider manipulation and loading
-    actions. "Displayed" data refers to 
-    the data BCEDataState has manipulated
-    for plotting.
-
-    Continuously manipulated upon user 
-    interaction. This class has access to
-    guiData through BCEDataState's "get"
-    functions.
-  */
-  BCEDataState *guiData;
   //! Heatmap template.
   /*! Stores the colorMap plottable, which
     contains data in BCEDataState's 
