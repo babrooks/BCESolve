@@ -357,7 +357,7 @@ void BCESolver::populate ()
 	      if (counter.getActions()[player] != action ||
 		  counter.getTypes()[player] != type)
 		throw(BCEException(BCEException::ConditionFailed));
-  
+
 	      // assert(counter.getActions()[player]==action);
 	      // assert(counter.getTypes()[player]==type);
 
@@ -688,8 +688,6 @@ void BCESolver::bceToMap(map<int,double> & distribution)
   int variable;
   list<int>::const_iterator it;
   vector<double> gurobiValues(numProbabilityVariables,0.0);
-  // throw(BCEException(BCEException::NoEquilibria));
-  // source of problem in prisoner/battle of sexes game.
   for(int var = 0; var<numProbabilityVariables; var++)
     gurobiValues[var] = variables[var].get(GRB_DoubleAttr_X);
 
@@ -712,7 +710,7 @@ void BCESolver::bceToMap(map<int,double> & distribution)
 void BCESolver::indexToTypeActionDeviation(int index, int player, int &type, int &action, int &deviation)
 {
   if (index < 0 ||
-      index < game->getNumTypes()[player]*
+      index >= game->getNumTypes()[player]*
       game->getNumActions()[player]*game->getNumActions()[player])
     throw(BCEException(BCEException::BadArgument));
   // assert(index>=0);

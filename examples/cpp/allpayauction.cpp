@@ -8,8 +8,13 @@ int main() {
   AllPayAuction apa(numVals,numBids);
 
   BCESolver solver(apa);
-  
+
+  try {
   solver.populate();
+  }
+  catch(BCEException &e) {
+    cout << e.getMessage() << endl;
+  }
 
   // Minimize Revenue by default.
   // Objective function 0 is player 0 payoff.
@@ -17,7 +22,12 @@ int main() {
   // Objective function 2 is seller revenue.
   solver.model.setObjective(solver.getObjectiveFunction(2),GRB_MINIMIZE);
 
+  try {
   solver.solve();
+  }
+  catch(BCEException &e) {
+    cout << e.getMessage() << endl;
+  }
   // solver.mapBoundary();
 
   BCESolution soln;
