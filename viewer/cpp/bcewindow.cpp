@@ -214,28 +214,35 @@ void BCEWindow::saveSolution() {
 
 void BCEWindow::saveGame() {
 
-  QFileDialog *saveGameDialog = new QFileDialog(this);
-  saveGameDialog->setDefaultSuffix("bgm");
-  QString newPath = saveGameDialog->getSaveFileName(this,tr("Save a game file"),
-						    "../examples/",
-						    tr("BCEViewer game files (*.bgm)"));
-  if (newPath.isEmpty())
-    return;
+  QFileDialog saveGameDialog(this,tr("Save a game file"),
+			     "../examples/",
+			     tr("BCEViewer game files (*.bgm)"));
+  saveGameDialog.setDefaultSuffix("bgm");
 
-  QFileInfo fi(newPath);
-  path = fi.canonicalPath();
-
-  try
+  if (saveGameDialog.exec()
+      && !saveGameDialog.selectedFiles().isEmpty())
     {
-      QByteArray ba = newPath.toLocal8Bit();
-      const char * newPath_c = ba.data();
+      QString newPath = saveGameDialog.selectedFiles().front();
+      if (newPath.isEmpty())
+	return;
 
-      BCEGame::save(gameTab->getGame(),
-		    newPath_c);
-    }
-  catch (std::exception & e)
-    {
-      qDebug() << "Save game didnt work :(" << endl;
+      qDebug() << newPath << endl;
+  
+      QFileInfo fi(newPath);
+      path = fi.canonicalPath();
+
+      try
+	{
+	  QByteArray ba = newPath.toLocal8Bit();
+	  const char * newPath_c = ba.data();
+
+	  BCEGame::save(gameTab->getGame(),
+			newPath_c);
+	}
+      catch (std::exception & e)
+	{
+	  qDebug() << "Save game didnt work :(" << endl;
+	}
     }
 } // saveGame
 

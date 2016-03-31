@@ -20,7 +20,7 @@ private:
   double price(double s) const
   {
     if (s>=r)
-      return s*(0.5+r*r/(s*s-r*r)*(log(s)-log(r)));
+      return s*(0.5+r*r/(s*s-r*r-1e-6)*(log(s)-log(r)));
     return 0.0;
   }
   
@@ -31,7 +31,7 @@ private:
 
 public:
   MVSOpt(int _nv,double _r, double _sbar):
-    BCEAbstractGame(_nv,_nv+1,1,3),
+    BCEAbstractGame(_nv,_nv,1,3),
     nv(_nv), r(_r), sbar(_sbar)
   {} // constructor
 
@@ -51,18 +51,16 @@ public:
     double obj = 0; 
     
     int winner = actions[1] >= actions[0];
-    
-    double winbid = actions[winner] * sbar / (numActions[0]-1.0);
 
-    if (winbid < r)
+    if (actions[winner]==0)
       return 0.0;
+    
+    double winbid = r+(actions[winner]-1.0) * (sbar - r) 
+      / (numActions[winner]-2.0);
 
     if (objIndex < 2)
       {
 	int player = objIndex;
-
-	if (actions[player]==0)
-	  return 0;
 
 	// Player 1's payoff
 	if (actions[player]>actions[1-player])
@@ -86,9 +84,9 @@ public:
 
 int main()
 {
-  int nv = 50;
-  double r = 1.0/exp(1.0);
-  double highbid = 1;
+  int nv = 75;
+  double r = 0.1; // 0.3 is about optimal;
+  double highbid = 0.7;
 
   try
     {
@@ -106,9 +104,12 @@ int main()
   
       cout << "REVENUE: " << solver.getObjectiveFunction(2).getValue() << endl;
 
+      stringstream filename;
+      filename << "mvsopt_nv=" << nv << "_r=" << r << "_hb=" << highbid << ".bce";
+
       BCESolution soln;
       solver.getSolution(soln);
-      BCESolution::save(soln,"mvsopt.bce");
+      BCESolution::save(soln,filename.str().c_str());
     }
   catch (GRBException & e)
     {

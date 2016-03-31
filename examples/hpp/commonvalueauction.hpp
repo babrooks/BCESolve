@@ -48,13 +48,10 @@ public:
 
   double prior (int state,const vector<int> & types) const {
 
-    double val = static_cast<double>(state)/(numStates-1.0);
-    double incr = 1.0/(numStates-1);
+    double val = static_cast<double>(state)/static_cast<double>(numStates);
+    double incr = 1.0/static_cast<double>(numStates);
 
-    if (state == 0)
-      return pow(val,alpha);
-    else
-      return pow(val,alpha)-pow(val-incr,alpha);
+    return pow(val,alpha)-pow(val-incr,alpha);
 
   }
 

@@ -6,7 +6,7 @@ BCEGame::BCEGame():
   priorData(1),
   conditionalData(1,vector<double>(1,1.0)),
   dominatedData(2,vector< vector<bool> >(1,vector<bool>(1,false))),
-  feasibleDeviationData(2,vector< vector<bool> > (1,vector<bool>(1,false)))
+  feasibleDeviationData(2,vector< vector<bool> > (1,vector<bool>(1,true)))
 {} // Default constructor
 
 BCEGame::BCEGame(const BCEAbstractGame & game):
@@ -87,7 +87,7 @@ BCEGame::BCEGame(const BCEAbstractGame & game):
       feasibleDeviationData[player]
 	= vector< vector<bool> > (game.getNumTypes()[player],
 				  vector<bool> (game.getNumActions()[player]
-						*game.getNumActions()[player],false));
+						*game.getNumActions()[player],true));
       for (int type = 0; type < game.getNumTypes()[player]; type++)
 	{
 	  for (int action=0; action < game.getNumActions()[player]; action++)
@@ -255,7 +255,7 @@ bool BCEGame::addAction(int player, int position)
 	      // Insert values for the new action and all deviations
 	      feasibleDeviationData[player][type]
 		.insert(feasibleDeviationData[player][type].begin()
-			+position+dev*numActions[player],
+			+dev*numActions[player],
 			numActions[player],true);
 	    }
 	  else

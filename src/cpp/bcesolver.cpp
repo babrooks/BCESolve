@@ -245,10 +245,10 @@ void BCESolver::populate ()
 	  // Create an IC constraint if both the action and the deviation
 	  // are not dominated, and if the deviating action is distinct.
 	  if (!(game->dominated(action,type,player) 
-		|| game->dominated(deviation,type,player) )
+	  	|| game->dominated(deviation,type,player) )
 	      && game->feasibleDeviation(action,deviation,type,player) )
 	    {
-	      numICConstraints[player]++; 
+	      numICConstraints[player]++;
 	    } // ! dominated
 	} // ICCounter
     } // player
