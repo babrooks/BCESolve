@@ -78,38 +78,29 @@ public slots:
     objectives is maximized. The weights should sum, in magnitude, to 1.
     If weights are negative, then the solver is maxing the negative of an 
     objective, i.e. minimizing. 
-   */
+  */
   void startSolve() {
 
     BCESolver solver(game);
 
     try {
       solver.populate();
-    }
-    catch(BCEException &e) {
-      emit(exceptionSignal(QString::fromStdString(e.getMessage())));
-    }
-    catch(std::exception &e) {
-      string str(e.what());
-      emit(exceptionSignal(QString::fromStdString(str)));
-    }
 
-    GRBLinExpr expr = weightData[0]*solver.getObjectiveFunction(0);
-    int numObjs = game.getNumObjectives();
+      GRBLinExpr expr = weightData[0]*solver.getObjectiveFunction(0);
+      int numObjs = game.getNumObjectives();
 
-    if (numObjs == 2) {
-      expr += weightData[1]*solver.getObjectiveFunction(1);
-    }
+      if (numObjs == 2) {
+	expr += weightData[1]*solver.getObjectiveFunction(1);
+      }
 
-    else if (numObjs > 2) {
-      for (int obj = 1; obj < numObjs; obj++)
-	expr += weightData[obj]*solver.getObjectiveFunction(obj);
-    }
+      else if (numObjs > 2) {
+	for (int obj = 1; obj < numObjs; obj++)
+	  expr += weightData[obj]*solver.getObjectiveFunction(obj);
+      }
 
-    solver.model.setObjective(expr,GRB_MAXIMIZE);
-    solver.model.setCallback(callback);
+      solver.model.setObjective(expr,GRB_MAXIMIZE);
+      solver.model.setCallback(callback);
 
-    try {
       solver.solve();
 
       // 11 signals that the solve routine
@@ -125,6 +116,12 @@ public slots:
       string str(e.what());
       emit(exceptionSignal(QString::fromStdString(str)));
     }
+    catch(GRBException &e) {
+      emit(exceptionSignal(QString::fromStdString(e.getMessage() + 
+						  "The error code for this GRBException was: " +
+						  to_string(e.getErrorCode()))));
+    }
+  
 
     emit(workFinished());
 

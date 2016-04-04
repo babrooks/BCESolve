@@ -64,8 +64,8 @@ public:
 	// obj is the player whose payoff we are returning
 	
 	double val = static_cast<double>(state)/(numStates-1.0);
-	double ownBid = static_cast<double>(actions[obj])/(numActions[obj]-1.0);
-	double otherBid = static_cast<double>(actions[1-obj])/(numActions[obj]-1.0);
+	double ownBid = highBid*static_cast<double>(actions[obj])/(numActions[obj]-1.0);
+	double otherBid = highBid*static_cast<double>(actions[1-obj])/(numActions[obj]-1.0);
 
 	if (ownBid < reservePrice)
 	  return ceil(ownBid)*entryCost;
@@ -82,8 +82,8 @@ public:
       } // players' payoffs
     else if (obj==2)
       {	
-	double b0 = static_cast<double>(actions[0])/(numActions[0]-1.0);
-	double b1 = static_cast<double>(actions[1])/(numActions[1]-1.0);
+	double b0 = highBid*static_cast<double>(actions[0])/(numActions[0]-1.0);
+	double b1 = highBid*static_cast<double>(actions[1])/(numActions[1]-1.0);
 	
 	double winningBid = b0;
 	if (b1 > b0) {

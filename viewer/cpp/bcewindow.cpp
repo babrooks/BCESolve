@@ -144,7 +144,7 @@ void BCEWindow::loadSolution() {
     }
   catch (std::exception & e)
     {
-      qDebug() << "Load solution didnt work :( from the BCEWindow class" << endl;
+      displayException("Load solution didnt work :( from the BCEWindow class");
     }
 
 }
@@ -179,36 +179,42 @@ void BCEWindow::loadGame() {
     }
   catch (std::exception & e)
     {
-      qDebug() << "Load game didnt work :( from the BCEWindow class" << endl;
+      displayException("Load game didnt work :( from the BCEWindow class");
     }
 
 }
 
 void BCEWindow::saveSolution() {
 
-  QFileDialog *saveSolnDialog = new QFileDialog(this);
-  saveSolnDialog->setDefaultSuffix("bce");
-  QString newPath = saveSolnDialog->getSaveFileName(this,tr("Save a solution file"),
-						    "../examples/",
-						    tr("BCEViewer solution files (*.bce)"));
+  QFileDialog saveSolnDialog(this,tr("Save a solution file"),
+			     "../examples/",
+			     tr("BCEViewer solution files (*.bce)"));
+  saveSolnDialog.setDefaultSuffix("bce");
 
-  if (newPath.isEmpty())
-    return;
-
-  QFileInfo fi(newPath);
-  path = fi.canonicalPath();
-
-  try
+  if (saveSolnDialog.exec()
+      && !saveSolnDialog.selectedFiles().isEmpty())
     {
-      QByteArray ba = newPath.toLocal8Bit();
-      const char * newPath_c = ba.data();
+      QString newPath = saveSolnDialog.selectedFiles().front();
+      if (newPath.isEmpty())
+	return;
 
-      BCESolution::save(solutionTab->getSolutionData(),
-		       newPath_c);
-    }
-  catch (std::exception & e)
-    {
-      qDebug() << "Save solution didnt work :( from BCEWindow" << endl;
+      qDebug() << newPath << endl;
+  
+      QFileInfo fi(newPath);
+      path = fi.canonicalPath();
+
+      try
+	{
+	  QByteArray ba = newPath.toLocal8Bit();
+	  const char * newPath_c = ba.data();
+
+	  BCEGame::save(gameTab->getGame(),
+			newPath_c);
+	}
+      catch (std::exception & e)
+	{
+	  displayException("Save soln didnt work :( from BCEWindow");
+	}
     }
 } // saveSolution
 
@@ -241,7 +247,7 @@ void BCEWindow::saveGame() {
 	}
       catch (std::exception & e)
 	{
-	  qDebug() << "Save game didnt work :(" << endl;
+	  displayException("Save game didnt work :( from BCEWindow");
 	}
     }
 } // saveGame
