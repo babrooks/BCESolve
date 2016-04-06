@@ -211,7 +211,17 @@ public:
   */
   BCEDataState();
 
-  //! Sets the solution data to the newly loaded solution.
+  //! Loads new data into the GUI.
+  /*! Receives emitted signal that there is a new data 
+    path from BCEWindow. This is called when the user
+    interacts with the loadAction within the GUI's file menu.
+    This function extracts the filename from the path for use
+    in the GUI's title. It also loads data at the path into
+    the class's privately stored "data" member. It then
+    determines if the game has private values and sets initial
+    conditions for a new load (i.e. actions, types, values, and
+    state are reset to 0). Emits that 
+  */
   void setSolutionData(const BCESolution &solution);
 
   //! Layout Holding Sliders and Other Data Controls
@@ -310,19 +320,6 @@ public slots:
   void setSliderValue(int value,
 		      BCESliderType st,
 		      int player);
-
-  //! Loads new data into the GUI.
-  /*! Receives emitted signal that there is a new data 
-    path from BCEWindow. This is called when the user
-    interacts with the loadAction within the GUI's file menu.
-    This function extracts the filename from the path for use
-    in the GUI's title. It also loads data at the path into
-    the class's privately stored "data" member. It then
-    determines if the game has private values and sets initial
-    conditions for a new load (i.e. actions, types, values, and
-    state are reset to 0). Emits that 
-  */
-  void setData(QString dataPath);
 
   //! Manipulates data after user interaction with controls or new load action.
   /*! Sets new data for some plots in the solution tab. If given 

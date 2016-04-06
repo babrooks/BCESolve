@@ -15,7 +15,7 @@ LDMTFLAGS = -lpthread
 DEBUG = -g
 
 # Directories
-include ../cplex.mk
+include ../localsettings.mk
 
 # Directories
 

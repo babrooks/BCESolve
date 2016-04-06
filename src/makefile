@@ -14,7 +14,7 @@ LDMTFLAGS = -lpthread
 # DEBUG = -O1 -DNDEBUG
 DEBUG = -g
 # Directories
-include ../cplex.mk
+include ../localsettings.mk
 
 CPPDIR=./cpp
 HPPDIR=./hpp

@@ -63,12 +63,15 @@ payoffs of the players.
   cases, the BCEViewer was compiled using Qt 5.5. The class BCESolver
   uses Gurobi for linear programming, and the code was compiled with
   Gurobi 5.63 on Linux and Gurobi 6.50 on OS X. To compile the source and example code
-  yourself, you need to change the relevant variables in cplex.mk 
-  to direct the compiler to Boost and Gurobi. You can then build the desired examples by calling 
+  yourself, you need to change the relevant variables in localsettings.mk and locasettings2.mk
+  to direct the compiler to Boost and Gurobi. Importantly, just directing
+  the compiler to Gurobi is not sufficient; your Gurobi installation must be 
+  associated with a valid license. A free academic license may be obtained here:
+  <a href="http://www.gurobi.com/registration/academic-license-reg">Gurobi University License</a>. You can then build the desired examples by calling 
   "make examplename" (the .cpp or .hpp ending is not included) in 
   the example dirctory. After you
-  build the source, you can build BCEViewer program from the viewer directory
-  by updating "conditional.mk," first calling "qmake," and then running "make".
+  build the source, you can build the BCEViewer program from the viewer directory
+  by first calling "qmake" and then running "make".
 
   \section solversec Overview of the solver library
 

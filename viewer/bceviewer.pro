@@ -79,7 +79,7 @@ bceplottitle.cpp
 
 LIBS += ../lib/libbce.a
 
-include(conditional.mk)
+include(../localviewersettings.mk)
 
 linux-g++ {
 LIBS +=  -Bstatic -L../lib -Wl,-Bstatic  -L/usr/lib/x86_64-linux-gnu/ -lboost_serialization -lboost_system -Wl,-Bdynamic

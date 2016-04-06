@@ -23,9 +23,7 @@ void BCEPlotHandler::setupLayout() {
 	  this,SLOT(setGUITitle()));
   connect(guiData,SIGNAL(newDataLoaded()),
 	  this,SLOT(indicateDataLoaded()));
-  connect(this,SIGNAL(sendingDataPath(QString)),
-	  guiData,SLOT(setData(QString)));
-
+  
   // End Data Connections
   /////////////////////////////////////////
   // Plot Initializations and Organization
@@ -171,8 +169,8 @@ void BCEPlotHandler::setupLayout() {
   QSplitter *mainSplitter = new QSplitter();
   mainSplitter->addWidget(leftSideSplitter);
   mainSplitter->addWidget(rightSideWidget);
-  mainSplitter->setStretchFactor(0,1);
-  mainSplitter->setStretchFactor(1,3);
+  mainSplitter->setStretchFactor(0,2);
+  mainSplitter->setStretchFactor(1,5);
 
   mainTab = new QHBoxLayout();
   mainTab->addWidget(mainSplitter);

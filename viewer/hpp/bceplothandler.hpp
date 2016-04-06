@@ -108,10 +108,6 @@ public slots:
   void toggleLinearScale(bool checked);
   //! Toggles color gradient between blue and gpSpectrum themes.
   void toggleColorfulTheme(bool checked);
-  //! Receives location of new data from BCEWindow
-  void loadData(QString location) {
-    emit(sendingDataPath(location));
-  }
 
 private:
 

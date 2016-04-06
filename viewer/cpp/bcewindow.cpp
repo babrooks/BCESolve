@@ -69,9 +69,7 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   connect(solveOption,SIGNAL(triggered()),this,SLOT(runSolve()));
   connect(cancelOption,SIGNAL(triggered()),this,SIGNAL(setCancelFlag()));
 
-  // Loading Connection
-  connect(this,SIGNAL(dataPathChanged(QString)),
-  	  solutionTab,SLOT(loadData(QString)));
+  // Exception Connection
   connect(solutionTab->guiData,SIGNAL(sendException(QString)),
 	  this,SLOT(displayException(QString)));
 
@@ -111,6 +109,17 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   // Window Title
   setWindowTitle(QApplication::translate("bceviewer","BCE Solution Viewer"));
 
+  // Load in default Game
+  BCESolution defaultSoln;
+  QString defaultPath = "../examples/prisonervsbattle.bce";
+  QByteArray ba = defaultPath.toLocal8Bit();
+  const char* defaultPath_c = ba.data();
+  BCESolution::load(defaultSoln,defaultPath_c);
+  BCEGame defaultGame = defaultSoln.getGame();
+
+  solutionTab->setSolution(defaultSoln);
+  gameTab->setGame(defaultGame);
+
 } // Default Constructor
 
 void BCEWindow::loadSolution() {
@@ -121,7 +130,7 @@ void BCEWindow::loadSolution() {
 
 
   if (newPath.isEmpty()) {
-    cout << "isEmpty" << endl;
+    cout << "Path for loading solution is empty." << endl;
     return;
   }
 
@@ -137,10 +146,14 @@ void BCEWindow::loadSolution() {
     solutionTab->setSolution(loadedSolution);
     gameTab->setGame(loadedGame);
 
-    emit(dataPathChanged(newPath));
-
     tabWidget->setCurrentIndex(0);
 
+    }
+  catch(BCEException & e)
+    {
+      displayException(QString("Load solution didnt work :( from the BCEWindow class. ") +
+		       QString("A BCEException was thrown with message: ") +
+		       QString::fromStdString(e.getMessage()));
     }
   catch (std::exception & e)
     {
@@ -157,7 +170,7 @@ void BCEWindow::loadGame() {
 
 
   if (newPath.isEmpty()) {
-    cout << "isEmpty" << endl;
+    cout << "Path for loading game is empty." << endl;
     return;
   }
 
@@ -176,6 +189,12 @@ void BCEWindow::loadGame() {
     /* Note that the solution remains the same and isn't
        necessarily associated with the game. */
 
+    }
+  catch(BCEException & e)
+    {
+      displayException(QString("Load game didnt work :( from the BCEWindow class. ") +
+		       QString("A BCEException was thrown with message: ") +
+		       QString::fromStdString(e.getMessage()));
     }
   catch (std::exception & e)
     {
@@ -208,12 +227,12 @@ void BCEWindow::saveSolution() {
 	  QByteArray ba = newPath.toLocal8Bit();
 	  const char * newPath_c = ba.data();
 
-	  BCEGame::save(gameTab->getGame(),
+	  BCESolution::save(solutionTab->getSolutionData(),
 			newPath_c);
 	}
       catch (std::exception & e)
 	{
-	  displayException("Save soln didnt work :( from BCEWindow");
+	  displayException("Save soln didnt work :( from BCEWindow.");
 	}
     }
 } // saveSolution

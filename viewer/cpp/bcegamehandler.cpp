@@ -334,10 +334,10 @@ void BCEGameHandler::setupLayout() {
   QSizePolicy policy(QSizePolicy::Expanding,QSizePolicy::Expanding);
   tableLayout->setSizePolicy(policy);
 
-  tableLayout->setStretchFactor(0,8);
-  tableLayout->setStretchFactor(1,2);
-  tableLayout->setStretchFactor(2,1);
-  tableLayout->setStretchFactor(3,1);
+  tableLayout->setStretchFactor(0,24);
+  tableLayout->setStretchFactor(1,6);
+  tableLayout->setStretchFactor(2,3);
+  tableLayout->setStretchFactor(3,5);
 
   // END ADDING WIDGETS TO QSPLITTER
   //////////////////////////////////

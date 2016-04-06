@@ -80,62 +80,6 @@ void BCEDataState::setSolutionData(const BCESolution &solution) {
   isDataLoaded = true;
 }
 
-void BCEDataState::setData(QString dataPath) {
-
-  try{
-
-    // Get File Name for GUI's Title
-    string filePath = dataPath.toStdString();
-    QFileInfo info(dataPath);
-    guiTitle = info.fileName().toStdString();
-		
-    isPrivateVals = !(gameData.hasProductStructure());
-
-    // Reset Initial Parameters
-    currentEqmIndex = 0;
-    actions = vector<int>(2,0);
-    types = vector<int>(2,0);
-    values = vector<int>(2,0);
-    state = 0;
-
-    for (int player = 0; player < 2; player++)
-      emit(sliderLabelsChanged(isPrivateVals,player));
-
-    resetManipulatedData();
-    emit(newDataLoaded());
-
-    vector<int> numActions = gameData.getNumActions();
-    vector<int> numTypes = gameData.getNumTypes();
-    int numStates = gameData.getNumStates();
-
-    // Set Slider Ranges 
-    for (int player = 0; player < 2; player++) {
-      sliderGroup[3*player]->setRange(0,numActions[player]-1);
-      sliderGroup[3*player+1]->setRange(0,numTypes[player]-1);
-      if (isPrivateVals)
-	sliderGroup[3*player+2]->setRange(0,numStates-1);
-      else
-	sliderGroup[3*player+2]->setRange(0,sqrt(numStates)-1);
-    }
-    // Set Sliders to 0
-    for (int i = 0; i < 6; i++) {
-      sliderGroup[i]->setSliderPosition(0);
-      sliderGroup[i]->setSingleStep(1);
-      lineEditGroup[i]->setText("0");
-    }
-  }
-  catch (BCEException & e)
-    {
-      emit(sendException(QString::fromStdString(e.getMessage())));;
-    }
-  catch (std::exception & e)
-    {
-      string str(e.what());
-      emit(sendException(QString::fromStdString(str)));
-    }
-  isDataLoaded = true;
-}
-
 void BCEDataState::setupControlsLayout() {
 
   // Slider, LineEdit, and CheckBox Controls Creation
