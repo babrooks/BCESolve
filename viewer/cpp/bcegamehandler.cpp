@@ -1,7 +1,7 @@
 #include "bcegamehandler.hpp"
 
 BCEGameHandler::BCEGameHandler(QWidget *parent):
-  game(BCEGame())
+  game(BCEGame()),mapBoundaryOption(false)
 {
   setupLayout();
   setParent(parent);
@@ -156,6 +156,10 @@ void BCEGameHandler::setupLayout() {
   clearButton->setSizePolicy(QSizePolicy::Expanding,
 			     QSizePolicy::Preferred);
 
+  mapBoundaryCheckBox = new QCheckBox(tr("Map Boundary"),this);
+  mapBoundaryCheckBox->setSizePolicy(QSizePolicy::Fixed,
+				     QSizePolicy::Preferred);
+
   for (int player = 0; player < 2; player ++)
     {
       QHBoxLayout * numActionsLayout = new QHBoxLayout();
@@ -232,6 +236,7 @@ void BCEGameHandler::setupLayout() {
   solveLayout->addWidget(solveButton);
   solveLayout->addWidget(cancelButton);
   solveLayout->addWidget(clearButton);
+  solveLayout->addWidget(mapBoundaryCheckBox);
   
   rightControlLayout->addRow(solveLayout);
 
@@ -390,6 +395,9 @@ void BCEGameHandler::setupLayout() {
   connect(clearButton,SIGNAL(clicked()),
 	  this,
 	  SLOT(clearCurrentGame()));
+
+  connect(mapBoundaryCheckBox,SIGNAL(stateChanged(int)),
+	  this,SLOT(setMBSolveOption(int)));
 
   // qDebug() << "Finished sggamehandler constructor" << endl;
 
@@ -737,10 +745,6 @@ void BCEGameHandler::stateRemoved()
   
 } // stateRemoved
 
-void BCEGameHandler::emitSolveSignal() {
-  emit(startSolveRoutine());
-}
-
 void BCEGameHandler::clearCurrentGame() {
   game = BCEGame();
   conditionalModel->emitLayoutChanged();
@@ -763,4 +767,8 @@ void BCEGameHandler::clearCurrentGame() {
 
 const vector<double>& BCEGameHandler::getWeightsOnObjectives() {
   return weightsModel->getSolverData();
+}
+
+void BCEGameHandler::emitSolveSignal() {
+  startSolveRoutine();
 }

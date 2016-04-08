@@ -55,14 +55,18 @@ private:
   vector<double> weightData;
   //! Callback, allows communication with Gurobi solver.
   BCEGurobiCallback * callback; 
+  //! True if the solver will be mapping the boundary.
+  bool mapBoundaryOption;
 
 public:
 
   //! Constructor
   BCESolverWorker(BCEGame _game,
-			vector<double> _weightData,
-			BCEGurobiCallback * _callback):
-    game(_game), weightData(_weightData), callback(_callback)
+		  vector<double> _weightData,
+		  BCEGurobiCallback * _callback,
+		  bool _mapBoundaryOption):
+    game(_game), weightData(_weightData), callback(_callback),
+    mapBoundaryOption(_mapBoundaryOption)
   {}
 
   //! Returns a reference to the solution object.
@@ -102,6 +106,9 @@ public slots:
       solver.model.setCallback(callback);
 
       solver.solve();
+
+      if (mapBoundaryOption)
+	solver.mapBoundary();
 
       // 11 signals that the solve routine
       if (solver.model.get(GRB_IntAttr_Status)!=11) {

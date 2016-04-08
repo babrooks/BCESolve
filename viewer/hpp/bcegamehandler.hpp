@@ -1,6 +1,6 @@
 // This file is part of the BCESolve library for games of incomplete
 // information
-// Copyright (C) 2016 Benjamin A. Brooks, Robert J. Minton
+// Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton
 // 
 // BCESolve free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by
@@ -73,6 +73,11 @@ private:
   //! Model for setting weights on objectives
   BCEObjWeightsTableModel * weightsModel;
 
+  //! Map Boundary option
+  /*! Tells the solver worker whether or not to map the boundary.
+    */
+  bool mapBoundaryOption;
+
   //! Layout for the game tab.
   QVBoxLayout * layout;
 
@@ -82,6 +87,8 @@ private:
   QPushButton * cancelButton;
   //! Button that clears currently displayed game.
   QPushButton *clearButton;
+  //! Check Box handling map boundary solve option.
+  QCheckBox *mapBoundaryCheckBox;
 
   // Edits
 
@@ -144,6 +151,11 @@ public:
   void setState(int state);
   //! Returns weights on objectives.
   const vector<double>& getWeightsOnObjectives();
+  //! Returns mapBoundaryOption.
+  const bool getMapBoundaryOption() const {
+    return mapBoundaryOption;
+  }
+
   
 private:
   //! Delete old data models and create new ones.
@@ -186,10 +198,18 @@ private slots:
   //! Clears the game currently displayed in the game tab.
   /*! Replaces the cleared game with a new game. */
   void clearCurrentGame();
+  //! Sets map boundary option to the value of the check box.
+  void setMBSolveOption(int value) {
+    if (value == 0)
+      mapBoundaryOption = false;
+    else if (value == 2)
+      mapBoundaryOption = true;
+  }
 
 signals:
 
-  //! Signals that the user has clicked the solve button.
+  //! Signals that the user has clicked the solve button
+  /*! Contains map boundary option */
   void startSolveRoutine();
   //! Signals that the user has clicked the cancel solve button.
   void cancelSolveRoutine();

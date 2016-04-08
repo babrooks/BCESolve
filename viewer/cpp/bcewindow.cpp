@@ -294,7 +294,8 @@ void BCEWindow::runSolve() {
       QThread *solverWorkerThread = new QThread(this);
       solverWorker = new BCESolverWorker(gameTab->getGame(),
 					 gameTab->getWeightsOnObjectives(),
-					 callback);
+					 callback,
+					 gameTab->getMapBoundaryOption());
       solverWorker->moveToThread(solverWorkerThread);
       connect(solverWorker,SIGNAL(exceptionSignal(QString)),
 	      this,SLOT(displayException(QString)));
