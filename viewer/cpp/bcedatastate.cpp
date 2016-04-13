@@ -282,7 +282,8 @@ void BCEDataState::setEqmMatrix() {
 					  margT,
 					  distribution);
 
-  // assert(solutionData.numActions_total == distribution.size());
+  if (solutionData.numActions_total != distribution.size())
+    throw(BCEException(BCEException::WrongDistnSize));
 
   vector<int> numActions = gameData.getNumActions();
 

@@ -363,7 +363,9 @@ void BCEWindow::generateHybridAuction() {
   QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
 
   dialog.exec();
-  qDebug() << "Dialog Closed" << endl;
+
+  if (dialog.result() == 0)
+    return;
 
   vector<int> intParams(2);
   vector<double> doubleParams(4);
@@ -412,16 +414,19 @@ void BCEWindow::generateCommonValueAuction() {
   dialog.exec();
   qDebug() << "Dialog Closed" << endl;
 
+  if (dialog.result() == 0)
+    return;
+
   vector<double> doubleParams(4);
 
   for (int i=0; i < numParams; i++) {
     doubleParams[i] = fields[i]->text().toDouble();
   }
 
-  CommonValueAuction her(50,50,doubleParams[0],doubleParams[1],
+  CommonValueAuction cva(50,50,doubleParams[0],doubleParams[1],
 			 doubleParams[2],doubleParams[3]);
 
-  gameTab->setGame(her);
+  gameTab->setGame(cva);
   tabWidget->setCurrentIndex(1);
 
 }

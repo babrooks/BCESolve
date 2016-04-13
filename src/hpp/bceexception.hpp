@@ -54,7 +54,8 @@ public:
       BadArgumentBCEAbstractGame, /*!< Bad argument in BCEAbstractGame */
       InvalidParameterName, /*!< Unrecognized parameter name. */
       InvalidParameterValue, /*!< Parameter value was invalid. */
-      ICConstraintViolated /*!< Incentive constraint violated. */
+      ICConstraintViolated, /*!< Incentive constraint violated. */
+      WrongDistnSize /*!< Size of Distn doesn't reflect the number of actions. */
     };
 
   //! Gives the error code for this BCEException.
@@ -121,6 +122,9 @@ public:
 	break;
       case ICConstraintViolated:
 	return "An incentive constraint was violated.";
+	break;
+      case WrongDistnSize:
+	return "Distribution given in solution data does not reflect the correct number of actions.";
 	break;
       } // switch
   }
