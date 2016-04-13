@@ -33,13 +33,20 @@ class BCEGurobiCallback: public QObject, public GRBCallback
 private:
   //! Flags if user has cancelled the solve ("true" if cancel has been hit).
   bool cancelFlag;
+  //! Contains whether solver is currently running Simplex or Barrier
+  bool isFullOutput;
 
 public:
 
   //! Constructor
   BCEGurobiCallback():
-    cancelFlag(false)
+    cancelFlag(false),isFullOutput(true)
   {}
+
+  //! Controls how much information is printed to the log tab.
+  void setFullOutput(bool toggle) {
+    isFullOutput = toggle;
+  }
 
 public slots:
 
@@ -64,11 +71,12 @@ protected:
 	  cout << "abort hit" << endl;
 	}
       }
-
       else if (where == GRB_CB_MESSAGE) {
-	string algorithmOutput = getStringInfo(GRB_CB_MSG_STRING);
-	// Will be redirected to log file by bcelogstream.
-	cout << algorithmOutput << endl;
+	if (isFullOutput) {
+	  string algorithmOutput = getStringInfo(GRB_CB_MSG_STRING);
+	  // Will be redirected to log file by bcelogstream.
+	  cout << algorithmOutput << endl;
+	}
       }
     }
     catch (GRBException e) {

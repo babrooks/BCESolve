@@ -105,10 +105,14 @@ public slots:
       solver.model.setObjective(expr,GRB_MAXIMIZE);
       solver.model.setCallback(callback);
 
+      callback->setFullOutput(true);
       solver.solve();
 
-      if (mapBoundaryOption)
+      if (mapBoundaryOption) {
+	callback->setFullOutput(false);
 	solver.mapBoundary();
+	callback->setFullOutput(true);
+      }
 
       // 11 signals that the solve routine
       if (solver.model.get(GRB_IntAttr_Status)!=11) {
