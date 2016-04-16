@@ -39,6 +39,7 @@ void BCEPlotHandler::setupLayout() {
   setOfBCEPlot = new BCEValueSetPlot();
   BCEPlotTitle *setOfBCEPlotTitle = new BCEPlotTitle(ValueSetPlot,
 						     setOfBCEPlot);
+  setOfBCEPlot->setInteractions(QCP::iRangeDrag|QCP::iRangeZoom);
   setOfBCEPlotTitle->setFont(font);
   setOfBCEPlot->plotLayout()->insertRow(0);
   setOfBCEPlot->
@@ -245,13 +246,12 @@ void BCEPlotHandler::plotBCEValueSet() {
   
   boundaryCurve->setData(objective0Payoffs,objective1Payoffs);
 
-  setOfBCEPlot->addPlottable(boundaryCurve);
-
-  setOfBCEPlot->graph(1)->setData(objective0Payoffs,objective1Payoffs);
-  setOfBCEPlot->graph(1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc,
+  boundaryCurve->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc,
 							QPen(Qt::blue),
 							QBrush(Qt::blue),
 							5));
+  setOfBCEPlot->addPlottable(boundaryCurve);
+
   setOfBCEPlot->rescaleAxes();
   setOfBCEPlot->xAxis->scaleRange(1.1, setOfBCEPlot->xAxis->range().center());
   setOfBCEPlot->yAxis->scaleRange(1.1, setOfBCEPlot->yAxis->range().center());

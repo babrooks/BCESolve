@@ -188,11 +188,6 @@ protected:
   types. */
   void countActionsTypes();
 
-  // Helper for mapboundary  
-  /*! Helper function for mapBoundary. Traces out one quadrant of the
-    frontier. */
-  void mapFrontier(int plusOrMinus1, int plusOrMinus2, bool reversePrint); 
-
   // Helper functions. These functions map between a linear index i
   // and valuations, types, and states. Mostly deprecated because of
   // use of BCECounter class.
