@@ -9,7 +9,7 @@ BCESolver::BCESolver ():
   bndryObjectives(2,GRBLinExpr()),
   boundaryObjectiveIndex1(0),
   boundaryObjectiveIndex2(1),
-  minAngleIncrement(0.0),
+  minAngleIncrement(1e-12),
   displayLevel(1)
 {} // Default constructor
 
@@ -22,7 +22,7 @@ BCESolver::BCESolver (BCEAbstractGame & _game):
   objectiveFunctions(2,GRBLinExpr()),
   bndryObjectives(2,GRBLinExpr()),
   numICConstraints(2,0),
-  minAngleIncrement(0.0),
+  minAngleIncrement(1e-12),
   boundaryObjectiveIndex1(0),
   boundaryObjectiveIndex2(1),
   soln(BCEGame(_game)),
@@ -292,7 +292,7 @@ void BCESolver::populate ()
   model.update();
   for (int prVars = 0; prVars < numProbabilityVariables; prVars++) {
     variables[prVars].set(GRB_DoubleAttr_LB,0.0);
-    variables[prVars].set(GRB_DoubleAttr_UB,1.0);
+    // variables[prVars].set(GRB_DoubleAttr_UB,1.0);
   }
   for (int countIC = numProbabilityVariables; countIC < numICConstraints_total; countIC++) {
     variables[countIC].set(GRB_DoubleAttr_LB,0.0);
@@ -514,34 +514,125 @@ void BCESolver::mapBoundary(const char * fname)
   soln.clearEquilibria();
 
   // First solve 
-  gurobiObjective = objectiveFunctions[boundaryObjectiveIndex1];
+  // gurobiObjective = objectiveFunctions[boundaryObjectiveIndex1];
   // Primal Simplex, Indexed at 0
   int oldMethod = model.getEnv().get(GRB_IntParam_Method);
   int oldOutput = model.getEnv().get(GRB_IntParam_OutputFlag);
   model.getEnv().set(GRB_IntParam_Method,0);
   model.getEnv().set(GRB_IntParam_OutputFlag,0);
-  model.setObjective(gurobiObjective,GRB_MAXIMIZE);
+  
+  int ItLimDefault = 2100000000;
 
-  model.update();
-  model.optimize();
+  double w0 = 1.0,
+    w1 = 0.0;
+  GRBLinExpr & obj0 = objectiveFunctions[boundaryObjectiveIndex1];
+  GRBLinExpr & obj1 = objectiveFunctions[boundaryObjectiveIndex2];
 
-  cout << "Northeast quadrant..." << endl;
-  bndryObjectives[0]=objectiveFunctions[boundaryObjectiveIndex1]; 
-  bndryObjectives[1]=objectiveFunctions[boundaryObjectiveIndex2];
-  mapFrontier(1,1,0);
-  cout << "Northwest quadrant..." << endl;
-  bndryObjectives[0]=objectiveFunctions[boundaryObjectiveIndex2]; 
-  bndryObjectives[1]=-objectiveFunctions[boundaryObjectiveIndex1];
-  mapFrontier(1,-1,1);
-  cout << "Southwest quadrant..." << endl;
-  bndryObjectives[0]=-objectiveFunctions[boundaryObjectiveIndex1]; 
-  bndryObjectives[1]=-objectiveFunctions[boundaryObjectiveIndex2];
-  mapFrontier(-1,-1,0);
-  cout << "Southeast quadrant..." << endl;
-  bndryObjectives[0]=-objectiveFunctions[boundaryObjectiveIndex2]; 
-  bndryObjectives[1]=objectiveFunctions[boundaryObjectiveIndex1];
-  mapFrontier(-1,1,1);
+  int numVars = model.get(GRB_IntAttr_NumVars);
 
+  // Keep track of when we have passed west. After passing east again,
+  // break from loop.
+  bool passedWest = false;
+
+  map<int,double> currentEquilibrium;
+  vector<double> rc0(numVars), rc1(numVars);
+
+  int iter = 0;
+  while (iter < 1e6)
+    {
+      model.getEnv().set(GRB_DoubleParam_IterationLimit,ItLimDefault);
+      model.setObjective(w0*obj0+w1*obj1,GRB_MAXIMIZE);
+      model.update();
+      model.optimize();
+
+      model.getEnv().set(GRB_DoubleParam_TimeLimit,2);
+      
+      if (model.get(GRB_IntAttr_Status) != GRB_OPTIMAL)
+	throw(BCEException(BCEException::MapFrontierNotOptimal));
+
+      model.getEnv().set(GRB_IntParam_Method,0);
+      model.getEnv().set(GRB_DoubleParam_IterationLimit, 0);
+      
+      // Print current equilibrium
+      bceToMap(currentEquilibrium);
+      soln.addEquilibrium(currentEquilibrium);
+
+      // Find the reduced costs
+      model.setObjective(obj0,GRB_MAXIMIZE);
+      model.optimize();
+      for (int i=0; i<numVars; i++)
+	rc0[i] = variables[i].get(GRB_DoubleAttr_RC);
+      boundaryXs.push_back(obj0.getValue());
+
+      model.setObjective(obj1,GRB_MAXIMIZE);
+      model.optimize();
+      for (int i=0; i<numVars; i++)
+	rc1[i] = variables[i].get(GRB_DoubleAttr_RC);
+      boundaryYs.push_back(obj1.getValue());
+
+      // Find the new weights
+
+      // Maximum rotation of direction is PI/4.0 radians, to prevent
+      // crossing of flats in only one iteration
+      double nw0 = w0 * cos(PI/4.0) - w1 * sin(PI/4.0),
+	  nw1 = w0* sin(PI/4.0) + w1 * cos(PI/4.0);
+      for (int vc = 0; vc < numVars; vc++)
+	{
+	  // Only look at variables with negative reduced costs under
+	  // the current weights
+	  if (w0*rc0[vc]+w1*rc1[vc]<0)
+	    {
+	      // Find unit clockwise normal from the reduced
+	      // cost. This is the shallowest direction such that we
+	      // would want to introduce this variable into the basis.
+	      double d = sqrt(rc0[vc]*rc0[vc] + rc1[vc]*rc1[vc]);
+	      if (d<1e-12)
+		continue;
+	      double t0 = rc1[vc]/d,
+		t1 = -rc0[vc]/d;
+	      
+	      // If this direction is shallower than the current new
+	      // direction, make it the new direction.
+	      if (t0*nw1 - t1*nw0>0)
+		{
+		  nw0 = t0;
+		  nw1 = t1;
+		} // better direction
+	    } // rc<0
+	} // variable counter
+
+      // Make sure we move at least by the minimum angle increment
+      double md0 = w0 * cos(minAngleIncrement) - w1 * sin(minAngleIncrement),
+	  md1 = w0* sin(minAngleIncrement) + w1 * cos(minAngleIncrement);
+      if (nw0*md1 - nw1*md0>0)
+	{
+	  w0 = md0; 
+	  w1 = md1;
+	}
+      else
+	{
+	  w0 = nw0; 
+	  w1 = nw1;
+	}
+
+      // Check if we have passed west or gone all the way around.
+      if (!passedWest && w1 < 0)
+	passedWest = true;
+      if (passedWest && w1 > 0)
+	break;
+
+      // Print progress.
+      if (!(iter%10))
+	cout << setprecision(3) 
+	     << "(w0,w1) = (" <<  w0 << "," << w1
+	     << "), passedWest = " << passedWest
+	     << ", iter = " << iter << endl;
+
+      iter++;
+    } // while
+
+  model.getEnv().set(GRB_DoubleParam_IterationLimit,ItLimDefault);
+  
   // Print the bndry points.
   ofstream vertexData;
   list<double>::iterator XIterator;
@@ -557,126 +648,7 @@ void BCESolver::mapBoundary(const char * fname)
 
   model.getEnv().set(GRB_IntParam_Method,oldMethod);
   model.getEnv().set(GRB_IntParam_OutputFlag,oldOutput);
-}
-
-void BCESolver::mapFrontier(int plusOrMinus1, int plusOrMinus2, bool reversePrint)
-{
-  double objectiveWeight=0, newWeight, alpha;
-
-  map<int,double> currentEquilibrium;
-
-  double objectiveValue1, objectiveValue2;
-
-  int variableCounter=0;
-  int ItLimDefault = 2100000000;
-
-  double oldAngleIncrement, minalpha;
-
-  int numVars = model.get(GRB_IntAttr_NumVars);
-
-  vector<double> reducedCosts1(numVars), reducedCosts2(numVars);
-  vector<int> basisStatuses(numVars);
-
-  int displayVal=0;
-
-  model.getEnv().set(GRB_DoubleParam_FeasibilityTol,1E-9);
-  model.getEnv().set(GRB_DoubleParam_TimeLimit,1e+75);
-
-  int iterationCounter = 0;
-  while ( objectiveWeight < 1e11 && iterationCounter < 1E8 )
-    {
-      // solve the new objective function.
-      // Switch to dual for the initial solve phase. Might take awhile.
-      model.setObjective(objectiveWeight*bndryObjectives[1]
-			 +bndryObjectives[0],GRB_MAXIMIZE);
-      model.getEnv().set(GRB_DoubleParam_IterationLimit,ItLimDefault);
-      model.getEnv().set(GRB_IntParam_Method,0);
-      model.optimize();
-
-      model.getEnv().set(GRB_DoubleParam_TimeLimit,2);
-      
-      if (model.get(GRB_IntAttr_Status) != GRB_OPTIMAL)
-	throw(BCEException(BCEException::MapFrontierNotOptimal));
-
-      model.getEnv().set(GRB_IntParam_Method,0);
-      model.getEnv().set(GRB_DoubleParam_IterationLimit, 0);
-      
-      for (int i=0; i<basisStatuses.size(); i++) 
-	basisStatuses[i] = variables[i].get(GRB_IntAttr_VBasis);
-
-      // Print current equilibrium
-      bceToMap(currentEquilibrium);
-      soln.addEquilibrium(currentEquilibrium);
-
-      // Find the next weight
-      gurobiObjective = bndryObjectives[0];
-      model.setObjective(gurobiObjective,GRB_MAXIMIZE);
-      model.optimize();
-      for (int i=0; i<numVars; i++)
-	reducedCosts1[i] = variables[i].get(GRB_DoubleAttr_RC);
-      objectiveValue1 = bndryObjectives[0].getValue();
-
-      model.setObjective(bndryObjectives[1],GRB_MAXIMIZE);
-      model.optimize();
-      for (int i=0; i<numVars; i++)
-	reducedCosts2[i] = variables[i].get(GRB_DoubleAttr_RC);
-      objectiveValue2 = bndryObjectives[1].getValue();
-
-      // Now find the smallest new weight that is greater than the old weight.
-      newWeight=-1;
-      for (variableCounter = 0; variableCounter<numVars; variableCounter++)
-	{
-	  // 0 is the flag for GRB BASIC.
-	  if (basisStatuses[variableCounter]!=0 
-	      && reducedCosts1[variableCounter]<0 
-	      && reducedCosts2[variableCounter]>0)
-	    {
-	      alpha = -reducedCosts1[variableCounter]/reducedCosts2[variableCounter]+1E-8;
-	      if (alpha>objectiveWeight && ( alpha<newWeight || newWeight<0 ))
-		newWeight = alpha;
-	    }
-	}
-      if (newWeight<0 || newWeight > 1e13)
-	break; // Could not find a new weight that met criteria. Done.
-
-      // Add new element to the list.
-      if (reversePrint)
-	{
-	  boundaryXs.push_back(plusOrMinus2*objectiveValue2);
-	  boundaryYs.push_back(plusOrMinus1*objectiveValue1);
-	}
-      else
-	{
-	  boundaryXs.push_back(plusOrMinus1*objectiveValue1);
-	  boundaryYs.push_back(plusOrMinus2*objectiveValue2);
-	}
-
-      if (minAngleIncrement>0)
-	{
-	  oldAngleIncrement = atan2(objectiveWeight,1);
-	  // assert(oldAngleIncrement>=0);
-	  if (oldAngleIncrement+minAngleIncrement > PI/2-1e-12)
-	    break;
-	  else
-	    minalpha = tan(oldAngleIncrement + minAngleIncrement);
-	  
-	  if (newWeight < minalpha)
-	    newWeight = minalpha;
-	}
-
-      objectiveWeight = newWeight;
-
-      if (!(iterationCounter%10))
-	cout << setprecision(3) 
-	     << "weight on objective 2 = " << objectiveWeight 
-	     << ", iterationCounter = " << iterationCounter << endl;
-
-      iterationCounter++;
-    }
-
-  cout << "Final weight = " << objectiveWeight << ", total iterations = " << iterationCounter << endl;
-  model.getEnv().set(GRB_DoubleParam_IterationLimit,ItLimDefault);
-} // mapFrontier
+} // mapBoundary
 
 void BCESolver::getSolution(BCESolution & output)
 {

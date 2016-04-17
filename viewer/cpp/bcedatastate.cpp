@@ -281,14 +281,16 @@ void BCEDataState::setEqmMatrix() {
 					  margA,
 					  margT,
 					  distribution);
-
-  if (solutionData.numActions_total != distribution.size())
+  
+  int numActions_total = solutionData.getGame().getNumActions()[0] 
+    * solutionData.getGame().getNumActions()[1];
+  if (numActions_total != distribution.size())
     throw(BCEException(BCEException::WrongDistnSize));
 
   vector<int> numActions = gameData.getNumActions();
 
-  equilibriumMatrix = vector< vector<double> >(numActions[1],
-					       vector<double>(numActions[0],0));
+  equilibriumMatrix = vector< vector<double> >(numActions[0],
+					       vector<double>(numActions[1],0));
 
   for (int a1 = 0; a1 < numActions[1]; a1++)
     {
@@ -317,7 +319,7 @@ void BCEDataState::setObjectiveVals(int player) {
 			  types[player],
 			  objectiveValues[player][actions[player]]));
 
-  emit(devPlotPrChange(player,prob/gameData.prior(player,types[player])));
+  emit(devPlotPrChange(player,prob));
   emit(objectiveValuesChanged(player));
 
 }

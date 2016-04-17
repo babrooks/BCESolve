@@ -20,9 +20,9 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   // Menu Bar
   QMenu * fileMenu = menuBar()->addMenu(tr("&File"));
   QAction * loadSolutionAction = new QAction(tr("&Load Solution"),this);
-  QAction * loadGameAction = new QAction(tr("&Load Game"),this);
+  QAction * loadGameAction = new QAction(tr("Load &Game"),this);
   QAction * saveSolutionAction = new QAction(tr("&Save Solution"),this);
-  QAction * saveGameAction = new QAction(tr("&Save Game"),this);
+  QAction * saveGameAction = new QAction(tr("S&ave Game"),this);
   QAction * quitAction = new QAction(tr("&Quit GUI"),this);
   QMenu * viewMenu = menuBar()->addMenu(tr("&View"));
   QAction * linearScale = new QAction(tr("&Linear/Log Color Scale Toggle"),this);
@@ -51,6 +51,7 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   toolMenu->addAction(solveOption);
   toolMenu->addAction(cancelOption);
   loadSolutionAction->setShortcut(tr("Ctrl+L"));
+  loadGameAction->setShortcut(tr("Ctrl+G"));
   screenShotAction->setShortcut(tr("Ctrl+P"));
   quitAction->setShortcut(tr("Ctrl+W"));
   saveSolutionAction->setShortcut(tr("Ctrl+S"));
