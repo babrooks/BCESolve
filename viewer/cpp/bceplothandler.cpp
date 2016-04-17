@@ -170,8 +170,8 @@ void BCEPlotHandler::setupLayout() {
   QSplitter *mainSplitter = new QSplitter();
   mainSplitter->addWidget(leftSideSplitter);
   mainSplitter->addWidget(rightSideWidget);
-  mainSplitter->setStretchFactor(0,2);
-  mainSplitter->setStretchFactor(1,5);
+  mainSplitter->setStretchFactor(0,4);
+  mainSplitter->setStretchFactor(1,10);
 
   mainTab = new QHBoxLayout();
   mainTab->addWidget(mainSplitter);

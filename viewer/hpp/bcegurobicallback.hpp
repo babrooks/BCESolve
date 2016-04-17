@@ -68,7 +68,6 @@ protected:
       else if (where == GRB_CB_SIMPLEX) {
 	if (cancelFlag) {
 	  abort();
-	  cout << "abort hit" << endl;
 	}
       }
       else if (where == GRB_CB_MESSAGE) {
@@ -88,4 +87,5 @@ protected:
       cout << "GRBCallback error, unrelated to GRB error codes." << endl;
     }
   }
+
 };

@@ -21,7 +21,7 @@ BCEPlotTitle::BCEPlotTitle(LabelType _labelType,
 {
   switch(_labelType) {
   case ValueSetPlot: {
-    std::string staticString = "Set of BCE, Selected: ";
+    std::string staticString = "Set of BCE: ";
     QString title = QString::fromStdString(staticString);
     setText(title);
   }
@@ -73,7 +73,7 @@ void BCEPlotTitle::changeDisplayedCoords(double x,double y) {
 
   if (labelType == ValueSetPlot) {
 
-    std::string staticString = "Set of BCE, Selected: ";
+    std::string staticString = "Set of BCE: ";
 
     dynamicString.str(std::string());
     dynamicString << staticString 

@@ -111,14 +111,12 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   setWindowTitle(QApplication::translate("bceviewer","BCE Solution Viewer"));
 
   // Load in default Game
-  BCESolution defaultSoln;
-  QString defaultPath = "../examples/prisonervsbattle.bce";
+  BCEGame defaultGame;
+  QString defaultPath = "../examples/prisonervsbattle.bgm";
   QByteArray ba = defaultPath.toLocal8Bit();
   const char* defaultPath_c = ba.data();
-  BCESolution::load(defaultSoln,defaultPath_c);
-  BCEGame defaultGame = defaultSoln.getGame();
+  BCEGame::load(defaultGame,defaultPath_c);
 
-  solutionTab->setSolution(defaultSoln);
   gameTab->setGame(defaultGame);
 
 } // Default Constructor
@@ -169,7 +167,6 @@ void BCEWindow::loadGame() {
 						 path,
 						 tr("BCESolve Game Files (*.bgm)"));
 
-
   if (newPath.isEmpty()) {
     cout << "Path for loading game is empty." << endl;
     return;
@@ -217,11 +214,8 @@ void BCEWindow::saveSolution() {
       QString newPath = saveSolnDialog.selectedFiles().front();
       if (newPath.isEmpty())
 	return;
-
-      qDebug() << newPath << endl;
   
       QFileInfo fi(newPath);
-      path = fi.canonicalPath();
 
       try
 	{
@@ -251,11 +245,8 @@ void BCEWindow::saveGame() {
       QString newPath = saveGameDialog.selectedFiles().front();
       if (newPath.isEmpty())
 	return;
-
-      qDebug() << newPath << endl;
   
       QFileInfo fi(newPath);
-      path = fi.canonicalPath();
 
       try
 	{
@@ -351,11 +342,17 @@ void BCEWindow::generateHybridAuction() {
   }
 
   form.addRow(QString("Number of Values (Integer)"), fields[0]);
+  fields[0]->setText("30");
   form.addRow(QString("Number of Actions (Integer)"), fields[1]);
+  fields[1]->setText("30");
   form.addRow(QString("Weight on Bid, 1 = FPA, 0 = SPA (Double in [0,1])"), fields[2]);
+  fields[2]->setText("0.5");
   form.addRow(QString("Reserve Price (Double in [0,1])"), fields[3]);
+  fields[3]->setText("0");
   form.addRow(QString("Entry Fee (Double in [0,1])"), fields[4]);
+  fields[4]->setText("0");
   form.addRow(QString("High Bid (Double in [0,1])"), fields[5]);
+  fields[5]->setText("1");
 
   QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
   			     Qt::Horizontal, &dialog);
@@ -394,17 +391,26 @@ void BCEWindow::generateCommonValueAuction() {
 
   form.addRow(new QLabel("Common Values Auction, Prior~v^alpha"));
 
-  int numParams = 4;
+  int numParams = 6;
   vector<QLineEdit *> fields(numParams);
   for(int i = 0; i < numParams; ++i) {
     QLineEdit *lineEdit = new QLineEdit(&dialog);
     fields[i] = lineEdit;
   }
 
-  form.addRow(QString("Alpha (Double > 0)"), fields[0]);
-  form.addRow(QString("High Bid (Double in [0,1])"), fields[1]);
-  form.addRow(QString("Reserve Price (Double in [0,1]"), fields[2]);
-  form.addRow(QString("Entry Fee (Double in [0,1])"), fields[3]);
+  // Setting default values
+  form.addRow(QString("Number of Values (Integer)"), fields[0]);
+  fields[0]->setText("30");
+  form.addRow(QString("Number of Actions (Integer)"), fields[1]);
+  fields[1]->setText("30");
+  form.addRow(QString("Alpha (Double > 0)"), fields[2]);
+  fields[2]->setText("1");
+  form.addRow(QString("High Bid (Double in [0,1])"), fields[3]);
+  fields[3]->setText("1");
+  form.addRow(QString("Reserve Price (Double in [0,1]"), fields[4]);
+  fields[4]->setText("0");
+  form.addRow(QString("Entry Fee (Double in [0,1])"), fields[5]);
+  fields[5]->setText("0");
 
   QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
   			     Qt::Horizontal, &dialog);
@@ -413,18 +419,21 @@ void BCEWindow::generateCommonValueAuction() {
   QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
 
   dialog.exec();
-  qDebug() << "Dialog Closed" << endl;
 
   if (dialog.result() == 0)
     return;
 
-  vector<double> doubleParams(4);
+  vector<int> intParams(2);
+  for (int i=0; i<intParams.size(); i++)
+    intParams[i] = fields[i]->text().toInt();
 
-  for (int i=0; i < numParams; i++) {
-    doubleParams[i] = fields[i]->text().toDouble();
+  vector<double> doubleParams(4);
+  for (int i=0; i < doubleParams.size(); i++) {
+    doubleParams[i] = fields[i+2]->text().toDouble();
   }
 
-  CommonValueAuction cva(50,50,doubleParams[0],doubleParams[1],
+  CommonValueAuction cva(intParams[0],intParams[1]
+			 ,doubleParams[0],doubleParams[1],
 			 doubleParams[2],doubleParams[3]);
 
   gameTab->setGame(cva);
