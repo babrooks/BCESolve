@@ -90,8 +90,8 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   QWidget *logTabWidget = new QWidget(this);
   logTabWidget->setLayout(logTab->getLayout());
 
-  tabWidget->addTab(solutionTabWidget,"Solution");
   tabWidget->addTab(gameTabWidget,"Game");
+  tabWidget->addTab(solutionTabWidget,"Solution");
   tabWidget->addTab(logTabWidget,"Log");
 
   QHBoxLayout *mainLayout = new QHBoxLayout();
@@ -146,7 +146,7 @@ void BCEWindow::loadSolution() {
     solutionTab->setSolution(loadedSolution);
     gameTab->setGame(loadedGame);
 
-    tabWidget->setCurrentIndex(0);
+    tabWidget->setCurrentIndex(1);
 
     }
   catch(BCEException & e)
@@ -184,7 +184,7 @@ void BCEWindow::loadGame() {
 
     gameTab->setGame(loadedGame);
 
-    tabWidget->setCurrentIndex(1);
+    tabWidget->setCurrentIndex(0);
 
     /* Note that the solution remains the same and isn't
        necessarily associated with the game. */
@@ -322,7 +322,7 @@ void BCEWindow::runSolve() {
 
 void BCEWindow::tabToSolution(BCESolution *soln) {
   solutionTab->setSolution(*soln);
-  tabWidget->setCurrentIndex(0);
+  tabWidget->setCurrentIndex(1);
 }
 
 void BCEWindow::screenshot() {
@@ -382,7 +382,7 @@ void BCEWindow::generateHybridAuction() {
 
   // HybridEntryReserve her(30,30,1,.1,0,.75);
   gameTab->setGame(her);
-  tabWidget->setCurrentIndex(1);
+  tabWidget->setCurrentIndex(0);
 
 }
 
@@ -427,7 +427,7 @@ void BCEWindow::generateCommonValueAuction() {
 			 doubleParams[2],doubleParams[3]);
 
   gameTab->setGame(cva);
-  tabWidget->setCurrentIndex(1);
+  tabWidget->setCurrentIndex(0);
 
 }
 
