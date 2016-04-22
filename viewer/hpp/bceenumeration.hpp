@@ -27,4 +27,6 @@ enum BCESliderType{Action,Type,State};
 
 enum LabelType{DeviationPlot,SliderLabel,ValueSetPlot,HeatMap};
 
+enum ModelType{Solver,MBObj1,MBObj2};
+
 #endif

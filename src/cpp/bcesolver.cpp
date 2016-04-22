@@ -9,7 +9,7 @@ BCESolver::BCESolver ():
   bndryObjectives(2,GRBLinExpr()),
   boundaryObjectiveIndex1(0),
   boundaryObjectiveIndex2(1),
-  minAngleIncrement(1e-12),
+  minAngleIncrement(1e-4),
   displayLevel(1)
 {} // Default constructor
 
@@ -22,7 +22,7 @@ BCESolver::BCESolver (BCEAbstractGame & _game):
   objectiveFunctions(2,GRBLinExpr()),
   bndryObjectives(2,GRBLinExpr()),
   numICConstraints(2,0),
-  minAngleIncrement(1e-12),
+  minAngleIncrement(1e-4),
   boundaryObjectiveIndex1(0),
   boundaryObjectiveIndex2(1),
   soln(BCEGame(_game)),
@@ -503,10 +503,24 @@ void BCESolver::solve()
 
 void BCESolver::mapBoundary()
 {
-  mapBoundary("bndry.dat");
+  mapBoundary("bndry.dat",objectiveFunctions[boundaryObjectiveIndex1],
+	      objectiveFunctions[boundaryObjectiveIndex2]);
 }
 
-void BCESolver::mapBoundary(const char * fname)
+void BCESolver::mapBoundary(const char * fname) {
+  mapBoundary(fname,objectiveFunctions[boundaryObjectiveIndex1],
+	      objectiveFunctions[boundaryObjectiveIndex2]);
+}
+
+void BCESolver::mapBoundary(GRBLinExpr & obj0,
+			    GRBLinExpr & obj1)
+{
+  mapBoundary("bndry.dat",obj0,obj1);
+}
+
+void BCESolver::mapBoundary(const char * fname,
+			    GRBLinExpr & mBObjective0,
+			    GRBLinExpr & mBObjective1)
 {
   cout << "mapping objfun1 vs objfun2..." << endl;
 
@@ -525,8 +539,8 @@ void BCESolver::mapBoundary(const char * fname)
 
   double w0 = 1.0,
     w1 = 0.0;
-  GRBLinExpr & obj0 = objectiveFunctions[boundaryObjectiveIndex1];
-  GRBLinExpr & obj1 = objectiveFunctions[boundaryObjectiveIndex2];
+  GRBLinExpr & obj0 = mBObjective0;
+  GRBLinExpr & obj1 = mBObjective1;
 
   int numVars = model.get(GRB_IntAttr_NumVars);
 

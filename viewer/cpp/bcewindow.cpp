@@ -32,7 +32,7 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   QAction * generateHAGame = new QAction(tr("&Generate Hybrid Auction"),this);
   QAction * generateCVGame = new QAction(tr("&Generate Common Value Auction"),this);
   QAction * solveOption = new QAction(tr("&Solve Game"),this);
-  QAction * cancelOption = new QAction(tr("&Cancel Game"),this);
+  QAction * cancelOption = new QAction(tr("&Cancel Solve"),this);
 
   fileMenu->addAction(loadSolutionAction);
   fileMenu->addAction(loadGameAction);
@@ -265,8 +265,8 @@ void BCEWindow::saveGame() {
 
 void BCEWindow::runSolve() {
 
-  try
-    {
+  // try
+  //   {
       delete callback;
       callback = new BCEGurobiCallback();
 
@@ -286,6 +286,7 @@ void BCEWindow::runSolve() {
       QThread *solverWorkerThread = new QThread(this);
       solverWorker = new BCESolverWorker(gameTab->getGame(),
 					 gameTab->getWeightsOnObjectives(),
+					 gameTab->getMapBWeights(),
 					 callback,
 					 gameTab->getMapBoundaryOption());
       solverWorker->moveToThread(solverWorkerThread);
@@ -302,13 +303,22 @@ void BCEWindow::runSolve() {
       connect(solverWorkerThread,SIGNAL(finished()),
 	      solverWorker,SLOT(deleteLater()));
       solverWorkerThread->start();
-    }
-  catch (exception & e)
-    {
-      QMessageBox::critical(this,tr("Solver failed"),
-			    tr("Gurobi was not able to solve your game."),
-			    QMessageBox::Ok);
-    }
+  //   }
+  // catch(BCEException &e) {
+  //   displayException(QString::fromStdString(e.getMessage()));
+  // }
+  // catch(GRBException &e) {
+  //   displayException(QString::fromStdString(e.getMessage() + 
+  // 			     "The error code for this GRBException was: " +
+  // 			     to_string(e.getErrorCode())));
+  // }
+  // catch(exception & e)
+  //   {
+  //     string str(e.what());
+  //     QMessageBox::critical(this,tr("Solver failed"),
+  // 			    QString::fromStdString("Gurobi was not able to solve your game. Message : " + str),
+  // 			    QMessageBox::Ok);
+  //   }
   
 }
 

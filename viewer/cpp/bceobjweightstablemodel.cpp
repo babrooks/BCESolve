@@ -25,7 +25,7 @@ bool BCEObjWeightsTableModel::setData(const QModelIndex & index,
     {
       int objective = index.row();
       QString strValue = value.toString();
-      setWeightData(objective,strValue.toDouble());
+      setWeightData(objective,strValue.toDouble(),type);
 
       emit dataChanged(index,index);
       return true;

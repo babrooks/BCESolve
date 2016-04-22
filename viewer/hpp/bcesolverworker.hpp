@@ -53,6 +53,8 @@ private:
   BCESolution solution;
   //! Weights on the objectives, as supplied by the user in the game tab.
   vector<double> weightData;
+  //! Weights on map boundary objectives, supplied in the game tab.
+  vector<vector<double> > mapBoundaryData;
   //! Callback, allows communication with Gurobi solver.
   BCEGurobiCallback * callback; 
   //! True if the solver will be mapping the boundary.
@@ -63,9 +65,11 @@ public:
   //! Constructor
   BCESolverWorker(BCEGame _game,
 		  vector<double> _weightData,
+		  vector<vector<double> > _mapBoundaryData,
 		  BCEGurobiCallback * _callback,
 		  bool _mapBoundaryOption):
-    game(_game), weightData(_weightData), callback(_callback),
+    game(_game), weightData(_weightData),
+    mapBoundaryData(_mapBoundaryData), callback(_callback),
     mapBoundaryOption(_mapBoundaryOption)
   {}
 
@@ -79,7 +83,8 @@ public slots:
   //! Triggered when the user clicks the "Solve" button in the game tab.
   /*! Uses GUROBI and BCESolver to solve a BCEGame. Objectives are
     multiplied by their respective weights, and then the sum of these
-    objectives is maximized. The weights should sum, in magnitude, to 1.
+    objectives is maximized. 
+
     If weights are negative, then the solver is maxing the negative of an 
     objective, i.e. minimizing. 
   */
@@ -91,15 +96,23 @@ public slots:
       solver.populate();
 
       GRBLinExpr expr = weightData[0]*solver.getObjectiveFunction(0);
+      vector<GRBLinExpr> mapBObj(2,0);
+      mapBObj[0] = mapBoundaryData[0][0]*solver.getObjectiveFunction(0);
+      mapBObj[1] = mapBoundaryData[1][0]*solver.getObjectiveFunction(0);
       int numObjs = game.getNumObjectives();
 
       if (numObjs == 2) {
 	expr += weightData[1]*solver.getObjectiveFunction(1);
+	for (int mBObj = 0; mBObj < 2; mBObj++)
+	  mapBObj[mBObj] += mapBoundaryData[mBObj][1]*solver.getObjectiveFunction(1);
       }
 
       else if (numObjs > 2) {
-	for (int obj = 1; obj < numObjs; obj++)
+	for (int obj = 1; obj < numObjs; obj++) {
 	  expr += weightData[obj]*solver.getObjectiveFunction(obj);
+	  for (int mBObj = 0; mBObj < 2; mBObj++)
+	    mapBObj[mBObj] += mapBoundaryData[mBObj][obj]*solver.getObjectiveFunction(obj);
+	} // for each objective
       }
 
       solver.model.setObjective(expr,GRB_MAXIMIZE);
@@ -110,7 +123,7 @@ public slots:
 
       if (mapBoundaryOption) {
 	callback->setFullOutput(false);
-	solver.mapBoundary();
+	solver.mapBoundary(mapBObj[0],mapBObj[1]);
 	callback->setFullOutput(true);
       }
 

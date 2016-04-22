@@ -27,6 +27,7 @@
 #include <QAbstractTableModel>
 #include <QTableView>
 #include "bcegame.hpp"
+#include "bceenumeration.hpp"
 
 //! Model for Objective Weights in the BCEViewer
 /*! Specializes QAbstractTableModel for the BCEViewer program.  Sets
@@ -48,11 +49,14 @@ private:
   //! Vector storing weights on objectives.
   vector<double> weightData;
   //! Sets data in the weightData vector.
-  void setWeightData(int obj,double value) {
-    weightData[obj] = value;
+  void setWeightData(int obj,double value,ModelType _type) {
+    if (_type == type)
+      weightData[obj] = value;
   }
   //! Vector storing objective labels
   vector<string> objectiveLabels;
+  //! Type of the model (Solver, MBObj1, or MBObj2)
+  ModelType type;
 
 public:
   //! Constructor
@@ -61,15 +65,29 @@ public:
     weight data to .5 on player 0 and player 1's objectives.
     Gets any existing objective labels from the game. 
    */
-  BCEObjWeightsTableModel(BCEGame * _game):
-    game(_game)
+  BCEObjWeightsTableModel(BCEGame * _game,ModelType _type):
+    game(_game),type(_type)
   {
 
-    for (int obj = 0; obj < game->getNumObjectives(); obj++)
-      weightData.push_back(0);
+    weightData = vector<double>(game->getNumObjectives(),0);
 
-    weightData[0] = .5;
-    weightData[1] = .5;
+    switch(type) {
+    case Solver: {
+      weightData[0] = .5;
+      weightData[1] = .5;
+    }
+      break;
+    case MBObj1: {
+      weightData[0] = 1;
+      weightData[1] = 0;
+    }
+      break;
+    case MBObj2: {
+      weightData[0] = 0;
+      weightData[1] = 1;
+    }
+      break;
+    }
 
     objectiveLabels = game->getObjLabels();
 

@@ -34,6 +34,7 @@
 #include "bceconditionaltablemodel.hpp"
 #include "bceobjweightstablemodel.hpp"
 #include "bcepushbutton.hpp"
+#include "bceenumeration.hpp"
 
 //! This class handles the widgets for editing/displaying the game.
 /*! All of the widgets in the game tab and their slots are members of
@@ -70,8 +71,12 @@ private:
   BCEPriorTableModel* priorModel;
   //! Model for interfacing with conditional distribution of types
   BCEConditionalTableModel * conditionalModel;
-  //! Model for setting weights on objectives
+  //! Model for setting weights on main solver objectives
   BCEObjWeightsTableModel * weightsModel;
+  //! Model for setting weights on objective0 for mapboundary.
+  BCEObjWeightsTableModel * obj0WeightsModel;
+  //! Model for settings weights on objective1 for mapboundary.
+  BCEObjWeightsTableModel *obj1WeightsModel;
 
   //! Map Boundary option
   /*! Tells the solver worker whether or not to map the boundary.
@@ -112,8 +117,12 @@ private:
   BCETableView* priorTableView;
   //! Table for displaying conditional distn of types
   BCETableView* conditionalTableView;
-  //! Table for displaying weights data
-  BCETableView *objWeightsTableView;
+  //! Table for displaying main solver weights data
+  BCETableView *weightsTableView;
+  //! Table for displaying mapBoundary objective0 weights data
+  BCETableView *obj0WeightsTableView;
+  //! Table for displaying mapBoundary objective1 weights data
+  BCETableView *obj1WeightsTableView;
 
 public:
   //! Constructor
@@ -151,6 +160,11 @@ public:
   void setState(int state);
   //! Returns weights on objectives.
   const vector<double>& getWeightsOnObjectives();
+  //! Returns weights on map boundary objectives.
+  /*! This is a matrix of doubles. The first row gives the weights
+    on objective0 for the mapBoundary algorithm. The second row gives
+    the weights on objective1 for the algorithm. */
+  const vector<vector<double> > getMapBWeights();
   //! Returns mapBoundaryOption.
   const bool getMapBoundaryOption() const {
     return mapBoundaryOption;
