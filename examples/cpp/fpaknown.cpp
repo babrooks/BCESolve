@@ -45,6 +45,7 @@ void solveFPA(int nvals, int nbids,
       // fpa.distribution.push_back(uniformWithMassPnt(0.3),1.0); // uniform with mass 
       fpa.distribution.push_back(new vToTheAlpha(1.0),1.0); // uniform
 
+      fpa.setHasProductStructureData(true);
 
       BCESolver solver(fpa);
 

@@ -59,7 +59,7 @@ void BCEDataState::setSolutionData(const BCESolution &solution) {
       if (isPrivateVals)
 	sliderGroup[3*player+2]->setRange(0,numStates-1);
       else
-	sliderGroup[3*player+2]->setRange(0,sqrt(numStates)-1);
+	sliderGroup[3*player+2]->setRange(0,gameData.getNumPrivateStates()[player]-1);
     }
     // Set Sliders to 0
     for (int i = 0; i < 6; i++) {
@@ -188,7 +188,7 @@ void BCEDataState::setSliderValue(int value,
     if (isPrivateVals)
       state = value;
     else
-      state = values[0]+sqrt(gameData.getNumStates())*values[1];
+      state = values[0]+sqrt(gameData.getNumPrivateStates()[0])*values[1];
     emit(newStateSignal(values[0],values[1],state,isPrivateVals));
   }
     break;

@@ -46,8 +46,8 @@ void BCEPlotHandler::setupLayout() {
     plotLayout()->
     addElement(0,0,setOfBCEPlotTitle);
 
-  setOfBCEPlot->xAxis->setLabel("Player 0");
-  setOfBCEPlot->yAxis->setLabel("Player 1");
+  setOfBCEPlot->xAxis->setLabel("Objective 0");
+  setOfBCEPlot->yAxis->setLabel("Objective 1");
   connect(setOfBCEPlot,SIGNAL(newEqmCoordinates(double,double)),
 	  guiData,SLOT(modifyEqmFocus(double,double)));
   connect(guiData,SIGNAL(eqmCoordSignal(double,double)),
