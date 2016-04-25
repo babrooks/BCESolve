@@ -28,6 +28,7 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   QAction * linearScale = new QAction(tr("&Linear/Log Color Scale Toggle"),this);
   QAction * colorfulDistn = new QAction(tr("&Colorful/Blue Theme Toggle"),this);
   QAction * screenShotAction = new QAction(tr("&Save a screen shot"),this);
+  QAction * conditionalBCE = new QAction(tr("&View BCE Conditional on State"),this);
   QMenu * toolMenu = menuBar()->addMenu(tr("&Tools"));
   QAction * generateHAGame = new QAction(tr("&Generate Hybrid Auction"),this);
   QAction * generateCVGame = new QAction(tr("&Generate Common Value Auction"),this);
@@ -46,6 +47,9 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   colorfulDistn->setCheckable(true);
   colorfulDistn->setChecked(true);
   viewMenu->addAction(screenShotAction);
+  viewMenu->addAction(conditionalBCE);
+  conditionalBCE->setCheckable(true);
+  conditionalBCE->setChecked(true);
   toolMenu->addAction(generateHAGame);
   toolMenu->addAction(generateCVGame);
   toolMenu->addAction(solveOption);
@@ -65,6 +69,7 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   connect(linearScale,SIGNAL(toggled(bool)),solutionTab,SLOT(toggleLinearScale(bool)));
   connect(colorfulDistn,SIGNAL(toggled(bool)),solutionTab,SLOT(toggleColorfulTheme(bool)));
   connect(screenShotAction,SIGNAL(triggered()),this,SLOT(screenshot()));
+  connect(conditionalBCE,SIGNAL(triggered(bool)),this,SLOT(conditionBCE(bool)));
   connect(generateHAGame,SIGNAL(triggered()),this,SLOT(generateHybridAuction()));
   connect(generateCVGame,SIGNAL(triggered()),this,SLOT(generateCommonValueAuction()));
   connect(solveOption,SIGNAL(triggered()),this,SLOT(runSolve()));
@@ -456,4 +461,8 @@ void BCEWindow::displayException(QString message) {
   msgBox.setText("A BCEException was thrown with message: " 
 		 + message);
   msgBox.exec();
+}
+
+void BCEWindow::conditionBCE(bool checked) {
+  solutionTab->guiData->setConditionOnState(checked);
 }

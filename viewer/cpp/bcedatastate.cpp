@@ -15,6 +15,7 @@ BCEDataState::BCEDataState():
   currentEqmIndex = 0;
   isPrivateVals=false;
   setupControlsLayout();  
+  conditionedOnState = true;
 }
 
 int BCEDataState::shareDataProperties(BCESliderType st,int player) {
@@ -261,9 +262,9 @@ void BCEDataState::setEqmMatrix() {
 
   // State Conditions
 
-  vector<int> stateConditions(1,state);
-  if (isPrivateVals == false)
-    stateConditions = vector<int>(1,state); 
+  vector<int> stateConditions(0);
+  if (conditionedOnState)
+    stateConditions = vector<int>(1,state);
 
   // Action Conditions
 

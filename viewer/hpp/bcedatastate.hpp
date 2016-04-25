@@ -199,6 +199,8 @@ private: // Private Properties. Private Functions near EOF.
     size of the vector is 6.
   */
   QVector<BCELineEdit*> lineEditGroup;
+  //! Tells whether equilibriumMatrix is conditioned on State.
+  bool conditionedOnState;
 
 public:
 
@@ -308,6 +310,12 @@ public:
   //! Shares file name of currently loaded file with BCEWindow.
   const string getGUITitle() const {
     return guiTitle;
+  }
+
+  //! Alters whether data in equilibriumMatrix is conditional on state.
+  void setConditionOnState(bool conditioned) {
+    conditionedOnState = conditioned;
+    setEqmMatrix();
   }
 
 public slots:

@@ -117,6 +117,8 @@ private slots:
   void generateCommonValueAuction();
   //! Displays exceptions signaled from other classes.
   void displayException(QString message);
+  //! Toggles whether BCE heat map is conditional on state.
+  void conditionBCE(bool checked);
 
 };
 
