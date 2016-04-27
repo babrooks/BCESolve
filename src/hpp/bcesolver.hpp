@@ -88,6 +88,11 @@ public:
     {
     };
 
+  //! Used to set the minimum angle increment. Called by bcesolverworker.hpp.
+  void setMinAngleIncr(double incr) {
+    minAngleIncrement = incr;
+  }
+
 protected:
   //! Pointer to the BCEAbstractGame object that is being solved. 
   BCEAbstractGame * game; 

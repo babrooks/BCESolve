@@ -82,6 +82,11 @@ private:
   /*! Tells the solver worker whether or not to map the boundary.
     */
   bool mapBoundaryOption;
+  //! Minimum Angle increment, used for mapBoundary()
+  /*! Tells the solver what minimum angle increment to use
+    when mapping the boundary.
+   */
+  double minAngleIncrement;
 
   //! Layout for the game tab.
   QVBoxLayout * layout;
@@ -169,6 +174,9 @@ public:
   const bool getMapBoundaryOption() const {
     return mapBoundaryOption;
   }
+  const double getMinAngleIncr() const {
+    return minAngleIncrement;
+  }
 
   
 private:
@@ -218,6 +226,11 @@ private slots:
       mapBoundaryOption = false;
     else if (value == 2)
       mapBoundaryOption = true;
+  }
+  void setMinAngleIncr(QString strValue) {
+    double incr = strValue.toDouble();
+    std::cout << incr << std::endl;
+    minAngleIncrement = incr;
   }
 
 signals:

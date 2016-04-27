@@ -189,7 +189,7 @@ void BCEDataState::setSliderValue(int value,
     if (isPrivateVals)
       state = value;
     else
-      state = values[0]+sqrt(gameData.getNumPrivateStates()[0])*values[1];
+      state = values[0]+gameData.getNumPrivateStates()[0]*values[1];
     emit(newStateSignal(values[0],values[1],state,isPrivateVals));
   }
     break;

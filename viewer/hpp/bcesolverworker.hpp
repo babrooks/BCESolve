@@ -59,6 +59,8 @@ private:
   BCEGurobiCallback * callback; 
   //! True if the solver will be mapping the boundary.
   bool mapBoundaryOption;
+  //! Minimum angle increment, used for mapping the boundary.
+  double minAngleIncrement;
 
 public:
 
@@ -67,10 +69,11 @@ public:
 		  vector<double> _weightData,
 		  vector<vector<double> > _mapBoundaryData,
 		  BCEGurobiCallback * _callback,
-		  bool _mapBoundaryOption):
+		  bool _mapBoundaryOption,
+		  double _minAngleIncrement):
     game(_game), weightData(_weightData),
     mapBoundaryData(_mapBoundaryData), callback(_callback),
-    mapBoundaryOption(_mapBoundaryOption)
+    mapBoundaryOption(_mapBoundaryOption),minAngleIncrement(_minAngleIncrement)
   {}
 
   //! Returns a reference to the solution object.
@@ -123,6 +126,7 @@ public slots:
 
       if (mapBoundaryOption) {
 	callback->setFullOutput(false);
+	solver.setMinAngleIncr(minAngleIncrement);
 	solver.mapBoundary(mapBObj[0],mapBObj[1]);
 	callback->setFullOutput(true);
       }

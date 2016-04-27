@@ -293,7 +293,8 @@ void BCEWindow::runSolve() {
 					 gameTab->getWeightsOnObjectives(),
 					 gameTab->getMapBWeights(),
 					 callback,
-					 gameTab->getMapBoundaryOption());
+					 gameTab->getMapBoundaryOption(),
+					 gameTab->getMinAngleIncr());
       solverWorker->moveToThread(solverWorkerThread);
       connect(solverWorker,SIGNAL(exceptionSignal(QString)),
 	      this,SLOT(displayException(QString)));

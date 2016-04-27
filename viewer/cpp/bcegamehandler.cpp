@@ -1,7 +1,7 @@
 #include "bcegamehandler.hpp"
 
 BCEGameHandler::BCEGameHandler(QWidget *parent):
-  game(BCEGame()),mapBoundaryOption(false)
+  game(BCEGame()),mapBoundaryOption(false),minAngleIncrement(1e-4)
 {
   setupLayout();
   setParent(parent);
@@ -166,6 +166,10 @@ void BCEGameHandler::setupLayout() {
   mapBoundaryCheckBox->setSizePolicy(QSizePolicy::Fixed,
 				     QSizePolicy::Preferred);
 
+  QLineEdit *minAngleLineEdit = new QLineEdit(tr("1e-4"),this);
+  minAngleLineEdit->setSizePolicy(QSizePolicy::Expanding,
+				  QSizePolicy::Preferred);
+
   for (int player = 0; player < 2; player ++)
     {
       QHBoxLayout * numActionsLayout = new QHBoxLayout();
@@ -242,8 +246,14 @@ void BCEGameHandler::setupLayout() {
   solveLayout->addWidget(solveButton);
   solveLayout->addWidget(cancelButton);
   solveLayout->addWidget(clearButton);
-  solveLayout->addWidget(mapBoundaryCheckBox);
-  
+
+  QHBoxLayout *mapBoundaryLayout = new QHBoxLayout();
+  QLabel *minAngleLabel = new QLabel(tr("Minimum Angle Increment:"),this);
+  mapBoundaryLayout->addWidget(minAngleLabel);
+  mapBoundaryLayout->addWidget(minAngleLineEdit);
+  mapBoundaryLayout->addWidget(mapBoundaryCheckBox);
+
+  rightControlLayout->addRow(mapBoundaryLayout);
   rightControlLayout->addRow(solveLayout);
 
   controlLayout->addLayout(leftControlLayout);
@@ -406,6 +416,9 @@ void BCEGameHandler::setupLayout() {
 
   connect(mapBoundaryCheckBox,SIGNAL(stateChanged(int)),
 	  this,SLOT(setMBSolveOption(int)));
+
+  connect(minAngleLineEdit,SIGNAL(textChanged(QString)),
+	  this,SLOT(setMinAngleIncr(QString)));
 
   // qDebug() << "Finished sggamehandler constructor" << endl;
 
