@@ -143,12 +143,6 @@ protected:
   /*! An array of objective functions, corresponding to the objectives
     in the BCEAbstractGame object. */
   vector<GRBLinExpr> objectiveFunctions; 
-  //! Boundary objectives, not currently being used. 
-  vector<GRBLinExpr> bndryObjectives; 
-  //! Index of the first boundary objective. 
-  int boundaryObjectiveIndex1;
-  //! Index of the second boundary objective. 
-  int boundaryObjectiveIndex2;
 
   //! List of indices of non-zero variables
   /*! The solver only creates variables for events that could occur
@@ -242,15 +236,15 @@ public:
   /*! Maps the boundary for specified objectives, not necessarily the
    same as BCESolver::boundaryObjective1 and BCESOlver::boundaryObjective2 */
   void mapBoundary(const char * fname,
-		   GRBLinExpr & obj0,
-		   GRBLinExpr & obj1);
+		   GRBLinExpr obj0,
+		   GRBLinExpr obj1);
 
   //! Maps the frontier
   /*! Maps the boundary for specified objectives, not necessarily the
     same as BCESolver::boundaryObjective1 and BCESOlver::boundaryObjective2.
    Saves to a default file name. */
-  void mapBoundary(GRBLinExpr & obj0,
-		   GRBLinExpr & obj1);
+  void mapBoundary(GRBLinExpr obj0,
+		   GRBLinExpr obj1);
 
   //! Returns the data object
   /*! Copies the data object to output. */
@@ -266,7 +260,7 @@ public:
   //! Returns the BCESolver::cplex object.
   GRBModel& getModel() { return model; }
   //! Returns the \f$n\f$th objective function. 
-  GRBLinExpr& getObjectiveFunction (int n) { return objectiveFunctions[n]; }
+  const GRBLinExpr& getObjectiveFunction (int n) { return objectiveFunctions[n]; }
   //! Returns the objective for BCESolver::cplex.
   GRBLinExpr& getObjective() { return gurobiObjective; }
 
@@ -283,8 +277,6 @@ public:
   void setParameter(BCESolver::BoolParameter, bool arg);
   //! Set objective function.
   void setObfun(int n) { gurobiObjective = objectiveFunctions[n]; }
-  //! Set boundary objective.
-  void setBndryObjective(int index, const GRBLinExpr & expr);
 
   // get methods
   //! Get double parameter.

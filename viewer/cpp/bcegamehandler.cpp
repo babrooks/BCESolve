@@ -825,7 +825,7 @@ const vector<double>& BCEGameHandler::getWeightsOnObjectives() {
 }
 
 const vector<vector<double> > BCEGameHandler::getMapBWeights() {
-  vector<vector<double> > finalWeights;
+  vector<vector<double> > finalWeights(0);
   finalWeights.push_back(obj0WeightsModel->getSolverData());
   finalWeights.push_back(obj1WeightsModel->getSolverData());
   return finalWeights;

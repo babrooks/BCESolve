@@ -100,23 +100,13 @@ public slots:
 
       GRBLinExpr expr = weightData[0]*solver.getObjectiveFunction(0);
       vector<GRBLinExpr> mapBObj(2,0);
-      mapBObj[0] = mapBoundaryData[0][0]*solver.getObjectiveFunction(0);
-      mapBObj[1] = mapBoundaryData[1][0]*solver.getObjectiveFunction(0);
       int numObjs = game.getNumObjectives();
 
-      if (numObjs == 2) {
-	expr += weightData[1]*solver.getObjectiveFunction(1);
+      for (int obj = 0; obj < numObjs; obj++) {
+	expr += weightData[obj]*solver.getObjectiveFunction(obj);
 	for (int mBObj = 0; mBObj < 2; mBObj++)
-	  mapBObj[mBObj] += mapBoundaryData[mBObj][1]*solver.getObjectiveFunction(1);
-      }
-
-      else if (numObjs > 2) {
-	for (int obj = 1; obj < numObjs; obj++) {
-	  expr += weightData[obj]*solver.getObjectiveFunction(obj);
-	  for (int mBObj = 0; mBObj < 2; mBObj++)
-	    mapBObj[mBObj] += mapBoundaryData[mBObj][obj]*solver.getObjectiveFunction(obj);
-	} // for each objective
-      }
+	  mapBObj[mBObj] += mapBoundaryData[mBObj][obj]*solver.getObjectiveFunction(obj);
+      } // for each objective
 
       solver.model.setObjective(expr,GRB_MAXIMIZE);
       solver.model.setCallback(callback);

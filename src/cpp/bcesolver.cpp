@@ -6,9 +6,6 @@ BCESolver::BCESolver ():
   variables(),
   constraints(),
   objectiveFunctions(2,GRBLinExpr()),
-  bndryObjectives(2,GRBLinExpr()),
-  boundaryObjectiveIndex1(0),
-  boundaryObjectiveIndex2(1),
   minAngleIncrement(1e-4),
   displayLevel(1)
 {} // Default constructor
@@ -20,11 +17,8 @@ BCESolver::BCESolver (BCEAbstractGame & _game):
   variables(),
   constraints(),
   objectiveFunctions(2,GRBLinExpr()),
-  bndryObjectives(2,GRBLinExpr()),
   numICConstraints(2,0),
   minAngleIncrement(1e-4),
-  boundaryObjectiveIndex1(0),
-  boundaryObjectiveIndex2(1),
   soln(BCEGame(_game)),
   numActions_total(1),
   numTypes_total(1),
@@ -92,14 +86,6 @@ void BCESolver::setParameter(BCESolver::IntParameter param, int arg)
       displayLevel = arg;
       break;
 
-    case BoundaryObjective1:
-      boundaryObjectiveIndex1 = arg;
-      break;
-
-    case BoundaryObjective2:
-      boundaryObjectiveIndex2 = arg;
-      break;
-
     default:
       throw(BCEException(BCEException::InvalidParameterName));
     } // switch
@@ -135,12 +121,6 @@ int BCESolver::getParameter(BCESolver::IntParameter param)
     case DisplayLevel:
       return displayLevel;
       break;
-    case BoundaryObjective1:
-      return boundaryObjectiveIndex1;
-      break;
-    case BoundaryObjective2:
-      return boundaryObjectiveIndex2;
-      break;
     default:
       throw(BCEException(BCEException::InvalidParameterName));
     } // switch
@@ -154,17 +134,6 @@ bool BCESolver::getParameter(BCESolver::BoolParameter param)
       throw(BCEException(BCEException::InvalidParameterName));
     } // switch
 }
-
-// Sets the expressions for the boundary objectives
-void BCESolver::setBndryObjective(int index, const GRBLinExpr & expr)
-{
-  if (index > bndryObjectives.size()-1)
-    throw(BCEException(BCEException::BadArgument));
-
-  else
-  bndryObjectives[index] = expr;
-}
-
 
 // Constructs the constraint matrix and objective function
 void BCESolver::populate ()
@@ -503,24 +472,24 @@ void BCESolver::solve()
 
 void BCESolver::mapBoundary()
 {
-  mapBoundary("bndry.dat",objectiveFunctions[boundaryObjectiveIndex1],
-	      objectiveFunctions[boundaryObjectiveIndex2]);
+  mapBoundary("bndry.dat",objectiveFunctions[0],
+	      objectiveFunctions[1]);
 }
 
 void BCESolver::mapBoundary(const char * fname) {
-  mapBoundary(fname,objectiveFunctions[boundaryObjectiveIndex1],
-	      objectiveFunctions[boundaryObjectiveIndex2]);
+  mapBoundary(fname,objectiveFunctions[0],
+	      objectiveFunctions[1]);
 }
 
-void BCESolver::mapBoundary(GRBLinExpr & obj0,
-			    GRBLinExpr & obj1)
+void BCESolver::mapBoundary(GRBLinExpr obj0,
+			    GRBLinExpr obj1)
 {
   mapBoundary("bndry.dat",obj0,obj1);
 }
 
 void BCESolver::mapBoundary(const char * fname,
-			    GRBLinExpr & mBObjective0,
-			    GRBLinExpr & mBObjective1)
+			    GRBLinExpr obj0,
+			    GRBLinExpr obj1)
 {
   cout << "mapping objfun1 vs objfun2..." << endl;
 
@@ -539,8 +508,6 @@ void BCESolver::mapBoundary(const char * fname,
 
   double w0 = 1.0,
     w1 = 0.0;
-  GRBLinExpr & obj0 = mBObjective0;
-  GRBLinExpr & obj1 = mBObjective1;
 
   int numVars = model.get(GRB_IntAttr_NumVars);
 
