@@ -278,7 +278,7 @@ void BCEGameHandler::setupLayout() {
   				       QSizePolicy::Expanding);
   probabilityScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
-  probabilityLayout->addWidget(new QLabel(tr("Prior Distribution of States:"),this));
+  probabilityLayout->addWidget(new QLabel(tr("Prior over States:"),this));
   probabilityLayout->addWidget(probabilityScrollArea);
 
   // Scroll Area for Conditional Distribution of Types

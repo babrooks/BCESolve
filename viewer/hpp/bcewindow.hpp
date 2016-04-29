@@ -31,6 +31,7 @@
 #include "bcesolverworker.hpp"
 #include "hybridentryreserve.hpp"
 #include "commonvalueauction.hpp"
+#include "fpaknown.hpp"
 
 //! Assembles BCEGameHandler, BCEPlotHandler, and BCELogHandler into a Unified GUI.
 /*! Sets up a menu bar and assembles bcegamehandler, bceplothandler, 
@@ -115,6 +116,8 @@ private slots:
   void generateHybridAuction();
   //! Builds the default common values auction.
   void generateCommonValueAuction();
+  //! Generates the first price auction.
+  void generateFirstPriceAuction();
   //! Displays exceptions signaled from other classes.
   void displayException(QString message);
   //! Toggles whether BCE heat map is conditional on state.

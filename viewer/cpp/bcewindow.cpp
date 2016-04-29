@@ -32,6 +32,7 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   QMenu * toolMenu = menuBar()->addMenu(tr("&Tools"));
   QAction * generateHAGame = new QAction(tr("&Generate Hybrid Auction"),this);
   QAction * generateCVGame = new QAction(tr("&Generate Common Value Auction"),this);
+  QAction * generateFPAGame = new QAction(tr("&Generate First Price Auction"),this);
   QAction * solveOption = new QAction(tr("&Solve Game"),this);
   QAction * cancelOption = new QAction(tr("&Cancel Solve"),this);
 
@@ -52,6 +53,7 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   conditionalBCE->setChecked(true);
   toolMenu->addAction(generateHAGame);
   toolMenu->addAction(generateCVGame);
+  toolMenu->addAction(generateFPAGame);
   toolMenu->addAction(solveOption);
   toolMenu->addAction(cancelOption);
   loadSolutionAction->setShortcut(tr("Ctrl+L"));
@@ -72,6 +74,7 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   connect(conditionalBCE,SIGNAL(triggered(bool)),this,SLOT(conditionBCE(bool)));
   connect(generateHAGame,SIGNAL(triggered()),this,SLOT(generateHybridAuction()));
   connect(generateCVGame,SIGNAL(triggered()),this,SLOT(generateCommonValueAuction()));
+  connect(generateFPAGame,SIGNAL(triggered()),this,SLOT(generateFirstPriceAuction()));
   connect(solveOption,SIGNAL(triggered()),this,SLOT(runSolve()));
   connect(cancelOption,SIGNAL(triggered()),this,SIGNAL(setCancelFlag()));
 
@@ -456,6 +459,64 @@ void BCEWindow::generateCommonValueAuction() {
   tabWidget->setCurrentIndex(0);
 
 }
+
+void BCEWindow::generateFirstPriceAuction() {
+
+  QDialog dialog(this);
+  QFormLayout form(&dialog);
+
+  form.addRow(new QLabel("First Price Auction"));
+
+
+
+  int numParams = 5;
+  vector<QLineEdit *> fields(numParams);
+  for(int i = 0; i < numParams; ++i) {
+    QLineEdit *lineEdit = new QLineEdit(&dialog);
+    fields[i] = lineEdit;
+  }
+
+  // Setting default values
+  form.addRow(QString("Number of Actions (Integer > 0)"), fields[0]);
+  fields[0]->setText("30");
+  form.addRow(QString("Number of Values (Integer > 0)"), fields[1]);
+  fields[1]->setText("2");
+  form.addRow(QString("Entry Cost (Double in [0,1])"), fields[2]);
+  fields[2]->setText("0");
+  form.addRow(QString("Reserve Price (Double in [0,1]"), fields[3]);
+  fields[3]->setText("0");
+  form.addRow(QString("High Bid (Double in [0,1])"), fields[4]);
+  fields[4]->setText("1");
+
+  QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+  			     Qt::Horizontal, &dialog);
+  form.addRow(&buttonBox);
+  QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
+  QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
+
+  dialog.exec();
+
+  if (dialog.result() == 0)
+    return;
+
+  vector<int> intParams(2);
+  for (int i=0; i<intParams.size(); i++)
+    intParams[i] = fields[i]->text().toInt();
+
+  vector<double> doubleParams(3);
+  for (int i=0; i < doubleParams.size(); i++) {
+    doubleParams[i] = fields[i+intParams.size()]->text().toDouble();
+  }
+
+  FPAKnown fpa(intParams[0],intParams[1],
+	       doubleParams[0],doubleParams[1],
+	       doubleParams[2],false);
+
+  gameTab->setGame(fpa);
+  tabWidget->setCurrentIndex(0);
+
+}
+
 
 void BCEWindow::displayException(QString message) {
   QMessageBox msgBox;
