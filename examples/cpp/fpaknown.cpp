@@ -12,7 +12,7 @@ int main(int argc, char ** argv)
   double entryCost=0.0;
   double reservePrice=0.0;
   int nvals=2;
-  int nbids=25;
+  int nbids=15;
   double lowbid = 0.0;
 
   solveFPA(nvals,nbids,entryCost,reservePrice,false);
@@ -56,12 +56,16 @@ void solveFPA(int nvals, int nbids,
       if (verbose)
 	cout << "Done populating" << endl;
 
-      solver.model.setObjective(solver.getObjectiveFunction(2),GRB_MINIMIZE);
+      solver.model.setObjective(solver.getObjectiveFunction(2),GRB_MAXIMIZE);
+      solver.solve();
+
       if (verbose)
       	cout << "Objective function set" << endl;
 
-      solver.solve();
-      solver.mapBoundary("fpaknown.dat");
+      solver.mapBoundary("fpaknown.dat",
+      			 solver.getObjectiveFunction(0),
+      			 solver.getObjectiveFunction(2));
+      // solver.mapBoundary();
 
       BCESolution soln;
       solver.getSolution(soln);

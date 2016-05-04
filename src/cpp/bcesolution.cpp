@@ -1,7 +1,8 @@
 #include "bcesolution.hpp"
 
 BCESolution::BCESolution (const BCEGame & _game):
-  game(_game)
+  game(_game),
+  currentEquilibrium(0)
 { } // Constructor
 
 void BCESolution::clearEquilibria()
@@ -61,6 +62,7 @@ BCESolution& BCESolution::operator=(const BCESolution &rhs)
       this->game=rhs.game;
       this->newEquilibria=rhs.newEquilibria;
       this->equilibria=rhs.equilibria;
+      this->currentEquilibrium = rhs.currentEquilibrium;
     }
 
   return *this;
