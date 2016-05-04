@@ -440,7 +440,7 @@ number of actions, number of states, number of types, number of objectives, and 
   \section viewerotherfeatures Other features of the viewer
 
   There is one other feature of the BCEViewer which we will mention. 
-  Two examples are built in to the tools menu in the menu bar. The 
+  Three examples are built in to the tools menu in the menu bar. The 
   hybrid auction provides a parameter to control the "weight on bidder
   1's bid." A weight of 1 means bidder 1 pays 100% of his bid when he wins.
   A weight of 2 likewise means bidder 1 pays only the bid of the other bidder
@@ -450,6 +450,7 @@ number of actions, number of states, number of types, number of objectives, and 
   allows more detailed (higher resolution) of the relevant bid region without 
   increasing the number of iterations the solver needs to run through. The 
   second example is a common-value auction where the prior is governed
-  by a CDF of the form v^alpha, where v is the common value in [0,1]. 
+  by a CDF of the form \f$ v^{\alpha} \f$, where \f$v\f$ is the common value in \f$[0,1]\f$. 
+  The final example is a first price, private values auction.
   
  */

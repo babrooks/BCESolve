@@ -96,34 +96,36 @@ public slots:
     BCESolver solver(game);
 
     try {
+      // Populate constraints
       solver.populate();
 
-      GRBLinExpr expr = weightData[0]*solver.getObjectiveFunction(0);
+      // Initialize objectives
       vector<GRBLinExpr> mapBObj(2,0);
+      GRBLinExpr expr = weightData[0]*solver.getObjectiveFunction(0);
       mapBObj[0] = mapBoundaryData[0][0]*solver.getObjectiveFunction(0);
-      mapBObj[1] = mapBoundaryData[1][0]*solver.getObjectiveFunction(0);
+      mapBObj[1] = mapBoundaryData[1][0]*solver.getObjectiveFunction(0);      
+
+      // Weight objectives using data from models in game tab
       int numObjs = game.getNumObjectives();
-
-      if (numObjs == 2) {
-	expr += weightData[1]*solver.getObjectiveFunction(1);
-	for (int mBObj = 0; mBObj < 2; mBObj++)
-	  mapBObj[mBObj] += mapBoundaryData[mBObj][1]*solver.getObjectiveFunction(1);
+      int objCounter = 1;
+      while (objCounter < numObjs) {
+	expr += weightData[objCounter]*solver.getObjectiveFunction(objCounter);
+	for (int mBObj = 0; mBObj < 2; mBObj++) {
+	  mapBObj[mBObj] += mapBoundaryData[mBObj][objCounter]
+	    *solver.getObjectiveFunction(objCounter);
+	}
+	objCounter++;
       }
 
-      else if (numObjs > 2) {
-	for (int obj = 1; obj < numObjs; obj++) {
-	  expr += weightData[obj]*solver.getObjectiveFunction(obj);
-	  for (int mBObj = 0; mBObj < 2; mBObj++)
-	    mapBObj[mBObj] += mapBoundaryData[mBObj][obj]*solver.getObjectiveFunction(obj);
-	} // for each objective
-      }
-
+      // Set Objectives
       solver.model.setObjective(expr,GRB_MAXIMIZE);
       solver.model.setCallback(callback);
 
+      // Solve the model
       callback->setFullOutput(true);
       solver.solve();
 
+      // If map boundary is checked in the game tab, map the boundary
       if (mapBoundaryOption) {
 	callback->setFullOutput(false);
 	solver.setMinAngleIncr(minAngleIncrement);
@@ -131,7 +133,7 @@ public slots:
 	callback->setFullOutput(true);
       }
 
-      // 11 signals that the solve routine
+      // A realization of 11 signals that the solve routine was interrupted
       if (solver.model.get(GRB_IntAttr_Status)!=11) {
 	solver.getSolution(solution);
 	emit(sendSolution(&solution));
@@ -150,7 +152,7 @@ public slots:
 						  to_string(e.getErrorCode()))));
     }
   
-
+    // Send a signal to end the solver thread.
     emit(workFinished());
 
   }
