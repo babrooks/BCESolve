@@ -106,7 +106,7 @@ private slots:
   //! Interacts with BCEGameHandler and BCESolverWorker to solve a game.
   void runSolve();
   //! Switches the current tab to the solution tab.
-  void tabToSolution(BCESolution *soln);
+  void tabToSolution(BCESolution *soln,bool isBoundaryMapped);
   //! Takes a screenshot and opens a save file menu.
   /* The .png file name ending must be entered manually
      upon saving for proper save action functionality.

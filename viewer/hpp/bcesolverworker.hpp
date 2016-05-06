@@ -100,32 +100,12 @@ public slots:
       solver.populate();
 
       // Initialize objectives
-      vector<GRBLinExpr> mapBObj(2,0);
-<<<<<<< HEAD
-      GRBLinExpr expr = weightData[0]*solver.getObjectiveFunction(0);
-      mapBObj[0] = mapBoundaryData[0][0]*solver.getObjectiveFunction(0);
-      mapBObj[1] = mapBoundaryData[1][0]*solver.getObjectiveFunction(0);      
-
-      // Weight objectives using data from models in game tab
-      int numObjs = game.getNumObjectives();
-      int objCounter = 1;
-      while (objCounter < numObjs) {
-	expr += weightData[objCounter]*solver.getObjectiveFunction(objCounter);
-	for (int mBObj = 0; mBObj < 2; mBObj++) {
-	  mapBObj[mBObj] += mapBoundaryData[mBObj][objCounter]
-	    *solver.getObjectiveFunction(objCounter);
-	}
-	objCounter++;
-      }
-=======
+      GRBLinExpr expr;
       int numObjs = game.getNumObjectives();
 
       for (int obj = 0; obj < numObjs; obj++) {
 	expr += weightData[obj]*solver.getObjectiveFunction(obj);
-	for (int mBObj = 0; mBObj < 2; mBObj++)
-	  mapBObj[mBObj] += mapBoundaryData[mBObj][obj]*solver.getObjectiveFunction(obj);
       } // for each objective
->>>>>>> 463f2c6b47243a3271998a54849d63cfe2fd99b8
 
       // Set Objectives
       solver.model.setObjective(expr,GRB_MAXIMIZE);
@@ -139,14 +119,14 @@ public slots:
       if (mapBoundaryOption) {
 	callback->setFullOutput(false);
 	solver.setMinAngleIncr(minAngleIncrement);
-	solver.mapBoundary(mapBObj[0],mapBObj[1]);
+	solver.mapBoundary(mapBoundaryData);
 	callback->setFullOutput(true);
       }
 
       // A realization of 11 signals that the solve routine was interrupted
       if (solver.model.get(GRB_IntAttr_Status)!=11) {
 	solver.getSolution(solution);
-	emit(sendSolution(&solution));
+	emit(sendSolution(&solution,mapBoundaryOption));
       }
     }
     catch(BCEException &e) {
@@ -172,7 +152,7 @@ signals:
   //! Signals that the solve routine has ended.
   void workFinished();
   //! Signals a pointer to the solution found by the solver.
-  void sendSolution(BCESolution *soln);
+  void sendSolution(BCESolution *soln,bool isBoundaryMapped);
   //! Signals an exception thrown during the solve routine.
   void exceptionSignal(QString message);
 

@@ -152,7 +152,7 @@ public:
     return mainTab;
   }
   //! Sets the current BCESolution in BCEDataState
-  void setSolution(const BCESolution &solution);
+  void setSolution(const BCESolution &solution,const bool isBoundaryMapped);
 
   //! Returns the current BCESolution in BCEDataState
   const BCESolution& getSolutionData() const {

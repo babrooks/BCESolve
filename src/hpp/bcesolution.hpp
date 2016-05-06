@@ -65,13 +65,20 @@ class BCESolution
 private:
   //! The game that the equilibria correspond to
   BCEGame game;
-
   //! List of new equilibria that have not yet been consolidated.
   list<BCEquilibrium> newEquilibria;
   //! Consolidated vector of equilibria
   vector<BCEquilibrium> equilibria;
   //! Index of the current equilibrium in BCESolution::equilibria
   int currentEquilibrium;
+  //! Matrix of weights on mapBoundary objectives.
+  /*! The first row, i.e. mapBoundaryWeights[0] contains weights
+    for objective0, and the second row contains weights for objective1.
+    The number of columns is the number of objectives.
+   */
+  vector<vector<double> > mapBoundaryWeights;
+  //! True if boundary was mapped in the solver.
+  bool boundaryMapped;
 
 public:
   //! Serialization routine
@@ -82,10 +89,15 @@ public:
     ar & equilibria;
     ar & game;
     ar & currentEquilibrium;
+    ar & mapBoundaryWeights;
+    ar & boundaryMapped;
   }
 
   //! Default constructor
-  BCESolution ():currentEquilibrium(0) {}
+  BCESolution ():currentEquilibrium(0),
+		 boundaryMapped(false),
+		 mapBoundaryWeights(2,vector<double>(2,0)) 
+  {}
 
   //! Constructor
   /*! Initializes a new BCESolution object for a game with the given
@@ -100,6 +112,16 @@ public:
   void addEquilibrium(const map<int,double> & distr);
   //! Clears all equilibria
   void clearEquilibria();
+  //! Sets boundaryMapped status. 
+  void setBoundaryMapped(const bool isMapped) 
+  { boundaryMapped = true; }
+  //! Sets mapBoundaryWeights.
+  void setMapBoundaryWeights(const vector<vector<double> >& weights)
+  { mapBoundaryWeights = weights;
+    cout << mapBoundaryWeights[0][0] << endl;
+    cout << mapBoundaryWeights[1][1] << endl;
+
+ }
   //! Consolidates equilibria
   /*! Appends the list of newEquilibria to the vector
       equilibria. Clears newEquilibria.*/
@@ -157,6 +179,15 @@ public:
 			      const vector<bool> &actionMarginal,
 			      const vector<bool> &typeMarginal,
 			      vector<double> &distribution) const;
+
+  //! Returns the mapBoundary weights 
+  const vector<vector<double> >& getMapBoundaryWeights() const {
+    return mapBoundaryWeights;
+  }
+
+  const bool getIsBoundaryMapped() const {
+    return boundaryMapped;
+  }
 
   //! Serialize a BCESolution object using Boost.
   static void save(const BCESolution & data, const char* filename)

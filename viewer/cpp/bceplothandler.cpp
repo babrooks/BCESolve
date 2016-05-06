@@ -228,16 +228,13 @@ void BCEPlotHandler::plotBCEValueSet() {
   // Getting Data
 
   const vector< vector<double> > allEqm(guiData->getAllEqm());
-  QVector<double> objective0Payoffs;
-  QVector<double> objective1Payoffs;
-  vector<int> playerObjectives;
+  int sizeEqmPayoffs = allEqm[0].size();
+  QVector<double> objective0Payoffs(sizeEqmPayoffs,0);
+  QVector<double> objective1Payoffs(sizeEqmPayoffs,0);
 
-  for (int player = 0; player < 2; player++)
-    playerObjectives.push_back(guiData->getPlayerObjective(player));
-
-  for (int i = 0; i < allEqm.size(); i++) {
-    objective0Payoffs.push_back(allEqm[i][playerObjectives[0]]);
-    objective1Payoffs.push_back(allEqm[i][playerObjectives[1]]);
+  for (int i = 0; i < sizeEqmPayoffs; i++) {
+    objective0Payoffs[i] = allEqm[0][i];
+    objective1Payoffs[i] = allEqm[1][i];
   }
 
   // Graphing Curve
@@ -402,8 +399,9 @@ void BCEPlotHandler::setGUITitle() {
   this->setWindowTitle(newTitle);
 }
 
-void BCEPlotHandler::setSolution(const BCESolution &solution) {
-  guiData->setSolutionData(solution);
+void BCEPlotHandler::setSolution(const BCESolution &solution,
+				 const bool isBoundaryMapped) {
+  guiData->setSolutionData(solution,isBoundaryMapped);
 }
 
 void BCEPlotHandler::indicateDataLoaded() {

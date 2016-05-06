@@ -1,7 +1,8 @@
 #include "bcedatastate.hpp"
 
 BCEDataState::BCEDataState():
-  sliderGroup(0),lineEditGroup(0)
+  sliderGroup(0),lineEditGroup(0),allEqm(2,vector<double>(2,0)),
+  equilibriumMatrix(0,vector<double>(0))
 {
   isDataLoaded = false;
   actions = vector<int>(2,0);
@@ -16,6 +17,7 @@ BCEDataState::BCEDataState():
   isPrivateVals=false;
   setupControlsLayout();  
   conditionedOnState = true;
+  isMapped = false;
 }
 
 int BCEDataState::shareDataProperties(BCESliderType st,int player) {
@@ -29,12 +31,14 @@ int BCEDataState::shareDataProperties(BCESliderType st,int player) {
   }
 }
 
-void BCEDataState::setSolutionData(const BCESolution &solution) {
+void BCEDataState::setSolutionData(const BCESolution &solution,
+				   const bool isBoundaryMapped) {
   try{
     solutionData = BCESolution(solution);
     gameData = BCEGame(solutionData.getGame());
 
     isPrivateVals = !(gameData.hasProductStructure());
+    isMapped = isBoundaryMapped;
 
     // Reset Initial Parameters
     currentEqmIndex = 0;
@@ -234,9 +238,9 @@ void BCEDataState::modifyEqmFocus(double x,double y) {
   int newEqmIndex = 0;
   double smallestEuclidianDistance = 1e10; // This just needs to be large
   double currentEuclidianDistance;
-  for (int i = 0; i < allEqm.size(); i++) {
-    currentEuclidianDistance = euclidianDistance(x,allEqm[i][objective0],
-						 y,allEqm[i][objective1]);
+  for (int i = 0; i < allEqm[0].size(); i++) {
+    currentEuclidianDistance = euclidianDistance(x,allEqm[0][i],
+						 y,allEqm[1][i]);
 
     if (currentEuclidianDistance < smallestEuclidianDistance) {
       newEqmIndex = i;
@@ -247,8 +251,8 @@ void BCEDataState::modifyEqmFocus(double x,double y) {
   currentEqmIndex = newEqmIndex;
   solutionData.setCurrentEquilibrium(currentEqmIndex);
 
-  double xClosest = allEqm[currentEqmIndex][objective0];
-  double yClosest = allEqm[currentEqmIndex][objective1]; 
+  double xClosest = allEqm[0][currentEqmIndex];
+  double yClosest = allEqm[1][currentEqmIndex]; 
 
   emit(eqmCoordSignal(xClosest,yClosest));
 
@@ -327,13 +331,61 @@ void BCEDataState::setObjectiveVals(int player) {
 
 void BCEDataState::setAllEqm() {
 
-  solutionData.getExpectedObjectives(allEqm);
+  vector<vector<double> > allEqmTemp;
+  solutionData.getExpectedObjectives(allEqmTemp);
   // cout << "setAllEqm Function Hit" << endl;
+
+  int numObjs = gameData.getNumObjectives();
+
+  vector<vector<double> > unadjMapBWeights = solutionData.getMapBoundaryWeights();
+  vector<double> summedWeights(2,0);
+  summedWeights[0] = 0;
+  summedWeights[1] = 0;
+
+  // Sum the weights
+  for (int obj=0; obj<numObjs; obj++) {
+    summedWeights[0] += unadjMapBWeights[0][obj];
+    summedWeights[1] += unadjMapBWeights[1][obj];
+  }
+
+  vector<vector<double> > mapBWeights(2,vector<double>(numObjs,0));
+  for (int i=0; i<2; i++) {
+    for (int obj=0; obj<numObjs; obj++) {
+      mapBWeights[i][obj] = unadjMapBWeights[i][obj]/summedWeights[i];
+    }
+  }
+
+  int sizeEqmData = allEqmTemp.size();
+
+  vector<vector<double> > eqmAccumulator(2,vector<double>(sizeEqmData,0));
+
+  for (int eqm=0; eqm<sizeEqmData; eqm++) {
+    double xVal = 0;
+    double yVal = 0;
+    int objCounter = 0;
+    while (objCounter < numObjs) {
+      xVal += mapBWeights[0][objCounter]*allEqmTemp[eqm][objCounter];
+      yVal += mapBWeights[1][objCounter]*allEqmTemp[eqm][objCounter];
+      objCounter++;
+    }
+    eqmAccumulator[0][eqm] = xVal;
+    eqmAccumulator[1][eqm] = yVal;
+  }
+
+  allEqm.clear();
+  allEqm.push_back(vector<double>(sizeEqmData,0));
+  allEqm.push_back(vector<double>(sizeEqmData,0));
+  for (int eqm=0; eqm<sizeEqmData; eqm++) {
+    allEqm[0][eqm] = eqmAccumulator[0][eqm];
+    allEqm[1][eqm] = eqmAccumulator[1][eqm];
+  }
+
+  for (int eqm=0; eqm<sizeEqmData; eqm++) {
+    if (eqm%10==0) 
+      cout << "Eqm Pair: (" << allEqm[0][eqm] << "," << allEqm[1][eqm] << ")" << endl;
+  }
+
   emit(selectedEqmChanged());
-
-  double xClosest = allEqm[currentEqmIndex][objective0];
-  double yClosest = allEqm[currentEqmIndex][objective1]; 
-
-  emit(eqmCoordSignal(xClosest,yClosest));
+  emit(eqmCoordSignal(allEqm[0][currentEqmIndex],allEqm[1][currentEqmIndex]));
 
 }

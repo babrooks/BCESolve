@@ -2,7 +2,9 @@
 
 BCESolution::BCESolution (const BCEGame & _game):
   game(_game),
-  currentEquilibrium(0)
+  currentEquilibrium(0),
+  boundaryMapped(false),
+  mapBoundaryWeights(2,vector<double>(2,0))
 { } // Constructor
 
 void BCESolution::clearEquilibria()
@@ -63,6 +65,8 @@ BCESolution& BCESolution::operator=(const BCESolution &rhs)
       this->newEquilibria=rhs.newEquilibria;
       this->equilibria=rhs.equilibria;
       this->currentEquilibrium = rhs.currentEquilibrium;
+      this->mapBoundaryWeights = rhs.mapBoundaryWeights;
+      this->boundaryMapped = rhs.boundaryMapped;
     }
 
   return *this;

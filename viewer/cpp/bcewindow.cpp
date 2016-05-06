@@ -150,7 +150,9 @@ void BCEWindow::loadSolution() {
     BCESolution::load(loadedSolution,newPath_c);
     BCEGame loadedGame = loadedSolution.getGame();
 
-    solutionTab->setSolution(loadedSolution);
+    bool isMapped = loadedSolution.getIsBoundaryMapped();
+
+    solutionTab->setSolution(loadedSolution,isMapped);
     gameTab->setGame(loadedGame);
 
     tabWidget->setCurrentIndex(1);
@@ -305,8 +307,8 @@ void BCEWindow::runSolve() {
 	      solverWorker,SLOT(startSolve()));
       connect(solverWorker,SIGNAL(workFinished()),
 	      solverWorkerThread,SLOT(quit()));
-      connect(solverWorker,SIGNAL(sendSolution(BCESolution*)),
-	      this,SLOT(tabToSolution(BCESolution*)));
+      connect(solverWorker,SIGNAL(sendSolution(BCESolution*,bool)),
+	      this,SLOT(tabToSolution(BCESolution*,bool)));
       connect(solverWorkerThread,SIGNAL(finished()),
 	      solverWorkerThread,SLOT(deleteLater()));
       connect(solverWorkerThread,SIGNAL(finished()),
@@ -331,8 +333,8 @@ void BCEWindow::runSolve() {
   
 }
 
-void BCEWindow::tabToSolution(BCESolution *soln) {
-  solutionTab->setSolution(*soln);
+void BCEWindow::tabToSolution(BCESolution *soln,bool isBoundaryMapped) {
+  solutionTab->setSolution(*soln,isBoundaryMapped);
   tabWidget->setCurrentIndex(1);
 }
 

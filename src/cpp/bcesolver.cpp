@@ -472,30 +472,53 @@ void BCESolver::solve()
 
 void BCESolver::mapBoundary()
 {
-  mapBoundary("bndry.dat",objectiveFunctions[0],
-	      objectiveFunctions[1]);
+  int numObjs = game->getNumObjectives();
+  vector<vector<double> > defaultWeights(2,vector<double>(numObjs,0));
+
+  // Objective 0: Maximize bidder 0 surplus
+  defaultWeights[0][0] = 1;
+  // Objective 1: Maximize bidder 1 surplus
+  defaultWeights[1][1] = 1;
+
+  mapBoundary("bndry.dat",defaultWeights);
 }
 
 void BCESolver::mapBoundary(const char * fname) {
-  mapBoundary(fname,objectiveFunctions[0],
-	      objectiveFunctions[1]);
+
+  int numObjs = game->getNumObjectives();
+  vector<vector<double> > defaultWeights(2,vector<double>(numObjs,0));
+
+  // Objective 0: Maximize bidder 0 surplus
+  defaultWeights[0][0] = 1;
+  // Objective 1: Maximize bidder 1 surplus
+  defaultWeights[1][1] = 1;
+
+  mapBoundary(fname,defaultWeights);
 }
 
-void BCESolver::mapBoundary(GRBLinExpr obj0,
-			    GRBLinExpr obj1)
+void BCESolver::mapBoundary(const vector<vector<double> >& weights)
 {
-  mapBoundary("bndry.dat",obj0,obj1);
+  mapBoundary("bndry.dat",weights);
 }
 
 void BCESolver::mapBoundary(const char * fname,
-			    GRBLinExpr obj0,
-			    GRBLinExpr obj1)
+			    const vector<vector<double> >& weights)
 {
   cout << "mapping objfun1 vs objfun2..." << endl;
 
   // Clear the equilibria array.
   soln.clearEquilibria();
 
+  // Construct objectives
+  GRBLinExpr obj0;
+  GRBLinExpr obj1;
+  int numObjs = game->getNumObjectives();
+
+  for (int obj=0;obj<numObjs;obj++) {
+    obj0 += weights[0][obj]*getObjectiveFunction(obj);
+    obj1 += weights[1][obj]*getObjectiveFunction(obj);
+  }
+  
   // First solve 
   // gurobiObjective = objectiveFunctions[boundaryObjectiveIndex1];
   // Primal Simplex, Indexed at 0
@@ -625,7 +648,10 @@ void BCESolver::mapBoundary(const char * fname,
     vertexData << *XIterator << " " << *YIterator << endl;
   vertexData.close();
   
+  // Configure solution
   soln.consolidateEquilibria();
+  soln.setBoundaryMapped(true);
+  soln.setMapBoundaryWeights(weights);
 
   model.getEnv().set(GRB_IntParam_Method,oldMethod);
   model.getEnv().set(GRB_IntParam_OutputFlag,oldOutput);

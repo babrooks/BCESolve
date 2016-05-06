@@ -56,15 +56,23 @@ void solveFPA(int nvals, int nbids,
       if (verbose)
 	cout << "Done populating" << endl;
 
-      solver.model.setObjective(solver.getObjectiveFunction(2),GRB_MAXIMIZE);
+      solver.model.setObjective(solver.getObjectiveFunction(2),GRB_MINIMIZE);
       solver.solve();
 
       if (verbose)
       	cout << "Objective function set" << endl;
 
-      solver.mapBoundary("fpaknown.dat",
-      			 solver.getObjectiveFunction(0),
-      			 solver.getObjectiveFunction(2));
+      int numObjs = fpa.getNumObjectives();
+      // Weights are set, by default, to 0.
+      vector<vector<double> > mapBoundaryWeights(2,vector<double>(numObjs,0));
+      // Sets objective 0 weights for the x-axis
+      mapBoundaryWeights[0][0]=1;
+      // Sets objective 1 weights for the x-axis
+      mapBoundaryWeights[0][1]=0;
+      // Sets objective 2 weights on the y-axis
+      mapBoundaryWeights[1][2]=1;      
+
+      solver.mapBoundary("fpaknown.dat",mapBoundaryWeights);
       // solver.mapBoundary();
 
       BCESolution soln;

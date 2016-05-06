@@ -236,15 +236,13 @@ public:
   /*! Maps the boundary for specified objectives, not necessarily the
    same as BCESolver::boundaryObjective1 and BCESOlver::boundaryObjective2 */
   void mapBoundary(const char * fname,
-		   GRBLinExpr obj0,
-		   GRBLinExpr obj1);
+		   const vector<vector<double> >& weights);
 
   //! Maps the frontier
   /*! Maps the boundary for specified objectives, not necessarily the
     same as BCESolver::boundaryObjective1 and BCESOlver::boundaryObjective2.
    Saves to a default file name. */
-  void mapBoundary(GRBLinExpr obj0,
-		   GRBLinExpr obj1);
+  void mapBoundary(const vector<vector<double> >& weights);
 
   //! Returns the data object
   /*! Copies the data object to output. */

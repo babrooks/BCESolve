@@ -143,6 +143,8 @@ private: // Private Properties. Private Functions near EOF.
     GUI controls before any data is loaded.
    */
   bool isDataLoaded;
+  //! Gives if boundary was mapped in the solution object.
+  bool isMapped;
   //! A 2 element vector holding the current action for each player.
   vector<int> actions;
   //! A 2 element vector holding the current type for each player.
@@ -166,11 +168,6 @@ private: // Private Properties. Private Functions near EOF.
     actions or type are displayed. Not currently in use.
   */
   vector<bool> margA, margT;
-  //! Equilibrium objectives for mapBoundary in BCEGame.
-  /* Equilibrium objectives displayed, currently set to player
-     0 and player 1 maximizing surplus.
-  */
-  int objective0 = 0,objective1 = 1;
   //! Index of equilibrium currently displayed in the GUI.
   int currentEqmIndex;
   //! Data displayed in the GUI's heatmap.
@@ -224,10 +221,20 @@ public:
     conditions for a new load (i.e. actions, types, values, and
     state are reset to 0). Emits that 
   */
-  void setSolutionData(const BCESolution &solution);
+  void setSolutionData(const BCESolution &solution, const bool isBoundaryMapped);
 
   //! Layout Holding Sliders and Other Data Controls
   QWidget *controlsLayout;
+  
+  //! Sends map boundary weights to the plot handler.
+  const vector<vector<double> >& getMapBWeights() const {
+    return solutionData.getMapBoundaryWeights();
+  }
+
+  //! Sends the number of objectives to the plot handler.
+  const int getNumObjs() const {
+    gameData.getNumObjectives();
+  }
 
   //! Shares basic game data (e.g. numActions) with BCEWindow.
   /*! Returns basic properties of currently stored BCEData
@@ -254,20 +261,6 @@ public:
     case Type: return types[player];
       break;
     case State: return state;
-      break;
-    }
-  }
-
-  //! Returns currently set player objectives.
-  /*! Currently returns 0 for player 0 and 1
-    for player 1. These correspond to players
-    maximizing their own supluses.
-  */
-  const int getPlayerObjective(int player) const {
-    switch(player) {
-    case 0: return objective0;
-      break;
-    case 1: return objective1;
       break;
     }
   }
