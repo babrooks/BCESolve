@@ -52,8 +52,8 @@ public:
       lowbid(0.0), reservePrice(_reservePrice),
       exAnteFee(_exAnteFee)
   {
-    // distribution.push_back(new vToTheAlpha(1.0),1.0);
-    distribution.push_back(new additiveCorrelated(),1.0);
+    distribution.push_back(new vToTheAlpha(1.0),1.0);
+    // distribution.push_back(new additiveCorrelated(),1.0);
     // distribution.push_back(new uniform(),1.0);
   }
 

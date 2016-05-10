@@ -441,8 +441,7 @@ void BCESolver::populate ()
   }
   std::cout << "Pr Constraints Added" << std::endl;
 
-  gurobiObjective = 0;
-  gurobiObjective += objectiveFunctions[2];
+  gurobiObjective = objectiveFunctions[0]+objectiveFunctions[1];
   model.update();
 
 } // populate
