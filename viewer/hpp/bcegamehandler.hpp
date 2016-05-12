@@ -223,7 +223,7 @@ private slots:
   //! Solves the game and maps the boundary.
   void setMBSolveOption() {
     mapBoundaryOption = true;
-    startSolveRoutine();
+    emit(startSolveRoutine());
   }
   //! Sets the minimum angle increment to the provided value.
   void setMinAngleIncr(QString strValue) {
