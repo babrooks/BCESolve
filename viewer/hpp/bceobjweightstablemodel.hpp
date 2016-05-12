@@ -34,7 +34,8 @@
     flags, reimplements the rowCount method to return
     the numbers of objectives.
   
-    Also contains a data member, weightData, that stores the objective
+    Also contains two data members, mainObjWeights and 
+    secondaryObjWeights, that store the objective
     weights set by the user in the game tab. Interfacing with the
     game occurs through the add and remove objective functions in the
     bcegamehandler.
@@ -46,17 +47,19 @@ class BCEObjWeightsTableModel : public QAbstractTableModel
   Q_OBJECT
 
 private:
-  //! Vector storing weights on objectives.
-  vector<double> weightData;
-  //! Sets data in the weightData vector.
-  void setWeightData(int obj,double value,ModelType _type) {
-    if (_type == type)
-      weightData[obj] = value;
+  //! Vector storing weights on main objective.
+  vector<double> mainObjWeights;
+  //! Vector storing weights on secondary objective.
+  vector<double> secondaryObjWeights;
+  //! Sets data in the objective weights vectors.
+  void setWeightData(vector<int> cellLocation,double value) {
+    if (cellLocation[1]==0)
+      mainObjWeights[cellLocation[0]] = value;
+    else
+      secondaryObjWeights[cellLocation[0]] = value;
   }
   //! Vector storing objective labels
   vector<string> objectiveLabels;
-  //! Type of the model (Solver, MBObj1, or MBObj2)
-  ModelType type;
 
 public:
   //! Constructor
@@ -64,30 +67,16 @@ public:
     the number of objectives in the game. Sets default
     weight data to .5 on player 0 and player 1's objectives.
     Gets any existing objective labels from the game. 
-   */
-  BCEObjWeightsTableModel(BCEGame * _game,ModelType _type):
-    game(_game),type(_type)
+  */
+  BCEObjWeightsTableModel(BCEGame * _game):
+    game(_game)
   {
 
-    weightData = vector<double>(game->getNumObjectives(),0);
+    mainObjWeights = vector<double>(game->getNumObjectives(),0);
+    secondaryObjWeights = vector<double>(game->getNumObjectives(),0);
 
-    switch(type) {
-    case Solver: {
-      weightData[0] = .5;
-      weightData[1] = .5;
-    }
-      break;
-    case MBObj1: {
-      weightData[0] = 1;
-      weightData[1] = 0;
-    }
-      break;
-    case MBObj2: {
-      weightData[0] = 0;
-      weightData[1] = 1;
-    }
-      break;
-    }
+    mainObjWeights[0] = 1;
+    secondaryObjWeights[1] = 1;
 
     objectiveLabels = game->getObjLabels();
 
@@ -111,7 +100,7 @@ public:
   { return game->getNumObjectives(); }
   //! Returns the number of column player actions.
   int columnCount(const QModelIndex & parent = QModelIndex()) const Q_DECL_OVERRIDE
-  { return 1; }
+  { return 2; }
 
   //! Emits layoutChanged signal.
   void emitLayoutChanged()
@@ -136,7 +125,8 @@ public:
 
   //! Adds an objective to the weight data vector.
   void addObjective(int position) {
-    weightData.insert(weightData.begin()+position,0);
+    mainObjWeights.insert(mainObjWeights.begin()+position,0);
+    secondaryObjWeights.insert(secondaryObjWeights.begin()+position,0);
     objectiveLabels.insert(objectiveLabels.begin()+position,
 			   game->getObjLabels(position));
   }
@@ -145,12 +135,21 @@ public:
   /*! Note that BCEGameHandler performs the check
     to determine if the vector has at least 1 element. */
   void removeObjective(int position) {
-    weightData.erase(weightData.begin() + position);
+    mainObjWeights.erase(mainObjWeights.begin() + position);
+    secondaryObjWeights.erase(secondaryObjWeights.begin() + position);
     objectiveLabels.erase(objectiveLabels.begin() + position);
   }
 
   //! Returns a reference to the weight data vector.
-  vector<double>& getSolverData() {
+  const vector<double> getSolverData() {
+    return mainObjWeights;
+  }
+
+  //! Returns a reference to the weight data vector.
+  const vector<vector<double> > getMapBoundaryData() {
+    vector<vector<double> > weightData;
+    weightData.push_back(mainObjWeights);
+    weightData.push_back(secondaryObjWeights);
     return weightData;
   }
   

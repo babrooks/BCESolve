@@ -53,6 +53,8 @@ public:
   ~BCEWindow() {
     delete callback;
   }
+  //! Displays "about" window
+  void displayAbout();
 
 signals:
 
@@ -122,6 +124,8 @@ private slots:
   void displayException(QString message);
   //! Toggles whether BCE heat map is conditional on state.
   void conditionBCE(bool checked);
+  //! Displays about screen when requested in the toolbar.
+  void displayAboutFromToolBar();
 
 };
 

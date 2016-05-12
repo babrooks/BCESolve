@@ -30,18 +30,29 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   QAction * screenShotAction = new QAction(tr("&Save a screen shot"),this);
   QAction * conditionalBCE = new QAction(tr("&View BCE Conditional on State"),this);
   QMenu * toolMenu = menuBar()->addMenu(tr("&Tools"));
-  QAction * generateHAGame = new QAction(tr("&Generate Hybrid Auction"),this);
-  QAction * generateCVGame = new QAction(tr("&Generate Common Value Auction"),this);
-  QAction * generateFPAGame = new QAction(tr("&Generate First Price Auction"),this);
+  QAction * generateHAGame = new QAction(tr("&Common Unknown Values Hybrid Auction"),this);
+  QAction * generateCVGame = new QAction(tr("&Common Unknown Values Auction"),this);
+  QAction * generateFPAGame = new QAction(tr("&Independent Known Values Auction"),this);
   QAction * solveOption = new QAction(tr("&Solve Game"),this);
   QAction * cancelOption = new QAction(tr("&Cancel Solve"),this);
+  QMenu * helpMenu = menuBar()->addMenu(tr("&Help"));
+  QAction * displayAboutScreen = new QAction(tr("&About"),this);
 
+  // File Menu
   fileMenu->addAction(loadSolutionAction);
   fileMenu->addAction(loadGameAction);
+  fileMenu->addSeparator();
   fileMenu->addAction(saveSolutionAction);
   fileMenu->addAction(saveGameAction);
-  viewMenu->addAction(linearScale);
+  fileMenu->addSeparator();
   fileMenu->addAction(quitAction);
+  loadSolutionAction->setShortcut(tr("Ctrl+L"));
+  loadGameAction->setShortcut(tr("Ctrl+G"));
+  quitAction->setShortcut(tr("Ctrl+W"));
+  saveSolutionAction->setShortcut(tr("Ctrl+S"));
+
+  // View Menu
+  viewMenu->addAction(linearScale);
   linearScale->setCheckable(true);
   linearScale->setChecked(true);
   viewMenu->addAction(colorfulDistn);
@@ -51,16 +62,19 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   viewMenu->addAction(conditionalBCE);
   conditionalBCE->setCheckable(true);
   conditionalBCE->setChecked(true);
-  toolMenu->addAction(generateHAGame);
-  toolMenu->addAction(generateCVGame);
-  toolMenu->addAction(generateFPAGame);
+  screenShotAction->setShortcut(tr("Ctrl+P"));
+
+  // Tools Menu
+  QMenu * gamesMenu = toolMenu->addMenu(tr("Special &games"));
+  gamesMenu->addAction(generateHAGame);
+  gamesMenu->addAction(generateCVGame);
+  gamesMenu->addAction(generateFPAGame);
+  toolMenu->addSeparator();
   toolMenu->addAction(solveOption);
   toolMenu->addAction(cancelOption);
-  loadSolutionAction->setShortcut(tr("Ctrl+L"));
-  loadGameAction->setShortcut(tr("Ctrl+G"));
-  screenShotAction->setShortcut(tr("Ctrl+P"));
-  quitAction->setShortcut(tr("Ctrl+W"));
-  saveSolutionAction->setShortcut(tr("Ctrl+S"));
+
+  // Help Menu
+  helpMenu->addAction(displayAboutScreen);
 
   // Menu Connections
   connect(loadSolutionAction,SIGNAL(triggered()),this,SLOT(loadSolution()));
@@ -77,6 +91,7 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   connect(generateFPAGame,SIGNAL(triggered()),this,SLOT(generateFirstPriceAuction()));
   connect(solveOption,SIGNAL(triggered()),this,SLOT(runSolve()));
   connect(cancelOption,SIGNAL(triggered()),this,SIGNAL(setCancelFlag()));
+  connect(displayAboutScreen,SIGNAL(triggered()),this,SLOT(displayAboutFromToolBar()));
 
   // Exception Connection
   connect(solutionTab->guiData,SIGNAL(sendException(QString)),
@@ -529,4 +544,18 @@ void BCEWindow::displayException(QString message) {
 
 void BCEWindow::conditionBCE(bool checked) {
   solutionTab->guiData->setConditionOnState(checked);
+}
+
+void BCEWindow::displayAbout() {
+  QMessageBox aboutBox;
+  aboutBox.setTextFormat(Qt::RichText); 
+
+  aboutBox.setWindowTitle("About");
+  aboutBox.setText("BCEViewer is part of the BCESolve library for solving games with incomplete information.<br><br>Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton<br><br>BCESolve implements a Gurobi linear programming algorithm to solve for Bayes Correlated Equilibria. Use the tabs at the top left to navigate through the program. The game tab is used to specify and solve a game. The solution tab can be used to explore the solution object of a solved game. The log tab outputs progress of the algorithm while the solve routine is running. For more about the viewer, see the documentation. <br><br>For more information about Gurobi, see their <a href='http://www.gurobi.com/'>website</a>. To download Gurobi and acquire an academic license, see <a href='http://www.gurobi.com/registration/academic-license-reg'>this link</a>. <br><br>Inquiries can be directed to:<br><br>Ben Brooks<br>Chicago, IL\nben@benjaminbrooks.net<br>February 5, 2016");
+  
+  aboutBox.exec();
+}
+
+void BCEWindow::displayAboutFromToolBar() {
+  displayAbout();
 }

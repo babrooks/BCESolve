@@ -119,17 +119,11 @@ void BCEGameHandler::setupLayout() {
   conditionalTableView->setSelectionMode(QAbstractItemView::ContiguousSelection);
   weightsTableView = new BCETableView();
   weightsTableView->setSelectionMode(QAbstractItemView::ContiguousSelection);
-  obj0WeightsTableView = new BCETableView();
-  obj0WeightsTableView->setSelectionMode(QAbstractItemView::ContiguousSelection);
-  obj1WeightsTableView = new BCETableView();
-  obj1WeightsTableView->setSelectionMode(QAbstractItemView::ContiguousSelection);
 
   payoffModel = NULL;
   priorModel = NULL;
   conditionalModel = NULL;
   weightsModel = NULL;
-  obj0WeightsModel = NULL;
-  obj1WeightsModel = NULL;
 
   initializeModels();
 
@@ -143,27 +137,27 @@ void BCEGameHandler::setupLayout() {
   QHBoxLayout * controlLayout = new QHBoxLayout();
   QFormLayout * leftControlLayout = new QFormLayout();
   QFormLayout * centerControlLayout = new QFormLayout();
-  QFormLayout * rightControlLayout = new QFormLayout();
+  QVBoxLayout * rightControlLayout = new QVBoxLayout();
   QSplitter * tableLayout = new QSplitter();
   QVBoxLayout * payoffLayout = new QVBoxLayout();
   QVBoxLayout * probabilityLayout = new QVBoxLayout();
   QVBoxLayout * conditionalLayout = new QVBoxLayout();
   QVBoxLayout * weightsLayout = new QVBoxLayout();
   
-  solveButton = new QPushButton(tr("Solve"),this);
-  solveButton->setSizePolicy(QSizePolicy::Fixed,
+  solveButton = new QPushButton(tr("Maximize Main Objective"),this);
+  solveButton->setSizePolicy(QSizePolicy::Expanding,
 			     QSizePolicy::Preferred);
 
-  cancelButton = new QPushButton(tr("Cancel"),this);
-  cancelButton->setSizePolicy(QSizePolicy::Fixed,
+  cancelButton = new QPushButton(tr("Cancel Solve"),this);
+  cancelButton->setSizePolicy(QSizePolicy::Expanding,
 			      QSizePolicy::Preferred);
 
   clearButton = new QPushButton(tr("Clear Game"),this);
   clearButton->setSizePolicy(QSizePolicy::Expanding,
 			     QSizePolicy::Preferred);
 
-  mapBoundaryCheckBox = new QCheckBox(tr("Map Boundary"),this);
-  mapBoundaryCheckBox->setSizePolicy(QSizePolicy::Fixed,
+  mapBoundaryButton = new QPushButton(tr("Map Main Vs. Secondary"),this);
+  mapBoundaryButton->setSizePolicy(QSizePolicy::Expanding,
 				     QSizePolicy::Preferred);
 
   QLineEdit *minAngleLineEdit = new QLineEdit(tr("1e-4"),this);
@@ -208,20 +202,10 @@ void BCEGameHandler::setupLayout() {
 	numTypesLabel += QString(tr("column"));
       numTypesLabel += QString(tr("):"));
       
-      centerControlLayout->addRow(numTypesLabel,
+      leftControlLayout->addRow(numTypesLabel,
 				  numTypesLayout);      
     }
-   
-  QHBoxLayout * numObjectivesLayout = new QHBoxLayout();
-  numObjectivesLayout->addWidget(numObjectivesEdit);
-  numObjectivesLayout->addWidget(removeObjectivesButton);
-  numObjectivesLayout->addWidget(addObjectivesButton);
-  numObjectivesLayout->setSpacing(5);
-
-  QString numObjectivesLabel = QString(tr("Number of Objectives:"));
-      
-  rightControlLayout->addRow(numObjectivesLabel,
-			     numObjectivesLayout);      
+       
 
   QHBoxLayout * currentStateLayout = new QHBoxLayout();
   currentStateLayout->addWidget(currentStateCombo);
@@ -237,24 +221,31 @@ void BCEGameHandler::setupLayout() {
   numStatesLayout->addWidget(removeStateButton);
   numStatesLayout->addWidget(addStateButton);
   numStatesLayout->setSpacing(5);
-  leftControlLayout->addRow(new QLabel(tr("Number of states:"),this),
+  centerControlLayout->addRow(new QLabel(tr("Number of states:"),this),
 			    numStatesLayout);
-  leftControlLayout->setSpacing(5);
+  centerControlLayout->setSpacing(5);
 
-  QHBoxLayout *solveLayout = new QHBoxLayout();
+  QHBoxLayout * numObjectivesLayout = new QHBoxLayout();
+  numObjectivesLayout->addWidget(numObjectivesEdit);
+  numObjectivesLayout->addWidget(removeObjectivesButton);
+  numObjectivesLayout->addWidget(addObjectivesButton);
+  numObjectivesLayout->setSpacing(5);
 
-  solveLayout->addWidget(solveButton);
-  solveLayout->addWidget(cancelButton);
-  solveLayout->addWidget(clearButton);
+  QString numObjectivesLabel = QString(tr("Number of Objectives:"));
+      
+  centerControlLayout->addRow(numObjectivesLabel,
+			     numObjectivesLayout); 
+  centerControlLayout->addRow(clearButton);
 
-  QHBoxLayout *mapBoundaryLayout = new QHBoxLayout();
+  QHBoxLayout *minAngleLayout = new QHBoxLayout();
   QLabel *minAngleLabel = new QLabel(tr("Minimum Angle Increment:"),this);
-  mapBoundaryLayout->addWidget(minAngleLabel);
-  mapBoundaryLayout->addWidget(minAngleLineEdit);
-  mapBoundaryLayout->addWidget(mapBoundaryCheckBox);
+  minAngleLayout->addWidget(minAngleLabel);
+  minAngleLayout->addWidget(minAngleLineEdit);
 
-  rightControlLayout->addRow(mapBoundaryLayout);
-  rightControlLayout->addRow(solveLayout);
+  rightControlLayout->addLayout(minAngleLayout);
+  rightControlLayout->addWidget(solveButton);
+  rightControlLayout->addWidget(mapBoundaryButton);
+  rightControlLayout->addWidget(cancelButton);
 
   controlLayout->addLayout(leftControlLayout);
   controlLayout->addLayout(centerControlLayout);
@@ -324,8 +315,6 @@ void BCEGameHandler::setupLayout() {
 
   QVBoxLayout* weightsTableLayout = new QVBoxLayout();
   weightsTableLayout->addWidget(weightsTableView);
-  weightsTableLayout->addWidget(obj0WeightsTableView);
-  weightsTableLayout->addWidget(obj1WeightsTableView);
   weightsWidget->setLayout(weightsTableLayout);
   weightsScrollArea->setWidget(weightsWidget);
 
@@ -414,8 +403,8 @@ void BCEGameHandler::setupLayout() {
 	  this,
 	  SLOT(clearCurrentGame()));
 
-  connect(mapBoundaryCheckBox,SIGNAL(stateChanged(int)),
-	  this,SLOT(setMBSolveOption(int)));
+  connect(mapBoundaryButton,SIGNAL(clicked()),
+	  this,SLOT(setMBSolveOption()));
 
   connect(minAngleLineEdit,SIGNAL(textChanged(QString)),
 	  this,SLOT(setMinAngleIncr(QString)));
@@ -444,16 +433,10 @@ BCEGameHandler::~BCEGameHandler()
     delete conditionalModel;
   if (weightsModel != NULL)
     delete weightsModel;
-  if (obj0WeightsModel != NULL)
-    delete obj0WeightsModel;
-  if (obj1WeightsModel != NULL)
-    delete obj1WeightsModel;
   delete payoffTableView;
   delete priorTableView;
   delete conditionalTableView;
   delete weightsTableView;
-  delete obj0WeightsTableView;
-  delete obj1WeightsTableView;
 }
 
 void BCEGameHandler::setGame(const BCEGame & _game)
@@ -513,10 +496,6 @@ void BCEGameHandler::initializeModels()
     delete conditionalModel;
   if (weightsModel != NULL)
     delete weightsModel;
-  if (obj0WeightsModel != NULL)
-    delete obj0WeightsModel;
-  if (obj1WeightsModel != NULL)
-    delete obj1WeightsModel;
 
   payoffModel = new BCEPayoffTableModel(&game,0);
   payoffTableView->setEditTriggers(QAbstractItemView::AllEditTriggers);
@@ -533,20 +512,10 @@ void BCEGameHandler::initializeModels()
   conditionalTableView->setModel(conditionalModel);
   conditionalTableView->resizeColumnsToContents();
 
-  weightsModel = new BCEObjWeightsTableModel(&game,ModelType::Solver);
+  weightsModel = new BCEObjWeightsTableModel(&game);
   weightsTableView->setEditTriggers(QAbstractItemView::AllEditTriggers);
   weightsTableView->setModel(weightsModel);
   weightsTableView->resizeColumnsToContents();
-
-  obj0WeightsModel = new BCEObjWeightsTableModel(&game,ModelType::MBObj1);
-  obj0WeightsTableView->setEditTriggers(QAbstractItemView::AllEditTriggers);
-  obj0WeightsTableView->setModel(obj0WeightsModel);
-  obj0WeightsTableView->resizeColumnsToContents();
-
-  obj1WeightsModel = new BCEObjWeightsTableModel(&game,ModelType::MBObj2);
-  obj1WeightsTableView->setEditTriggers(QAbstractItemView::AllEditTriggers);
-  obj1WeightsTableView->setModel(obj1WeightsModel);
-  obj1WeightsTableView->resizeColumnsToContents();
 
 } // initializeModels
 
@@ -659,17 +628,11 @@ void BCEGameHandler::objectiveAdded() {
 
   game.addObjective(newObjective,"k");
   weightsModel->addObjective(newObjective);
-  obj0WeightsModel->addObjective(newObjective);
-  obj1WeightsModel->addObjective(newObjective);
   numObjectivesEdit
     ->setText(QString::number(game.getNumObjectives()));
 
   weightsModel->emitLayoutChanged();
   weightsTableView->resizeColumnToContents(newObjective);
-  obj0WeightsModel->emitLayoutChanged();
-  obj0WeightsTableView->resizeColumnToContents(newObjective);
-  obj1WeightsModel->emitLayoutChanged();
-  obj1WeightsTableView->resizeColumnToContents(newObjective);
   payoffModel->emitLayoutChanged();
 } // objectiveAdded
 
@@ -753,12 +716,8 @@ void BCEGameHandler::objectiveRemoved()
   game.removeObjective(objective);
   weightsModel->removeObjective(objective);
   numObjectivesEdit->setText(QString::number(game.getNumObjectives()));
-  obj0WeightsModel->removeObjective(objective);
-  obj1WeightsModel->removeObjective(objective);
 
   weightsModel->emitLayoutChanged();
-  obj0WeightsModel->emitLayoutChanged();
-  obj1WeightsModel->emitLayoutChanged();
   payoffModel->emitLayoutChanged();
 
 } // objectiveRemoved
@@ -802,10 +761,6 @@ void BCEGameHandler::clearCurrentGame() {
   conditionalTableView->resizeColumnToContents(game.getNumStates());
   weightsModel->emitLayoutChanged();
   weightsTableView->resizeColumnToContents(game.getNumStates());
-  obj0WeightsModel->emitLayoutChanged();
-  obj0WeightsTableView->resizeColumnToContents(game.getNumStates());
-  obj1WeightsModel->emitLayoutChanged();
-  obj1WeightsTableView->resizeColumnToContents(game.getNumStates());
   payoffModel->emitLayoutChanged();
   payoffTableView->resizeColumnToContents(game.getNumStates());
   priorModel->emitLayoutChanged();
@@ -818,19 +773,20 @@ void BCEGameHandler::clearCurrentGame() {
   }
   numStatesEdit->setText(QString::number(game.getNumStates()));
   numObjectivesEdit->setText(QString::number(game.getNumObjectives()));
+  currentStateCombo->clear();
+  currentStateCombo->addItem("0");
 }
 
-const vector<double>& BCEGameHandler::getWeightsOnObjectives() {
+const vector<double> BCEGameHandler::getWeightsOnObjectives() {
   return weightsModel->getSolverData();
 }
 
 const vector<vector<double> > BCEGameHandler::getMapBWeights() {
-  vector<vector<double> > finalWeights(0);
-  finalWeights.push_back(obj0WeightsModel->getSolverData());
-  finalWeights.push_back(obj1WeightsModel->getSolverData());
-  return finalWeights;
+
+  return weightsModel->getMapBoundaryData();
 }
 
 void BCEGameHandler::emitSolveSignal() {
-  startSolveRoutine();
+  mapBoundaryOption = false;
+  emit(startSolveRoutine());
 }

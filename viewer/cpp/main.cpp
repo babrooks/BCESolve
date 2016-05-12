@@ -15,6 +15,7 @@ int main(int argc, char ** args)
   BCEWindow window(logHandler);
 
   window.show();
+  window.displayAbout();
 
   return app.exec();
 }

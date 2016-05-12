@@ -97,8 +97,8 @@ private:
   QPushButton * cancelButton;
   //! Button that clears currently displayed game.
   QPushButton *clearButton;
-  //! Check Box handling map boundary solve option.
-  QCheckBox *mapBoundaryCheckBox;
+  //! Button handling map boundary solve option.
+  QPushButton *mapBoundaryButton;
 
   // Edits
 
@@ -164,7 +164,7 @@ public:
       views. */
   void setState(int state);
   //! Returns weights on objectives.
-  const vector<double>& getWeightsOnObjectives();
+  const vector<double> getWeightsOnObjectives();
   //! Returns weights on map boundary objectives.
   /*! This is a matrix of doubles. The first row gives the weights
     on objective0 for the mapBoundary algorithm. The second row gives
@@ -220,13 +220,12 @@ private slots:
   //! Clears the game currently displayed in the game tab.
   /*! Replaces the cleared game with a new game. */
   void clearCurrentGame();
-  //! Sets map boundary option to the value of the check box.
-  void setMBSolveOption(int value) {
-    if (value == 0)
-      mapBoundaryOption = false;
-    else if (value == 2)
-      mapBoundaryOption = true;
+  //! Solves the game and maps the boundary.
+  void setMBSolveOption() {
+    mapBoundaryOption = true;
+    startSolveRoutine();
   }
+  //! Sets the minimum angle increment to the provided value.
   void setMinAngleIncr(QString strValue) {
     double incr = strValue.toDouble();
     std::cout << incr << std::endl;

@@ -8,9 +8,14 @@ QVariant BCEObjWeightsTableModel::data(const QModelIndex & index,
   else if (role == Qt::DisplayRole || role == Qt::EditRole)
     {
 
-      int objective = index.row();
+    vector<int> cellLocation(2,0);
+    cellLocation[0] = index.row();
+    cellLocation[1] = index.column();
 
-      return QVariant(QString::number(weightData[objective]));
+    if (cellLocation[1]==0)
+      return QVariant(QString::number(mainObjWeights[cellLocation[0]]));
+    else if (cellLocation[1]==1)
+      return QVariant(QString::number(secondaryObjWeights[cellLocation[0]]));
 	
     }
   else
@@ -23,9 +28,12 @@ bool BCEObjWeightsTableModel::setData(const QModelIndex & index,
 {
   if (role == Qt::EditRole)
     {
-      int objective = index.row();
+      vector<int> cellLocation(2,0);
+      cellLocation[0]= index.row();
+      cellLocation[1] = index.column();
+
       QString strValue = value.toString();
-      setWeightData(objective,strValue.toDouble(),type);
+      setWeightData(cellLocation,strValue.toDouble());
 
       emit dataChanged(index,index);
       return true;
@@ -41,8 +49,11 @@ QVariant BCEObjWeightsTableModel::headerData(int section,
     {
       switch (orientation)
 	{
-	case Qt::Horizontal:
-	  return QVariant(QString(""));
+	case Qt::Horizontal: {
+	  if (section==0)
+	    return QVariant(QString("Main"));
+	  return QVariant(QString("Secondary"));
+	}
 
 	case Qt::Vertical: {
 	  return QVariant
