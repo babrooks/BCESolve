@@ -82,7 +82,6 @@ void solveFPA(int nvals, int nbids,
       mapBoundaryWeights[1][2]=1;      
 
       solver.mapBoundary("fpaknown.dat",mapBoundaryWeights);
-      // solver.mapBoundary();
 
       BCESolution soln;
       solver.getSolution(soln);
