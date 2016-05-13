@@ -456,6 +456,9 @@ void BCESolver::solve(vector<double>& objectiveWeights)
   GRBLinExpr expr;
   int numObjs = game->getNumObjectives();
 
+  if (objectiveWeights.size() != numObjs)
+    throw(BCEException(BCEException::WrongWeightSize));
+
   for (int obj = 0; obj < numObjs; obj++) {
     expr += objectiveWeights[obj]*getObjectiveFunction(obj);
   } // for each objective

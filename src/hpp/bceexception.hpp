@@ -55,7 +55,8 @@ public:
       InvalidParameterName, /*!< Unrecognized parameter name. */
       InvalidParameterValue, /*!< Parameter value was invalid. */
       ICConstraintViolated, /*!< Incentive constraint violated. */
-      WrongDistnSize /*!< Size of Distn doesn't reflect the number of actions. */
+      WrongDistnSize, /*!< Size of Distn doesn't reflect the number of actions. */
+      WrongWeightSize /*! Size of Weights given in BCESolver::solve() doesn't match number of objs. */
     };
 
   //! Gives the error code for this BCEException.
@@ -125,6 +126,10 @@ public:
 	break;
       case WrongDistnSize:
 	return "Distribution given in solution data does not reflect the correct number of actions.";
+	break;
+      case WrongWeightSize: {
+	return "Size of the weight vector supplied as an argument to BCESolver::solve(weights) does not match the number of objectives. Check your specification in the example file.";
+      }
 	break;
       } // switch
   }
