@@ -446,12 +446,22 @@ void BCESolver::populate ()
 
 } // populate
 
-void BCESolver::solve()
+void BCESolver::solve(vector<double>& objectiveWeights)
 {
   map<int,double> solutionEquilibrium;
 
   model.getEnv().set(GRB_IntParam_Crossover,0);
   model.getEnv().set(GRB_IntParam_Method,2);
+
+  GRBLinExpr expr;
+  int numObjs = game->getNumObjectives();
+
+  for (int obj = 0; obj < numObjs; obj++) {
+    expr += objectiveWeights[obj]*getObjectiveFunction(obj);
+  } // for each objective
+
+  // Set Objectives
+  model.setObjective(expr,GRB_MAXIMIZE);
 
   cout << "Display level = " << displayLevel << endl;
 
@@ -467,6 +477,9 @@ void BCESolver::solve()
   bceToMap(solutionEquilibrium);
   soln.addEquilibrium(solutionEquilibrium);
   soln.consolidateEquilibria();
+  // If the solve routine is used after mapping the boundary,
+  // this will be overridden
+  soln.setBoundaryMapped(false);
 }
 
 void BCESolver::mapBoundary()

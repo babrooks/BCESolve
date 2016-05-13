@@ -99,21 +99,12 @@ public slots:
       // Populate constraints
       solver.populate();
 
-      // Initialize objectives
-      GRBLinExpr expr;
-      int numObjs = game.getNumObjectives();
-
-      for (int obj = 0; obj < numObjs; obj++) {
-	expr += weightData[obj]*solver.getObjectiveFunction(obj);
-      } // for each objective
-
-      // Set Objectives
-      solver.model.setObjective(expr,GRB_MAXIMIZE);
+      // Set callback object
       solver.model.setCallback(callback);
+      callback->setFullOutput(true);
 
       // Solve the model
-      callback->setFullOutput(true);
-      solver.solve();
+      solver.solve(weightData);
 
       // If map boundary is checked in the game tab, map the boundary
       if (mapBoundaryOption) {

@@ -269,9 +269,6 @@ void BCEGameHandler::setupLayout() {
   				       QSizePolicy::Expanding);
   probabilityScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
-  probabilityLayout->addWidget(new QLabel(tr("Prior over States:"),this));
-  probabilityLayout->addWidget(probabilityScrollArea);
-
   // Scroll Area for Conditional Distribution of Types
 
   QScrollArea * payoffScrollArea = new QScrollArea(this);
@@ -325,6 +322,8 @@ void BCEGameHandler::setupLayout() {
 
   weightsLayout->addWidget(new QLabel(tr("Weights on Objectives:"),this));
   weightsLayout->addWidget(weightsScrollArea);
+  weightsLayout->addWidget(new QLabel(tr("Prior over States:"),this));
+  weightsLayout->addWidget(probabilityScrollArea);
  
   // END SCROLL AREA SETUP
   //////////////////////////////
@@ -336,9 +335,6 @@ void BCEGameHandler::setupLayout() {
   QWidget *conditionalSplitterWidget = new QWidget(this);
   conditionalSplitterWidget->setLayout(conditionalLayout);
   tableLayout->addWidget(conditionalSplitterWidget);
-  QWidget *probabilitySplitterWidget = new QWidget(this);
-  probabilitySplitterWidget->setLayout(probabilityLayout);
-  tableLayout->addWidget(probabilitySplitterWidget);
   QWidget *weightsSplitterWidget = new QWidget(this);
   weightsSplitterWidget->setLayout(weightsLayout);
   tableLayout->addWidget(weightsSplitterWidget);
@@ -346,10 +342,9 @@ void BCEGameHandler::setupLayout() {
   QSizePolicy policy(QSizePolicy::Expanding,QSizePolicy::Expanding);
   tableLayout->setSizePolicy(policy);
 
-  tableLayout->setStretchFactor(0,24);
-  tableLayout->setStretchFactor(1,6);
-  tableLayout->setStretchFactor(2,3);
-  tableLayout->setStretchFactor(3,5);
+  tableLayout->setStretchFactor(0,60);
+  tableLayout->setStretchFactor(1,10);
+  tableLayout->setStretchFactor(3,30);
 
   // END ADDING WIDGETS TO QSPLITTER
   //////////////////////////////////

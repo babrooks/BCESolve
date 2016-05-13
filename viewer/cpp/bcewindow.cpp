@@ -367,8 +367,10 @@ void BCEWindow::generateHybridAuction() {
 
   QDialog dialog(this);
   QFormLayout form(&dialog);
+  dialog.setSizePolicy(QSizePolicy::Fixed,
+		       QSizePolicy::Fixed);
 
-  form.addRow(new QLabel("Common Values Hybrid Auction"));
+  form.addRow(new QLabel("Common Unknown Values Hybrid Auction <br><br>This auction encompasses the first price and second price common unknown values auctions<br>and permits exploration of the spectrum in between. The parameter <b>Weight on Bid</b> governs <br>the fraction player <i>i</i> pays of bid <i>i</i>, if player <i>i</i> wins. Winning as player <i>i</i> entails paying <br> WeightOnBid*Bid<sub>i</sub> + (1-WeightOnBid)*Bid<sub>j</sub> + Entry Fee. The parameter <b>High Bid</b> can be set below<br> 1 to limit the highest bid a bidder can make. Values are distributed uniformly on [0,1].<br><br>"));
 
   int numParams = 6;
   vector<QLineEdit *> fields(numParams);
@@ -425,7 +427,7 @@ void BCEWindow::generateCommonValueAuction() {
   QDialog dialog(this);
   QFormLayout form(&dialog);
 
-  form.addRow(new QLabel("Common Values Auction, Prior~v^alpha"));
+  form.addRow(new QLabel("Common Unknown Values First Price Auction. <br><br> Values are distributed according to v<sup>&alpha;</sup>, where <i>v</i> takes on values in [0,1].<br><br>"));
 
   int numParams = 6;
   vector<QLineEdit *> fields(numParams);
@@ -482,7 +484,7 @@ void BCEWindow::generateFirstPriceAuction() {
   QDialog dialog(this);
   QFormLayout form(&dialog);
 
-  form.addRow(new QLabel("First Price Auction"));
+  form.addRow(new QLabel("Independent Known Values First Price Auction <br><br>"));
 
 
 

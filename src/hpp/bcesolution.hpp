@@ -73,10 +73,12 @@ private:
   int currentEquilibrium;
   //! Matrix of weights on mapBoundary objectives.
   /*! The first row, i.e. mapBoundaryWeights[0] contains weights
-    for objective0, and the second row contains weights for objective1.
-    The number of columns is the number of objectives.
+    for the main objective, and the second row contains weights for
+    the secondary objective. The number of columns is the number of objectives.
    */
   vector<vector<double> > mapBoundaryWeights;
+  //! Vector of weights on the main objective.
+  vector<double> mainObjectiveWeights;
   //! True if boundary was mapped in the solver.
   bool boundaryMapped;
 
@@ -91,12 +93,14 @@ public:
     ar & currentEquilibrium;
     ar & mapBoundaryWeights;
     ar & boundaryMapped;
+    ar & mainObjectiveWeights;
   }
 
   //! Default constructor
   BCESolution ():currentEquilibrium(0),
 		 boundaryMapped(false),
-		 mapBoundaryWeights(2,vector<double>(2,0)) 
+		 mapBoundaryWeights(2,vector<double>(2,0)),
+		 mainObjectiveWeights(2,0)
   {}
 
   //! Constructor
@@ -114,14 +118,14 @@ public:
   void clearEquilibria();
   //! Sets boundaryMapped status. 
   void setBoundaryMapped(const bool isMapped) 
-  { boundaryMapped = true; }
+  { boundaryMapped = isMapped; }
   //! Sets mapBoundaryWeights.
   void setMapBoundaryWeights(const vector<vector<double> >& weights)
-  { mapBoundaryWeights = weights;
-    cout << mapBoundaryWeights[0][0] << endl;
-    cout << mapBoundaryWeights[1][1] << endl;
-
- }
+  { mapBoundaryWeights = weights; }
+  //! Sets main objective weights
+  void setMainObjectiveWeights(const vector<double>& weights) {
+    mainObjectiveWeights = weights;
+  }
   //! Consolidates equilibria
   /*! Appends the list of newEquilibria to the vector
       equilibria. Clears newEquilibria.*/
@@ -183,6 +187,11 @@ public:
   //! Returns the mapBoundary weights 
   const vector<vector<double> >& getMapBoundaryWeights() const {
     return mapBoundaryWeights;
+  }
+
+  //! Returns the main objective weights
+  const vector<double> getMainObjectiveWeights() const {
+    return mainObjectiveWeights;
   }
 
   const bool getIsBoundaryMapped() const {

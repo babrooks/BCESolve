@@ -30,7 +30,6 @@
 #include "bceexception.hpp"
 #include "bceutilities.hpp"
 #include "gurobi_c++.h"
-// #include <ilcplex/ilocplex.h>
 
 //! Solves a BCEAbstractGame using gurobi.
 /*! This class contains routines for solving a BCEAbstractGame object using
@@ -70,8 +69,8 @@ public:
       //! Control algorithm output
       /*! Controls the frequency and detail with which progress of the
 	algorithm is reported. 0 corresponds to no output, 1 is some
-	output. Is also passed to the BCESolver::cplex solver, so it
-	controls the level of output of CPLEX. */
+	output. Is also passed to the BCESolver::model solver, so it
+	controls the level of output of Gurobi. */
       DisplayLevel, 
       //! The first objective used when mapping the boundary. 
       BoundaryObjective1, 
@@ -123,13 +122,11 @@ protected:
   //! The total number of constraints on probabilities
   long int numProbabilityConstraints; 
 
-  // Cplex components
+  // Gurobi components
 
   GRBEnv env;  
-  //! The objective for BCESolver::cplex.
+  //! The objective for BCESolver::model.
   GRBLinExpr gurobiObjective; 
-
-  // Cplex variables and constraints.
 
   //! The variables for BCESolver::model.
   GRBVar* variables; 
@@ -166,8 +163,8 @@ protected:
   //! Index of the current objective. Not currently being used. 
   int currentObjective;
   //! The display level. 
-  /*! 0 is no output, 1 is some output. Also passed to CPLEX, so 2+
-    controls CPLEX output. */
+  /*! 0 is no output, 1 is some output. Also passed to Gurobi, so 2+
+    controls Gurobi output. */
   int displayLevel; 
 
   // Lists for storing equilibria and boundary points.
@@ -212,13 +209,13 @@ public:
   // Main routines
 
   //! Main populate routine
-  /*! Populates the CPLEX model with constraints and initializes the
+  /*! Populates the Gurobi model with constraints and initializes the
     objectives. */
   void populate(); 
 
   //! Solve method
-  /*! Sets CPLEX solver parameters and calls IloCplex::solve. */
-  void solve();
+  /*! Sets Gurobi solver parameters and calls Gurobi::optimize(). */
+  void solve(vector<double>& objectiveWeights);
 
   //! Maps the frontier
   /*! Maps the frontier for the boundary objectives indicated in
@@ -255,11 +252,11 @@ public:
   void bceToMap(map<int,double> & distribution);
   
   // Get methods
-  //! Returns the BCESolver::cplex object.
+  //! Returns the BCESolver::model object.
   GRBModel& getModel() { return model; }
   //! Returns the \f$n\f$th objective function. 
   const GRBLinExpr& getObjectiveFunction (int n) { return objectiveFunctions[n]; }
-  //! Returns the objective for BCESolver::cplex.
+  //! Returns the objective for BCESolver::model.
   GRBLinExpr& getObjective() { return gurobiObjective; }
 
   // Clear

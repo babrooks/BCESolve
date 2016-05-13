@@ -45,24 +45,33 @@ void solveFPA(int nvals, int nbids,
       // fpa.distribution.push_back(uniformWithMassPnt(0.3),1.0); // uniform with mass 
       fpa.distribution.push_back(new vToTheAlpha(1.0),1.0); // uniform
 
+      // Denote that the game has a product structure (private values)
       fpa.setHasProductStructureData(true);
 
+      // Creating the solver object
       BCESolver solver(fpa);
 
       if (verbose)
 	cout << "Constructor finished" << endl;
 
+      // Populating Constraints
       solver.populate();
       if (verbose)
 	cout << "Done populating" << endl;
 
-      solver.model.setObjective(solver.getObjectiveFunction(2),GRB_MINIMIZE);
-      solver.solve();
+      // Set the main objective
+      int numObjs = fpa.getNumObjectives();
+      vector<double> solverWeights(numObjs,0);
+      // Minimize Revenue
+      solverWeights[2]=-1;
 
       if (verbose)
       	cout << "Objective function set" << endl;
 
-      int numObjs = fpa.getNumObjectives();
+      // Solve the model
+      solver.solve(solverWeights);
+
+
       // Weights are set, by default, to 0.
       vector<vector<double> > mapBoundaryWeights(2,vector<double>(numObjs,0));
       // Sets objective 0 weights for the x-axis

@@ -333,56 +333,69 @@ void BCEDataState::setAllEqm() {
 
   vector<vector<double> > allEqmTemp;
   solutionData.getExpectedObjectives(allEqmTemp);
-  // cout << "setAllEqm Function Hit" << endl;
 
   int numObjs = gameData.getNumObjectives();
 
   vector<vector<double> > unadjMapBWeights = solutionData.getMapBoundaryWeights();
-  vector<double> summedWeights(2,0);
-  summedWeights[0] = 0;
-  summedWeights[1] = 0;
-
-  // Sum the weights
-  for (int obj=0; obj<numObjs; obj++) {
-    summedWeights[0] += unadjMapBWeights[0][obj];
-    summedWeights[1] += unadjMapBWeights[1][obj];
-  }
-
+  vector<double> mainObjectiveWeights = solutionData.getMainObjectiveWeights();
+  bool isMapped = solutionData.getIsBoundaryMapped();
   vector<vector<double> > mapBWeights(2,vector<double>(numObjs,0));
-  for (int i=0; i<2; i++) {
-    for (int obj=0; obj<numObjs; obj++) {
-      mapBWeights[i][obj] = unadjMapBWeights[i][obj]/summedWeights[i];
-    }
-  }
-
   int sizeEqmData = allEqmTemp.size();
-
-  vector<vector<double> > eqmAccumulator(2,vector<double>(sizeEqmData,0));
-
-  for (int eqm=0; eqm<sizeEqmData; eqm++) {
-    double xVal = 0;
-    double yVal = 0;
-    int objCounter = 0;
-    while (objCounter < numObjs) {
-      xVal += mapBWeights[0][objCounter]*allEqmTemp[eqm][objCounter];
-      yVal += mapBWeights[1][objCounter]*allEqmTemp[eqm][objCounter];
-      objCounter++;
-    }
-    eqmAccumulator[0][eqm] = xVal;
-    eqmAccumulator[1][eqm] = yVal;
-  }
 
   allEqm.clear();
   allEqm.push_back(vector<double>(sizeEqmData,0));
   allEqm.push_back(vector<double>(sizeEqmData,0));
-  for (int eqm=0; eqm<sizeEqmData; eqm++) {
-    allEqm[0][eqm] = eqmAccumulator[0][eqm];
-    allEqm[1][eqm] = eqmAccumulator[1][eqm];
-  }
 
-  for (int eqm=0; eqm<sizeEqmData; eqm++) {
-    if (eqm%10==0) 
-      cout << "Eqm Pair: (" << allEqm[0][eqm] << "," << allEqm[1][eqm] << ")" << endl;
+  cout << isMapped << endl;
+  if (!isMapped) {
+    for (int eqm=0; eqm<sizeEqmData; eqm++) {
+      allEqm[0][eqm] = allEqmTemp[eqm][0];
+      allEqm[1][eqm] = allEqmTemp[eqm][1];
+    }
+    cout << allEqm[0][0] << endl;
+    cout << allEqm[1][0] << endl;
+  }
+  else if (isMapped) {
+    
+    vector<double> summedWeights(2,0);
+    summedWeights[0] = 0;
+    summedWeights[1] = 0;
+
+    // Sum the weights
+    for (int obj=0; obj<numObjs; obj++) {
+      summedWeights[0] += unadjMapBWeights[0][obj];
+      summedWeights[1] += unadjMapBWeights[1][obj];
+    }
+
+    // Rescale weights so that they sum to 1
+    for (int i=0; i<2; i++) {
+      for (int obj=0; obj<numObjs; obj++) {
+	mapBWeights[i][obj] = unadjMapBWeights[i][obj]/summedWeights[i];
+      }
+    }
+
+    vector<vector<double> > eqmAccumulator(2,vector<double>(sizeEqmData,0));
+
+    if (isMapped) {
+      for (int eqm=0; eqm<sizeEqmData; eqm++) {
+	double xVal = 0;
+	double yVal = 0;
+	int objCounter = 0;
+	while (objCounter < numObjs) {
+	  xVal += mapBWeights[0][objCounter]*allEqmTemp[eqm][objCounter];
+	  yVal += mapBWeights[1][objCounter]*allEqmTemp[eqm][objCounter];
+	  objCounter++;
+	}
+	eqmAccumulator[0][eqm] = xVal;
+	eqmAccumulator[1][eqm] = yVal;
+      }
+    }
+
+    for (int eqm=0; eqm<sizeEqmData; eqm++) {
+      allEqm[0][eqm] = eqmAccumulator[0][eqm];
+      allEqm[1][eqm] = eqmAccumulator[1][eqm];
+      
+    }
   }
 
   emit(selectedEqmChanged());
