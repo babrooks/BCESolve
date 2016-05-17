@@ -152,11 +152,23 @@ public:
     weightData.push_back(secondaryObjWeights);
     return weightData;
   }
+
+  //! Resets weights on objectives
+  void resetObjectiveWeights() {
+  mainObjWeights.clear();
+  secondaryObjWeights.clear();
+  mainObjWeights.resize(game->getNumObjectives());
+  secondaryObjWeights.resize(game->getNumObjectives());
+
+  mainObjWeights[0] = 1;
+  secondaryObjWeights[1] = 1;
+  }
   
 protected:
   //! Pointer to the associated game.
   BCEGame * game;
-  
+
+
 };
 
 

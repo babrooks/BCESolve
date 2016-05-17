@@ -755,6 +755,7 @@ void BCEGameHandler::clearCurrentGame() {
   conditionalModel->emitLayoutChanged();
   conditionalTableView->resizeColumnToContents(game.getNumStates());
   weightsModel->emitLayoutChanged();
+  weightsModel->resetObjectiveWeights();
   weightsTableView->resizeColumnToContents(game.getNumStates());
   payoffModel->emitLayoutChanged();
   payoffTableView->resizeColumnToContents(game.getNumStates());
