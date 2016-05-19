@@ -222,8 +222,8 @@ void BCEPlotHandler::plotBCEValueSet() {
   // Erase Current Contents
   setOfBCEPlot->clearGraphs();
   setOfBCEPlot->clearPlottables();
-  setOfBCEPlot->addGraph();
-  setOfBCEPlot->addGraph();
+  // setOfBCEPlot->addGraph();
+  // setOfBCEPlot->addGraph();
 
   // Getting Data
 
@@ -266,11 +266,13 @@ void BCEPlotHandler::plotBCEValueSet() {
   pen.setColor(Qt::green);
   pen.setWidth(4);
 
-  setOfBCEPlot->graph(0)->setData(xCoordCurrentEqm,yCoordCurrentEqm);
-  setOfBCEPlot->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCross,
-							pen,
-							QBrush(Qt::green),
-							15));
+  QCPCurve * xCurve = new QCPCurve(setOfBCEPlot->xAxis,setOfBCEPlot->yAxis);
+  xCurve->setData(xCoordCurrentEqm,yCoordCurrentEqm);
+  xCurve->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCross,
+					  pen,
+					  QBrush(Qt::green),
+					  13));
+  setOfBCEPlot->addPlottable(xCurve);
   // Replot
 
   setOfBCEPlot->replot();

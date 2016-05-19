@@ -46,8 +46,9 @@ public:
   FPAGame() {distribution.push_back(new vToTheAlpha(1.0),1.0);}
   
   FPAGame(int na, int nv, double _fee, 
-	  double _reservePrice,double _highbid,bool _exAnteFee)
-    : BCEAbstractGame(nv*nv,na+1,1,5+2*nv), numValues(nv), 
+	  double _reservePrice,double _highbid,
+	  bool _exAnteFee)
+    : BCEAbstractGame(nv*nv,na+1,1,3), numValues(nv), 
       fee(_fee), highbid(_highbid),
       lowbid(0.0), reservePrice(_reservePrice),
       exAnteFee(_exAnteFee)
@@ -127,35 +128,6 @@ public:
 	obj += (actions[0]>0? fee : 0.0);
 	obj += (actions[1]>0? fee : 0.0);
       }
-    else if (objectiveIndex==3)
-      {
-	// Surplus
-	if (actions[0]>actions[1] 
-	    || (actions[0]==actions[1] && values[0]>values[1]))
-	  obj = (1.0*values[0]/(numValues-1.0)); // Player 1 won
-	else
-	  obj = (1.0*values[1]/(numValues-1.0)); // Either player 2
-						 // won or they tied
-						 // with same val.
-      }
-    else if (objectiveIndex==4)
-      {
-	return objective(state,actions,0)+objective(state,actions,1);
-      }
-    else if (objectiveIndex>=5 && objectiveIndex < 5+2*numValues)
-      {
-	// These objectives evaluate the surplus from positive bids,
-	// versus surplus from a zero bid. For each primitive type,
-	// this should be large enough to justify the ex-ante entry
-	// cost. 
-	int value = objectiveIndex - 5;
-	int player = value/numValues;
-	value -= player*numValues;
-	
-	if (actions[player]>0 && values[player]==value)
-	  return objective(state,actions,player);
-      }
-    
     return obj;
   } // objective
 

@@ -31,8 +31,8 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   QAction * conditionalBCE = new QAction(tr("&View BCE Conditional on State"),this);
   QMenu * toolMenu = menuBar()->addMenu(tr("&Tools"));
   QAction * generateHAGame = new QAction(tr("&Common Unknown Values Hybrid Auction"),this);
-  QAction * generateCVGame = new QAction(tr("&Common Unknown Values Auction"),this);
-  QAction * generateFPAGame = new QAction(tr("&Independent Known Values Auction"),this);
+  QAction * generateCVGame = new QAction(tr("&Unknown Values First Price Auction"),this);
+  QAction * generateFPAGame = new QAction(tr("&Independent Known Values First Price Auction"),this);
   QAction * solveOption = new QAction(tr("&Solve Game"),this);
   QAction * cancelOption = new QAction(tr("&Cancel Solve"),this);
   QMenu * helpMenu = menuBar()->addMenu(tr("&Help"));
@@ -450,6 +450,9 @@ void BCEWindow::generateCommonValueAuction() {
   form.addRow(QString("Entry Fee (Double in [0,1])"), fields[5]);
   fields[5]->setText("0");
 
+  QCheckBox * independentCheck = new QCheckBox(&dialog);
+  form.addRow(QString("Independent (versus common) values"), independentCheck);
+
   QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
   			     Qt::Horizontal, &dialog);
   form.addRow(&buttonBox);
@@ -470,13 +473,24 @@ void BCEWindow::generateCommonValueAuction() {
     doubleParams[i] = fields[i+2]->text().toDouble();
   }
 
-  CommonValueAuction cva(intParams[0],intParams[1]
-			 ,doubleParams[0],doubleParams[1],
-			 doubleParams[2],doubleParams[3]);
+  if (independentCheck->isChecked())
+    {
+      
+      FPAUnknown fpa(intParams[1],intParams[0],
+		     doubleParams[0],doubleParams[1],
+		     doubleParams[2],doubleParams[3]);
+      gameTab->setGame(fpa);
+      tabWidget->setCurrentIndex(0);
+    }
+  else
+    {
+      CommonValueAuction cva(intParams[1],intParams[0]
+			     ,doubleParams[0],doubleParams[1],
+			     doubleParams[2],doubleParams[3]);
 
-  gameTab->setGame(cva);
-  tabWidget->setCurrentIndex(0);
-
+      gameTab->setGame(cva);
+      tabWidget->setCurrentIndex(0);
+    }
 }
 
 void BCEWindow::generateFirstPriceAuction() {
@@ -485,8 +499,6 @@ void BCEWindow::generateFirstPriceAuction() {
   QFormLayout form(&dialog);
 
   form.addRow(new QLabel("Independent Known Values First Price Auction <br><br>"));
-
-
 
   int numParams = 5;
   vector<QLineEdit *> fields(numParams);
@@ -530,10 +542,8 @@ void BCEWindow::generateFirstPriceAuction() {
   FPAKnown fpa(intParams[0],intParams[1],
 	       doubleParams[0],doubleParams[1],
 	       doubleParams[2],false);
-
   gameTab->setGame(fpa);
   tabWidget->setCurrentIndex(0);
-
 }
 
 

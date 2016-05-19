@@ -32,6 +32,7 @@
 #include "hybridentryreserve.hpp"
 #include "commonvalueauction.hpp"
 #include "fpaknown.hpp"
+#include "fpaunknown.hpp"
 
 //! Assembles BCEGameHandler, BCEPlotHandler, and BCELogHandler into a Unified GUI.
 /*! Sets up a menu bar and assembles bcegamehandler, bceplothandler, 
@@ -114,11 +115,11 @@ private slots:
      upon saving for proper save action functionality.
   */
   void screenshot();
-  //! Starts the routine to build the default hybrid auction.
+  //! Starts the routine to build the common values default hybrid auction.
   void generateHybridAuction();
-  //! Builds the default common values auction.
+  //! Builds the default common values first price auction.
   void generateCommonValueAuction();
-  //! Generates the first price auction.
+  //! Generates the first price auction with known values.
   void generateFirstPriceAuction();
   //! Displays exceptions signaled from other classes.
   void displayException(QString message);

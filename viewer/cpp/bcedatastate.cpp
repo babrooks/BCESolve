@@ -256,7 +256,14 @@ void BCEDataState::modifyEqmFocus(double x,double y) {
 
   emit(eqmCoordSignal(xClosest,yClosest));
 
-  resetManipulatedData();
+  // resetManipulatedData();
+
+  setEqmMatrix();
+  for (int player = 0; player < 2; player++)
+    setObjectiveVals(player);
+
+  emit(selectedEqmChanged());
+  emit(eqmCoordSignal(allEqm[0][currentEqmIndex],allEqm[1][currentEqmIndex]));
 
 }
 
