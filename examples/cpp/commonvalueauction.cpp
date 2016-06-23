@@ -16,10 +16,10 @@ int main() {
 
   solver.populate();
 
-  solver.model.setObjective(solver.getObjectiveFunction(2),
-			    GRB_MINIMIZE);
+  vector<double> objWeights(3);
+  objWeights[2]=-1;
 
-  solver.solve();
+  solver.solve(objWeights);
 
   BCESolution soln;
   solver.getSolution(soln);

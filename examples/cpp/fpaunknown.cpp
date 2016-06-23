@@ -33,65 +33,31 @@ int main(int argc, char ** argv)
       solver.populate();
       cout << "Done populating" << endl;
 
-      IloCplex cplex=solver.getCplex();
-      cplex.setParam(IloCplex::Threads,4);
-
-      // // First add efficiency constraint
-      // cplex.getObjective().setExpr(solver.getObjectiveFunction(3));
-      // solver.solve();
-      // cplex.getModel().add(solver.getObjectiveFunction(3) == cplex.getObjValue());
-
-      // Sum of bidders' surplus
-      // cplex.getObjective().setExpr(solver.getObjectiveFunction(1)
-      // 				   +solver.getObjectiveFunction(0));
-
-      cplex.getObjective().setExpr(-1.0*solver.getObjectiveFunction(2));
-      cout << "Objective function set" << endl;
-      
-      cplex.setParam(IloCplex::BarDisplay,1);
-      cplex.setParam(IloCplex::SimDisplay,1);
-      // cplex.setParam(IloCplex::RootAlg,IloCplex::Dual);
-
-      solver.solve();
+      vector<double> objWeights(4,0);
+      objWeights[2]=-1;
+      solver.solve(objWeights);
       cout << "Solved" << endl;
       
-      cout << "ItLim: " << cplex.getParam(IloCplex::ItLim) << endl;
-
-      cout << "Objective = " << setprecision(16) << cplex.getObjValue() << endl;
-
       cout << "Bidder 1's surplus: " 
-      	   << cplex.getValue(solver.getObjectiveFunction(0)) << endl;
+      	   << solver.getObjectiveFunction(0).getValue() << endl;
       cout << "Bidder 2's surplus: "
-      	   << cplex.getValue(solver.getObjectiveFunction(1)) << endl;
+      	   << solver.getObjectiveFunction(1).getValue() << endl;
       cout << "Revenue: " 
-      	   << cplex.getValue(solver.getObjectiveFunction(2)) << endl;
+      	   << solver.getObjectiveFunction(2).getValue() << endl;
       cout << "Total surplus: " 
-      	   << cplex.getValue(solver.getObjectiveFunction(3)) << endl;
+      	   << solver.getObjectiveFunction(3).getValue() << endl;
 
-      solver.setParameter(BCESolver::BoundaryObjective1,4);
-      solver.setParameter(BCESolver::BoundaryObjective2,2);
+      vector< vector<double> > bndryWeights(2,vector<double>(3));
+      bndryWeights[0] = vector<double>(3,1); // total surplus
+      bndryWeights[1][2] = 1; // revenue
       
-      solver.mapBoundary("fpaunknownbndry_correlated.dat");
+      solver.mapBoundary("fpaunknownbndry_correlated.dat",
+			 bndryWeights);
       cout << "Mapped boundary" << endl;
 
-      // BCEData data;
-      // solver.getData(data);
-      // data.setNumValues(vector<int>(2,fpa.getNumValues()));
-
-      // BCEData::save(data,filename);
-
-      // Solver.setParameter(BCESolver::BoundaryObjective1,0);
-      // solver.setParameter(BCESolver::BoundaryObjective2,1);
-      
-      // solver.mapBoundary("fpaunknownbndry_bidder.dat");
-      // cout << "Mapped boundary" << endl;
-
-
-    }
-  catch (IloException & e)
-    {
-      cerr << "Concert exception caught: " << e << endl
-	   << e.getMessage() << endl;
+      BCESolution soln;
+      solver.getSolution(soln);
+      BCESolution::save(soln,filename);
     }
   catch (BCEException & bcee)
     {

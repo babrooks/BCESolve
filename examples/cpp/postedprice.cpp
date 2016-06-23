@@ -1,5 +1,5 @@
 #include "postedprice.hpp"
-#include "bcegurobisolver.hpp"
+#include "bcesolver.hpp"
 
 int main() {
 
@@ -10,30 +10,13 @@ int main() {
   PostedPrice pp(numVals,price,prPlayer0Wins);
   pp.setHasProductStructureData(false);
 
-  BCEGurobiSolver solver(pp);
-  // BCESolver solver(apa);
+  BCESolver solver(pp);
   
   solver.populate();
   
-  GRBModel model = solver.getModel();
-  // IloCplex model = solver.getCplex();
-
-  // // CPLEX
-  // // Minimize revenue
-  // string objective = "minrev";
-  // model.getObjective().setSense(IloObjective::Minimize);
-  // model.getObjective().setExpr(solver.getObjectiveFunction(2));
-  
-  // // Maximize revenue
-  // string objective = "maxrev";
-  // cplex.getObjective().setSense(IloObjective::Minimize);
-  // cplex.getObjective().setExpr(solver.getObjectiveFunction(2));
-
-
-  // GUROBI
-  model.setObjective(solver.getObjectiveFunction(2),GRB_MINIMIZE);
-
-  solver.solve();
+  vector<double> objWeights(3,0);
+  objWeights[2]=-1;
+  solver.solve(objWeights);
 
   BCESolution soln;
 

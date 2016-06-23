@@ -39,3 +39,33 @@ ifneq "$(wildcard /opt/ibm/ILOG/CPLEX_Enterprise_Server1262/CPLEX_Studio/cplex/b
 
  CXX=g++
 endif
+
+# General settings
+# DEBUG=-g
+DEBUG=-DNDEBUG -O
+
+CSYSFLAGS = -fPIC -std=gnu++11
+LDMTFLAGS = -lpthread -lm
+
+CPPDIR=../src/cpp
+HPPDIR=../src/hpp
+EXAMPLEDIR=./cpp
+LIBDIR=../lib
+
+# Boost directories
+BOOSTINCLDIR=/usr/include/boost
+BOOSTDIR=/usr/include/boost
+
+CFLAGS = $(CSYSFLAGS) $(DEBUG) \
+	-I$(BOOSTDIR) \
+	-I$(HPPDIR) \
+	-I./hpp/ \
+	-I$(GRBDIR)/include \
+	-I$(BOOSTINCLDIR)
+
+LDFLAGS = -L$(GRBDIR)/lib \
+	-lgurobi_c++ -l$(GRBNAME) \
+	$(LDSYSFLAGS) \
+	$(LDMTFLAGS) \
+	$(LDOPTIONS) \
+	-ldl

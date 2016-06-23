@@ -5,7 +5,7 @@
 
 #include "bce.hpp"
 
-class Duopoly : public BCEGame
+class Duopoly : public BCEAbstractGame
 {
 private:
   int numValues;
@@ -15,17 +15,15 @@ private:
 public:
   BCEDistrArray distribution;
 
-  // Duopoly() {distribution.push_back(independent(),1.0);}
-  
   Duopoly(int na, int nv, int no, double _entryCost, double _margCost) 
     : BCEAbstractGame(nv*nv,na,1,no), numValues(nv), entryCost(_entryCost)
   {
-    distribution.push_back(uniform(),1.0);
+    distribution.push_back(new uniform(),1.0);
   }
 
   int getNumValues(){return numValues;}
 
-  int stateToPrivateValues(int state, vector<int> &values)
+  void stateToPrivateValues(int state, vector<int> &values) const
   {
     values.resize(2);
 
@@ -34,7 +32,7 @@ public:
     values[1]=state/numValues;
   }
 
-  double prior (int state, const vector<int> &types)
+  double prior (int state, const vector<int> &types) const
   {
     vector<int> values;
     stateToPrivateValues(state,values);
@@ -46,7 +44,7 @@ public:
     return distribution.PDF(v0,v1,incr);
   }
 
-  double objective(int state, const vector<int> &actions, int objectiveIndex)
+  double objective(int state, const vector<int> &actions, int objectiveIndex) const
   {
     // Convert the state into a pair of valuations
     vector<int> values(2,0);
@@ -101,15 +99,12 @@ public:
 	else if (surpluses[1]>max(0.0,surpluses[0]))
 	  return (valuations[1]-margCost); // Player 1 won
 	else if (surpluses[0]==surpluses[1] 
-		 && surpluses[0] >= 0);
-	return (0.5 * valuations[0] + 0.5 * valuations[1] - margCost);
+		 && surpluses[0] >= 0)
+	  return (0.5 * valuations[0] + 0.5 * valuations[1] - margCost);
       }
+    return 0;
   }
 
-  bool dominated(int a, int t, int player)
-  {
-    return false;
-  }
 };
 
 #endif

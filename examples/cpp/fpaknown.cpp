@@ -86,9 +86,6 @@ void solveFPA(int nvals, int nbids,
       BCESolution soln;
       solver.getSolution(soln);
 
-      vector< vector<double> > expObj;
-      // soln.getExpectedObjectives(expObj);
-
       string fileNameStr = filename.str();
       const char * fnameC = fileNameStr.c_str();
       BCESolution::save(soln,fnameC);

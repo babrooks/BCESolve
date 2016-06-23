@@ -255,7 +255,7 @@ public:
   //! Returns the BCESolver::model object.
   GRBModel& getModel() { return model; }
   //! Returns the \f$n\f$th objective function. 
-  const GRBLinExpr& getObjectiveFunction (int n) { return objectiveFunctions[n]; }
+  const GRBLinExpr& getObjectiveFunction (int n) const { return objectiveFunctions[n]; }
   //! Returns the objective for BCESolver::model.
   GRBLinExpr& getObjective() { return gurobiObjective; }
 

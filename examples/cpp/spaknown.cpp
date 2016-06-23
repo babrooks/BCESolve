@@ -21,7 +21,7 @@ public:
       probBehavioral(_probBehavioral)
   {};
 
-  int stateToPrivateValues(int state, vector<int> &values)
+  void stateToPrivateValues(int state, vector<int> &values) const
   {
     values.resize(2);
 
@@ -30,7 +30,7 @@ public:
     values[1]=state/numValues;
   }
 
-  double prior (int state, const vector<int> &types)
+  double prior (int state, const vector<int> &types) const
   {
     // Use a uniform prior
     vector<int> values(2,0);
@@ -38,9 +38,6 @@ public:
 
     if (values[0]==types[0] && values[1]==types[1])
       {
-	// Uniform
-	// return (1.0/numValues/numValues);
-
 	// Stephen's example
 	if (values[0] && values[1])
 	  return 4.0/9.0;
@@ -53,7 +50,7 @@ public:
       return 0.0;
   }
 
-  double objective(int state, const vector<int> &actions, int objectiveIndex)
+  double objective(int state, const vector<int> &actions, int objectiveIndex) const
   {
     // Convert the state into a pair of valuations
     vector<int> values(2,0);
@@ -115,14 +112,13 @@ public:
       }
   }
 
-  bool dominated(int a, int t, int player)
+  bool dominated(int a, int t, int player) const
   {
-    // if ((static_cast<double>(a))/(static_cast<double>(numActions[player]) - 1.0) 
-    // 	> (static_cast<double>(t))/(static_cast<double>(numTypes[player]) - 1.0))
-    //   return (true);
-    // else
-    //   return (false);
-    return (false);
+    if ((static_cast<double>(a))/(static_cast<double>(numActions[player]) - 1.0) 
+    	> (static_cast<double>(t))/(static_cast<double>(numTypes[player]) - 1.0))
+      return (true);
+    else
+      return (false);
   }
 };
 

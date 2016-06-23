@@ -5,7 +5,7 @@
 
 #include "bce.hpp"
 
-class SPAUnknown : public BCEGame
+class SPAUnknown : public BCEAbstractGame
 {
 private:
   int numValues;
@@ -14,22 +14,22 @@ private:
   double lowbid;
 
 public:
-  distributionArray distribution;
+  BCEDistrArray distribution;
 
-  SPAUnknown() {distribution.push_back(independent(),1.0);}
+  SPAUnknown() {distribution.push_back(new uniform(),1.0);}
   
   SPAUnknown(int na, int nv, double _entryCost,double _highbid) 
-    : BCEGame(2,nv*nv,na,1,5), numValues(nv), 
+    : BCEAbstractGame(nv*nv,na,1,5), numValues(nv), 
       entryCost(_entryCost), highbid(_highbid),
       lowbid(-0.1)
   {
-    distribution.push_back(vToTheAlpha(1.0),1.0);
-    // distribution.push_back(uniform(),1.0);
+    setNumPrivateStates(vector<int>(2,nv));
+    distribution.push_back(new vToTheAlpha(1.0),1.0);
   }
 
-  int getNumValues(){return numValues;}
+  int getNumValues(){return numValues;} const
 
-  int stateToPrivateValues(int state, vector<int> &values)
+  void stateToPrivateValues(int state, vector<int> &values) const
   {
     values.resize(2);
 
@@ -38,7 +38,7 @@ public:
     values[1]=state/numValues;
   }
 
-  double prior (int state, const vector<int> &types)
+  double prior (int state, const vector<int> &types) const
   {
     vector<int> values;
     stateToPrivateValues(state,values);
@@ -49,17 +49,16 @@ public:
     if (numValues == 2)
       {
 	double p = 0.4;
-	if (v0 == 1 && v1 == 0
-	    || v0 == 0 && v1 == 1)
+	if (v0 == 1 && (v1 == 0
+			|| (v0 == 0 && v1 == 1) ))
 	  return p;
 	return (1.0-2*p)/2.0;
       }
 
-    // return PDF(distribution,v0,v1,incr);
-    return PDF(distribution,v0,v1,incr);
+    return distribution.PDF(v0,v1,incr);
   }
 
-  double objective(int state, const vector<int> &actions, int objectiveIndex)
+  double objective(int state, const vector<int> &actions, int objectiveIndex) const
   {
     // Convert the state into a pair of valuations
     vector<int> values(2,0);
@@ -111,10 +110,6 @@ public:
     return obj;
   } // objective
 
-  bool dominated(int a, int t, int player)
-  {
-    return false;
-  }
 };
 
 #endif

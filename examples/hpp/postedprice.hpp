@@ -76,6 +76,7 @@ public:
 	  return price;
 	  
       }
+    return 0;
   } // objective 
 
 };

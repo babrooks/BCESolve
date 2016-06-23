@@ -134,14 +134,17 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
   setWindowTitle(QApplication::translate("bceviewer","BCE Solution Viewer"));
 
   // Load in default Game
-  BCEGame defaultGame;
-  QString defaultPath = "../examples/prisonervsbattle.bgm";
-  QByteArray ba = defaultPath.toLocal8Bit();
-  const char* defaultPath_c = ba.data();
-  BCEGame::load(defaultGame,defaultPath_c);
-
-  gameTab->setGame(defaultGame);
-
+  try
+    {
+      PrisonerVsBattle pvb;
+      BCEGame defaultGame(pvb);
+      gameTab->setGame(defaultGame);
+    }
+  catch (BCEException & e)
+    {
+      qDebug() << "BCEException caught: " << endl
+	       << e.what() << endl;
+    }
 } // Default Constructor
 
 void BCEWindow::loadSolution() {

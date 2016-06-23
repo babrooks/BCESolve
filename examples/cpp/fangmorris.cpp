@@ -34,8 +34,8 @@ void solveModel (double signalAccuracy)
 
   cout << "Starting main" << endl;
 
-  FangMorris fpa(nbids,entryCost,signalAccuracy);
-  BCEGurobiSolver solver(fpa);
+  FangMorris fma(nbids,entryCost,signalAccuracy);
+  BCESolver solver(fma);
 
   solver.setParameter(BCESolver::MinAngleIncrement,minAngleIncrement);
 
@@ -47,49 +47,14 @@ void solveModel (double signalAccuracy)
 
       char filename[100];
       sprintf(filename,"fangmorris_nb=%d_sig=%1.2f.bce",nbids,signalAccuracy);
-      // sprintf(filename,"fangmorris_-p1+p0_nb=%d_entrycost_%1.2f_signalacc_%1.2f.bce",
-      // 	      nbids,entryCost,signalAccuracy);
-
-      model.setObjective(-solver.getObjectiveFunction(1)
-			 +solver.getObjectiveFunction(0),GRB_MAXIMIZE);
-      cout << "Objective function set" << endl;
-      
-      // solver.solve();
-      // cout << "Solved" << endl;
-
-      // cout << "Objective = " << setprecision(16) << cplex.getObjValue() << endl;
 
       solver.mapBoundary();
 
       BCESolution data;
       solver.getSolution(data);
-      // data.setNumValues(vector<int>(2,2));
-
-      // vector<int> sortObj(2,0);
-      // sortObj[1]=1;
-      // data.sortEquilibria(sortObj);
 
       BCESolution::save(data,filename);
 
-      // vector< vector<int> > actionConditions(2,vector<int>(0));
-      // vector< vector<int> > typeConditions(2,vector<int>(0));
-      // vector<int> stateConditions(0);
-
-      // // actionConditions[0] = vector<int>(3,0);
-      // // actionConditions[0][1] = 1;
-      // // actionConditions[0][2] = 2;
-      // // stateConditions = vector<int>(1,0);
-
-      // vector<double> distr;
-
-      // data.getConditionalMarginal(stateConditions,actionConditions,typeConditions,
-      // 				  false, vector<bool>(2,false),vector<bool>(2,true),
-      // 				  distr);
-    }
-  catch (IloException & e)
-    {
-      cerr << "Concert exception caught: " << e << endl
-	   << e.getMessage() << endl;
     }
   catch (BCEException & err)
     {

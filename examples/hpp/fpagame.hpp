@@ -53,14 +53,17 @@ public:
       lowbid(0.0), reservePrice(_reservePrice),
       exAnteFee(_exAnteFee)
   {
+    setNumPrivateStates(vector<int>(2,nv));
+    
     distribution.push_back(new vToTheAlpha(1.0),1.0);
     // distribution.push_back(new additiveCorrelated(),1.0);
     // distribution.push_back(new uniform(),1.0);
+    // distribution.push_back(new bernoulli(0.25),1.0);
   }
 
   int getNumValues() const {return numValues;}
 
-  int stateToPrivateValues(int state, vector<int> &values) const
+  void stateToPrivateValues(int state, vector<int> &values) const
   {
     values.resize(2);
 
@@ -77,16 +80,6 @@ public:
     double v1 = static_cast<double>(values[1]+1)/numValues;
     double incr = 1.0/numValues;
 
-    if (numValues == 2)
-      {
-    	double p = 0.25;
-    	if (v0 == 1 && v1 == 0
-    	    || v0 == 0 && v1 == 1)
-    	  return p;
-    	return (1.0-2*p)/2.0;
-      }
-
-    // return PDF(distribution,v0,v1,incr);
     return distribution.PDF(v0,v1,incr);
   }
 
@@ -139,8 +132,6 @@ public:
   	     && dev == 0); // Just exclude deviations from positive to
 			   // zero actions.
   }
-
-  friend class FPASolver;
 };
 
 #endif

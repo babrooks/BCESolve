@@ -6,34 +6,31 @@ int main() {
   int numVals = 30;
   double weightOnOwnBid = 1;
   double reservePrice = .25;
-  double entryFee = 0;
+  double entryFee = 0.0;
+  double highBid = 1.0;
 
   HybridEntryReserve hera(numVals,
 			  numBids,
 			  weightOnOwnBid,
 			  reservePrice,
-			  entryFee);
+			  entryFee,
+			  highBid);
 
   BCESolver solver(hera);
   
   solver.populate();
   
   // Minimize Revenue
-  IloCplex cplex = solver.getCplex();
-  // cplex.getObjective().setSense(IloObjective::Maximize);
-  // cplex.getObjective().setExpr(.5*solver.getObjectiveFunction(0) + 
-  // 			       .5*solver.getObjectiveFunction(1));
-  cplex.getObjective().setSense(IloObjective::Minimize);
-  cplex.getObjective().setExpr(solver.getObjectiveFunction(2));
-  
-  solver.solve();
+  vector<double> objWeights(3,0);
+  objWeights[2]=-1;
+  solver.solve(objWeights);
 
   BCESolution data;
   solver.getSolution(data);
   
-  cout << "Objective 0: " << cplex.getValue(solver.getObjectiveFunction(0)) << endl;
-  cout << "Objective 1: " << cplex.getValue(solver.getObjectiveFunction(1)) << endl;
-  cout << "Objective 2: " << cplex.getValue(solver.getObjectiveFunction(2)) << endl;
+  cout << "Objective 0: " << solver.getObjectiveFunction(0).getValue() << endl;
+  cout << "Objective 1: " << solver.getObjectiveFunction(1).getValue() << endl;
+  cout << "Objective 2: " << solver.getObjectiveFunction(2).getValue() << endl;
 
   stringstream fName;
   fName << "hybridauction_nv=" << numVals

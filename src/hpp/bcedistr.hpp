@@ -260,6 +260,32 @@ public:
 
 }; // uniform
 
+//! Bernoulli distribution
+class bernoulli: public BCEDistr
+{
+private:
+  double lowProb;
+public:
+  bernoulli(double _lowProb): lowProb(_lowProb) {};
+
+  double CDF(double v0, double v1) const
+  {
+    double p = 1.0;
+    if (v0<0)
+      return 0.0;
+    else if (v0<1)
+      p *= lowProb;
+
+    if (v1<0)
+      return 0.0;
+    else if (v1 < 1)
+      p *= lowProb;
+    
+    return p;
+  }
+
+}; // bernoulli
+
 //! Uniform w/ mass at zero
 class uniformWithMassPnt: public BCEDistr
 {

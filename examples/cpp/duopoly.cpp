@@ -2,7 +2,7 @@
 // BAB 2-12-2013
 
 #include "duopoly.hpp"
-#include "bcegurobisolver.hpp"
+#include "bcesolver.hpp"
 
 int main(int argc, char ** argv)
 {
@@ -20,9 +20,11 @@ int main(int argc, char ** argv)
 
   Duopoly duop(numBids,numVals,4,entryCost,margCost);
 
-  BCEGurobiSolver solver(duop);
+  BCESolver solver(duop);
 
-  solver.setParameter(BCEGurobiSolver::MinAngleIncrement,minAngleIncrement);
+  solver.setParameter(BCESolver::MinAngleIncrement,minAngleIncrement);
+
+  vector<double> objWeights(4,0);
 
   cout << "Constructor finished" << endl;
   try
@@ -30,41 +32,19 @@ int main(int argc, char ** argv)
       solver.populate();
       cout << "Done populating" << endl;
 
-      // // Sum of bidders' surplus
-      // cplex.getObjective().setExpr(solver.getObjectiveFunction(1)+solver.getObjectiveFunction(0));
-      
-      // cplex.setParam(IloCplex::RootAlg,IloCplex::Dual);
+      objWeights[0]=1;
+      solver.solve(objWeights);
 
-      solver.model.setObjective(1.0*solver.getObjectiveFunction(0),GRB_MAXIMIZE);
-      cout << "Objective function set" << endl;
-      solver.solve();
-      // cout << "Solved" << endl;
-      // cout << "Objective = " << setprecision(16) << cplex.getObjValue() << endl;
-
-      solver.model.setObjective(1.0*solver.getObjectiveFunction(1),GRB_MINIMIZE);
-      cout << "Objective function set" << endl;
-      solver.solve();
-      // cout << "Solved" << endl;
-      // cout << "Objective = " << setprecision(16) << cplex.getObjValue() << endl;
+      objWeights[0]=0; objWeights[1]=1;
+      solver.solve(objWeights);
 
       solver.mapBoundary();
       cout << "Mapped boundary" << endl;
 
       BCESolution data;
       solver.getSolution(data);
-      // data.setNumValues(vector<int>(2,duop.getNumValues()));
-
-      // cout << "Sorting data." << endl;
-      // vector<int> sortObj(2,0);
-      // sortObj[1]=1;
-      // data.sortEquilibria(sortObj);
 
       BCESolution::save(data,filename);
-    }
-  catch (IloException & e)
-    {
-      cerr << "Concert exception caught: " << e << endl
-	   << e.getMessage() << endl;
     }
   catch (BCEException & bcee)
     {

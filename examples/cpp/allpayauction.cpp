@@ -15,15 +15,16 @@ int main() {
   catch(BCEException &e) {
     cout << e.getMessage() << endl;
   }
-
+  
   // Minimize Revenue by default.
   // Objective function 0 is player 0 payoff.
   // Objective function 1 is player 1 payoff.
   // Objective function 2 is seller revenue.
-  solver.model.setObjective(solver.getObjectiveFunction(2),GRB_MINIMIZE);
-
+  vector<double> objWeights(3);
+  objWeights[2]=-1;
+  
   try {
-  solver.solve();
+    solver.solve(objWeights);
   }
   catch(BCEException &e) {
     cout << e.getMessage() << endl;

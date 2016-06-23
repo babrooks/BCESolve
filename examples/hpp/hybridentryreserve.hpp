@@ -102,6 +102,8 @@ public:
 	else 
 	  return weightOnOwnBid*b1+(1.0-weightOnOwnBid)*b0+entryFeeRevenue;	  
       }
+
+    return 0;
   } // objective
 
 

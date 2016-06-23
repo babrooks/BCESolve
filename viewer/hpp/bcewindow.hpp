@@ -31,6 +31,7 @@
 #include "bcesolverworker.hpp"
 #include "hybridentryreserve.hpp"
 #include "commonvalueauction.hpp"
+#include "prisonervsbattle.hpp"
 #include "fpaknown.hpp"
 #include "fpaunknown.hpp"
 
