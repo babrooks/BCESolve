@@ -141,6 +141,9 @@ protected:
     in the BCEAbstractGame object. */
   vector<GRBLinExpr> objectiveFunctions; 
 
+  //! Indicates if solver has been populated yet
+  bool isPopulated;
+  
   //! List of indices of non-zero variables
   /*! The solver only creates variables for events that could occur
     with positive probability under the prior in the BCEAbstractGame

@@ -56,7 +56,8 @@ public:
       InvalidParameterValue, /*!< Parameter value was invalid. */
       ICConstraintViolated, /*!< Incentive constraint violated. */
       WrongDistnSize, /*!< Size of Distn doesn't reflect the number of actions. */
-      WrongWeightSize /*! Size of Weights given in BCESolver::solve() doesn't match number of objs. */
+      WrongWeightSize, /*! Size of Weights given in BCESolver::solve() doesn't match number of objs. */
+      AlreadyPopulated /*!< Solver is already populated */
     };
 
   //! Gives the error code for this BCEException.
@@ -81,56 +82,40 @@ public:
       {
       case OutOfBounds: 
 	return "An index was out of the provided bounds.";
-      	break;
       case ConditionFailed: 
 	return "A condition we imposed failed.";
-	break;
       case BCECounterConditionFailed:
 	return "A condition we imposed in bcecounter.cpp failed.";
-	break;
       case BCEAbstractGameConditionFailed:
 	return "A condition we imposed in bceabstractgame.cpp failed.";
-	break;
       case NoEquilibria: 
 	return "There are no equilibria.";
-	break;
       case MapFrontierNotOptimal: 
 	return "Map frontier is not optimal.";
-	break;
       case FailedOpen: 
 	return "The file failed to open.";
-	break;
       case NotProbDistr: 
 	return "Probabilities are misbehaving. At least one is negative or greater than 1, or they do not sum to 1.";
-	break;
       case BadArgument: 
 	return "A bad argument was received.";
-	break;
       case BadArgumentBCEComparator:
 	return "A bad argument was received in bcecomparator.cpp.";
-	break;
       case BadArgumentBCEUtilities:
 	return "A bad argument was received in bceutilities.cpp.";
-	break;
       case BadArgumentBCEAbstractGame:
 	return "A bad argument was received in bceabstractgame.cpp.";
-	break;
       case InvalidParameterName: 
 	return "Parameter name wasn't recognized.";
-	break;
       case InvalidParameterValue: 
 	return "A parameter value is invalid.";
-	break;
       case ICConstraintViolated:
 	return "An incentive constraint was violated.";
-	break;
       case WrongDistnSize:
 	return "Distribution given in solution data does not reflect the correct number of actions.";
-	break;
-      case WrongWeightSize: {
+      case WrongWeightSize: 
 	return "Size of the weight vector supplied as an argument to BCESolver::solve(weights) does not match the number of objectives. Check your specification in the example file.";
-      }
-	break;
+      case AlreadyPopulated:
+	return "Solver is already populated.";      
       } // switch
   }
 };

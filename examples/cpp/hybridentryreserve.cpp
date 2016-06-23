@@ -1,9 +1,31 @@
+// This file is part of the BCESolve library for games of incomplete
+// information
+// Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton
+// 
+// BCESolve free software: you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// BCESolve is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see
+// <http://www.gnu.org/licenses/>.
+// 
+// Benjamin A. Brooks
+// ben@benjaminbrooks.net
+// Chicago, IL
+
 #include "hybridentryreserve.hpp"
 
 int main() {
 
-  int numBids = 30;
-  int numVals = 30;
+  int numBids = 15;
+  int numVals = 15;
   double weightOnOwnBid = 1;
   double reservePrice = .25;
   double entryFee = 0.0;
@@ -28,10 +50,6 @@ int main() {
   BCESolution data;
   solver.getSolution(data);
   
-  cout << "Objective 0: " << solver.getObjectiveFunction(0).getValue() << endl;
-  cout << "Objective 1: " << solver.getObjectiveFunction(1).getValue() << endl;
-  cout << "Objective 2: " << solver.getObjectiveFunction(2).getValue() << endl;
-
   stringstream fName;
   fName << "hybridauction_nv=" << numVals
 	<< "_nb=" << numBids

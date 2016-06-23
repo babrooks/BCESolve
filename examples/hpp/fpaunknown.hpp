@@ -22,6 +22,7 @@
 
 // Header file for fpaunknown example.
 // BAB 11-3-2012
+//! @example
 #ifndef FPAUNKNOWN_HPP
 #define FPAUNKNOWN_HPP
 

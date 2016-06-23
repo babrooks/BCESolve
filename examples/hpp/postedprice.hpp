@@ -20,6 +20,7 @@
 // ben@benjaminbrooks.net
 // Chicago, IL
 
+//! @example
 #ifndef POSTEDPRICE_HPP
 #define POSTEDPRICE_HPP
 

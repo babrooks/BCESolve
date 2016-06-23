@@ -22,6 +22,7 @@
 
 // Header for all pay auction example.
 // RJM 9-17-2015
+//! @example
 
 #ifndef ALLPAYAUCTION_HPP
 #define ALLPAYAUCTION_HPP

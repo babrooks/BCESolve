@@ -1,3 +1,25 @@
+// This file is part of the BCESolve library for games of incomplete
+// information
+// Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton
+// 
+// BCESolve free software: you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// BCESolve is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see
+// <http://www.gnu.org/licenses/>.
+// 
+// Benjamin A. Brooks
+// ben@benjaminbrooks.net
+// Chicago, IL
+
 // First price auction with common but not perfectly correlated values
 // BAB 11-3-2012
 
@@ -8,8 +30,8 @@ int main(int argc, char ** argv)
   double entryCost=0.0;
   double reservePrice=0;
   double minAngleIncrement = 0.025;
-  int nb = 35;
-  int nv = 10;
+  int nb = 15;
+  int nv = 15;
 
   double highbid = 1.0;
 
@@ -33,7 +55,7 @@ int main(int argc, char ** argv)
       solver.populate();
       cout << "Done populating" << endl;
 
-      vector<double> objWeights(4,0);
+      vector<double> objWeights(3,0);
       objWeights[2]=-1;
       solver.solve(objWeights);
       cout << "Solved" << endl;
@@ -48,7 +70,7 @@ int main(int argc, char ** argv)
       	   << solver.getObjectiveFunction(3).getValue() << endl;
 
       vector< vector<double> > bndryWeights(2,vector<double>(3));
-      bndryWeights[0] = vector<double>(3,1); // total surplus
+      bndryWeights[0] = vector<double>(3,1);// total surplus
       bndryWeights[1][2] = 1; // revenue
       
       solver.mapBoundary("fpaunknownbndry_correlated.dat",
@@ -61,9 +83,8 @@ int main(int argc, char ** argv)
     }
   catch (BCEException & bcee)
     {
-      cerr << "BCEException caught: " << endl;
-      if (bcee.errorType == BCEException::NotProbDistr)
-	cerr << "Not a probability distribution" << endl;
+      cerr << "BCEException caught: " << endl
+	   << bcee.getMessage() << endl;
     }
   catch (...)
     {

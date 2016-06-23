@@ -24,6 +24,7 @@
    reserve and entree fee example.
    RJM 9-18-2015
 */
+//! @example
 
 #ifndef HYBRIDENTRYRESERVE_HPP
 #define HYBRIDENTRYRESERVE_HPP

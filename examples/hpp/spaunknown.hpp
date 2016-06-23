@@ -1,5 +1,28 @@
+// This file is part of the BCESolve library for games of incomplete
+// information
+// Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton
+// 
+// BCESolve free software: you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// BCESolve is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see
+// <http://www.gnu.org/licenses/>.
+// 
+// Benjamin A. Brooks
+// ben@benjaminbrooks.net
+// Chicago, IL
+
 // Header file for spaunknown example.
 // BAB 11-3-2012
+//! @example
 #ifndef SPAUNKNOWN_HPP
 #define SPAUNKNOWN_HPP
 
@@ -19,7 +42,7 @@ public:
   SPAUnknown() {distribution.push_back(new uniform(),1.0);}
   
   SPAUnknown(int na, int nv, double _entryCost,double _highbid) 
-    : BCEAbstractGame(nv*nv,na,1,5), numValues(nv), 
+    : BCEAbstractGame(nv*nv,na,1,4), numValues(nv), 
       entryCost(_entryCost), highbid(_highbid),
       lowbid(-0.1)
   {
@@ -101,10 +124,6 @@ public:
 	  obj = (1.0*values[0]/(numValues-1.0)); // Player 1 won
 	else
 	  obj = (1.0*values[1]/(numValues-1.0)); // Either player 2 won or they tied with same val.
-      }
-    else if (objectiveIndex==4)
-      {
-	return objective(state,actions,0)+objective(state,actions,1);
       }
     
     return obj;

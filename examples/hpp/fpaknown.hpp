@@ -20,6 +20,7 @@
 // ben@benjaminbrooks.net
 // Chicago, IL
 
+//! @example
 #ifndef FPAKNOWN_HPP
 #define FPAKNOWN_HPP
 

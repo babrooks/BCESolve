@@ -1,3 +1,25 @@
+// This file is part of the BCESolve library for games of incomplete
+// information
+// Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton
+// 
+// BCESolve free software: you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// BCESolve is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see
+// <http://www.gnu.org/licenses/>.
+// 
+// Benjamin A. Brooks
+// ben@benjaminbrooks.net
+// Chicago, IL
+
 #include "bce.hpp"
 
 BCESolver::BCESolver ():
@@ -7,7 +29,8 @@ BCESolver::BCESolver ():
   constraints(),
   objectiveFunctions(2,GRBLinExpr()),
   minAngleIncrement(1e-4),
-  displayLevel(1)
+  displayLevel(1),
+  isPopulated(false)
 {} // Default constructor
 
 BCESolver::BCESolver (BCEAbstractGame & _game):
@@ -24,7 +47,8 @@ BCESolver::BCESolver (BCEAbstractGame & _game):
   numTypes_total(1),
   numActionsTypes_total(1),
   numActionsTypesPerPlayer_total(0),
-  displayLevel(1)
+  displayLevel(1),
+  isPopulated(false)
 {
   // Set the total type/action variables
   countActionsTypes();
@@ -138,6 +162,10 @@ bool BCESolver::getParameter(BCESolver::BoolParameter param)
 // Constructs the constraint matrix and objective function
 void BCESolver::populate ()
 {
+  if (isPopulated)
+    throw(BCEException(BCEException::AlreadyPopulated));
+  isPopulated = true;
+  
   const int numPlayers = 2;
   const int numStates = game->getNumStates();
   const int numObjectives = game->getNumObjectives();

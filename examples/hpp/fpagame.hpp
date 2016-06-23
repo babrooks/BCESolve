@@ -20,7 +20,7 @@
 // ben@benjaminbrooks.net
 // Chicago, IL
 
-// Header file for fpaunknown example.
+// Base game class for fpa examples.
 // BAB 11-3-2012
 //! @example
 
