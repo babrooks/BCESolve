@@ -1,6 +1,6 @@
 // This file is part of the BCESolve library for games of incomplete
 // information
-// Copyright (C) 2016 Benjamin A. Brooks, Robert J. Minton
+// Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton
 // 
 // BCESolve free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by
