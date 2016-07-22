@@ -110,6 +110,7 @@ LIBS += -L/usr/lib/x86_64-linux-gnu/ -L/usr/local/lib -lboost_serialization -lbo
 
 LIBS += -L../lib/ -L/usr/local/lib/ -L/usr/lib/x86_64-linux-gnu
 
+DESTDIR = ./build
 
 MOC_DIR = ./tmp
 OBJECTS_DIR = ./tmp

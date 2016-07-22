@@ -42,7 +42,7 @@ public:
   CommonValueAuction(int _na, int _nv, double _alpha,
 		     double _highBid, double _rp,
 		     double _entryCost):
-    BCEAbstractGame(_nv,_na,1,3),alpha(_alpha),
+    BCEAbstractGame(_nv,_na+1,1,3),alpha(_alpha),
     highBid(_highBid),reservePrice(_rp),entryCost(_entryCost) 
   { }
 
@@ -59,13 +59,13 @@ public:
 		    const vector<int> & actions,
 		    int obj) const {
   
-    if (obj<2)
+    if (obj<2 && actions[obj]>0)
       {
 	// obj is the player whose payoff we are returning
 	
 	double val = static_cast<double>(state)/(numStates-1.0);
-	double ownBid = highBid*static_cast<double>(actions[obj])/(numActions[obj]-1.0);
-	double otherBid = highBid*static_cast<double>(actions[1-obj])/(numActions[obj]-1.0);
+	double ownBid = highBid*static_cast<double>(actions[obj]-1)/(numActions[obj]-2.0);
+	double otherBid = highBid*static_cast<double>(actions[1-obj]-1)/(numActions[obj]-2.0);
 
 	if (ownBid < reservePrice)
 	  return ceil(ownBid)*entryCost;
@@ -82,17 +82,17 @@ public:
       } // players' payoffs
     else if (obj==2)
       {	
-	double b0 = highBid*static_cast<double>(actions[0])/(numActions[0]-1.0);
-	double b1 = highBid*static_cast<double>(actions[1])/(numActions[1]-1.0);
-	
-	double winningBid = b0;
-	if (b1 > b0) {
-	  winningBid = b1;
+	int highBid = actions[0];
+	if (actions[1] > actions[0]) {
+	  highBid = actions[1];
 	}
+	if (highBid == 0)
+	  return 0.0;
 
+	double winningBid = (highBid-1.0)/(numActions[0]-2.0);
+	
 	if (winningBid >= reservePrice)
 	  return winningBid + entryCost;
-
 	else 
 	  return ceil(winningBid)*entryCost;
 
