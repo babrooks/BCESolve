@@ -43,6 +43,6 @@ $(MAINS): % : $(EXAMPLEDIR)/%.cpp
 	 $(LDFLAGS) -L./cpp -L../lib -o $@ 
 
 clean:
-	rm -rf *.o $(MAINS)
+	$(RMCMD) *.o $(MAINS)
 	make -C ../lib clean
 

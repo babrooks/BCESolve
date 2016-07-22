@@ -39,5 +39,5 @@ libbce.a: $(BCEOBJ)
 	ranlib $(LIBDIR)/libbce.a
 
 clean:
-	rm -rf *.o $(BCEMAINS)
+	$(RMCMD) *.o $(BCEMAINS)
 
