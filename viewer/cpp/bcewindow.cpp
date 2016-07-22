@@ -315,8 +315,8 @@ void BCEWindow::saveGame() {
 
 void BCEWindow::runSolve() {
 
-  // try
-  //   {
+  try
+    {
       delete callback;
       callback = new BCEGurobiCallback();
 
@@ -332,7 +332,7 @@ void BCEWindow::runSolve() {
       
       // Reimplement when adding cancelGame()
       // cancelSolveFlag = false;
-      
+
       QThread *solverWorkerThread = new QThread(this);
       solverWorker = new BCESolverWorker(gameTab->getGame(),
 					 gameTab->getWeightsOnObjectives(),
@@ -354,22 +354,22 @@ void BCEWindow::runSolve() {
       connect(solverWorkerThread,SIGNAL(finished()),
 	      solverWorker,SLOT(deleteLater()));
       solverWorkerThread->start();
-  //   }
-  // catch(BCEException &e) {
-  //   displayException(QString::fromStdString(e.getMessage()));
-  // }
-  // catch(GRBException &e) {
-  //   displayException(QString::fromStdString(e.getMessage() + 
-  // 			     "The error code for this GRBException was: " +
-  // 			     to_string(e.getErrorCode())));
-  // }
-  // catch(exception & e)
-  //   {
-  //     string str(e.what());
-  //     QMessageBox::critical(this,tr("Solver failed"),
-  // 			    QString::fromStdString("Gurobi was not able to solve your game. Message : " + str),
-  // 			    QMessageBox::Ok);
-  //   }
+    }
+  catch(BCEException &e) {
+    displayException(QString::fromStdString(e.getMessage()));
+  }
+  catch(GRBException &e) {
+    displayException(QString::fromStdString(e.getMessage() + 
+  			     "The error code for this GRBException was: " +
+  			     to_string(e.getErrorCode())));
+  }
+  catch(exception & e)
+    {
+      string str(e.what());
+      QMessageBox::critical(this,tr("Solver failed"),
+  			    QString::fromStdString("Gurobi was not able to solve your game. Message : " + str),
+  			    QMessageBox::Ok);
+    }
   
 }
 

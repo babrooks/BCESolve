@@ -92,10 +92,10 @@ public slots:
     objective, i.e. minimizing. 
   */
   void startSolve() {
-
-    BCESolver solver(game);
-
     try {
+    
+      BCESolver solver(game);
+
       // Populate constraints
       solver.populate();
 
