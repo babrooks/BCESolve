@@ -20,6 +20,7 @@
 # ben@benjaminbrooks.net
 # Chicago, IL
 
+# Boost directories
 BOOSTINCLDIR=/usr/include/boost
 BOOSTDIR=/usr/include/boost
 
@@ -94,10 +95,6 @@ CPPDIR=../src/cpp
 HPPDIR=../src/hpp
 EXAMPLEDIR=./cpp
 LIBDIR=../lib
-
-# Boost directories
-BOOSTINCLDIR=/usr/include/boost
-BOOSTDIR=/usr/include/boost
 
 CFLAGS = $(CSYSFLAGS) $(DEBUG) \
 	-I$(BOOSTDIR) \
