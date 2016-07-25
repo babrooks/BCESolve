@@ -32,8 +32,8 @@ CONFIG += WARN_OFF
 CONFIG += debug
 
 QMAKE_CXXFLAGS += -std=gnu++11
-QMAKE_CXXFLAGS += -m64 -lm -lpthread  -O0 -O -fPIC -fexceptions -DNDEBUG -DIL_STD 
-QMAKE_LFLAGS += -m64 -lm -lpthread  -m64 -O -fPIC -fexceptions -DNDEBUG -DIL_STD
+QMAKE_CXXFLAGS += -lm -lpthread  -O0 -O -fPIC -fexceptions 
+QMAKE_LFLAGS += -lm -lpthread  -O -fPIC -fexceptions 
 
 INCLUDEPATH += /usr/local/include \
 /usr/local/lib \
@@ -42,7 +42,8 @@ INCLUDEPATH += /usr/local/include \
 ../viewer/cpp \
 ../viewer/hpp \
 ../examples/hpp \
-/usr/include/boost
+/usr/include/boost \
+"C:\Program Files\boost\boost_1_60_0"
 
 VPATH += ../src/cpp \
 ../src/hpp \
@@ -101,12 +102,16 @@ include(../localviewersettings.mk)
 
 linux-g++ {
 LIBS +=  -Bstatic -L../lib -Wl,-Bstatic  -L/usr/lib/x86_64-linux-gnu/ -lboost_serialization -lboost_system -Wl,-Bdynamic
+LIBS += -L/usr/lib/x86_64-linux-gnu/ -L/usr/local/lib -lboost_serialization -lboost_system
 }
 macx {
 LIBS +=
-}
-
 LIBS += -L/usr/lib/x86_64-linux-gnu/ -L/usr/local/lib -lboost_serialization -lboost_system
+}
+win32 {
+LIBS += -L"C:\Program Files\boost\boost_1_60_0\bin.v2\libs\serialization\build\gcc-mingw-4.9.2\debug\link-static\threading-multi" \
+ -lboost_serialization-mgw49-mt-d-1_60 -L../lib/ -lbce
+}
 
 LIBS += -L../lib/ -L/usr/local/lib/ -L/usr/lib/x86_64-linux-gnu
 

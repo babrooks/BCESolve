@@ -56,7 +56,7 @@ endif
 ifneq "$(wildcard C:\Users\babrooks\ )" "" 
  $(info Compiling on Bens windows laptop)
 
- GRBDIR=C:\gurobi652\win64
+ GRBDIR=C:\gurobi652\win32
  GRBINCLDIR=$(GRBDIR)\include
  GRBLIBDIR=$(GRBDIR)\lib
  GRBNAME=gurobi65
