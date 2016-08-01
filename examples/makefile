@@ -33,7 +33,7 @@ MAINS=allpayauction commonvalueauction duopoly \
 all: $(MAINS)
 
 $(MAINS): % : $(EXAMPLEDIR)/%.cpp
-	make -C ../lib
+	mingw32-make -C ../lib
 	$(CXX) $(CFLAGS) -I$(GRBDIR)/include \
 	$< -L. $(STATIC) -lbce $(STATIC) -L/usr/lib/x86_64-linux-gnu/ \
 	-lboost_serialization -L$(GRBDIR)/lib \
