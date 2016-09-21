@@ -25,9 +25,9 @@
 int main() {
 
   double entryCost = 0.0;
-  double reservePrice = 0.0;
-  int nv = 30;
-  int nbids = 30;
+  double reservePrice = 0.125;
+  int nv = 50;
+  int nbids = 50;
   double highBid = 1;
   double alpha = 1;
 

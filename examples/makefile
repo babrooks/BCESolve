@@ -28,7 +28,8 @@ include ../localsettings.mk
 
 MAINS=allpayauction commonvalueauction duopoly \
 	fangmorris fpaknown fpaunknown \
-	hybridentryreserve postedprice spaunknown
+	hybridentryreserve postedprice spaunknown \
+	smoothauction maxminconj
 
 all: $(MAINS)
 
