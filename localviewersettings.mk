@@ -43,6 +43,15 @@ GRBDIR=/Library/gurobi650/mac64
 
 } # Ben's macbook pro
 
+
+exists( C:\Users\babrooks ) {
+message("QMAKE run on Ben's windows laptop...")
+
+GRBNAME=gurobi65
+GRBDIR=C:\gurobi652\win32
+
+} # Ben's windows laptop
+
 LIBS += -L$${GRBDIR}/lib -lgurobi_c++ -l$${GRBNAME}
 INCLUDEPATH += $${GRBDIR}/include
 VPATH += $${GRBDIR}/include
