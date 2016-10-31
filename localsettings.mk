@@ -32,6 +32,9 @@ ifneq "$(wildcard /Users/benjaminbrooks/Applications/IBM/ILOG/CPLEX_Studio1262/c
  GRBLIBDIR=$(GRBDIR)/lib
  GRBNAME=gurobi65
 
+ BOOSTINCLDIR=/usr/local/include/
+ BOOSTDIR=/usr/local/lib/
+
  STATIC=
  DYNAMIC=
 

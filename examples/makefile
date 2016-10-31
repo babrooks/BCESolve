@@ -29,15 +29,14 @@ include ../localsettings.mk
 MAINS=allpayauction commonvalueauction duopoly \
 	fangmorris fpaknown fpaunknown \
 	hybridentryreserve postedprice spaunknown \
-	smoothauction maxminconj
+	smoothauction maxminconj songzi
 
 all: $(MAINS)
 
 $(MAINS): % : $(EXAMPLEDIR)/%.cpp
-	mingw32-make -C ../lib
 	$(CXX) $(CFLAGS) -I$(GRBDIR)/include \
 	$< -L. $(STATIC) -lbce $(STATIC) -L/usr/lib/x86_64-linux-gnu/ \
-	-lboost_serialization -L$(GRBDIR)/lib \
+	-L$(BOOSTDIR) -lboost_serialization -L$(GRBDIR)/lib \
 	-lgurobi_c++ \
 	$(DYNAMIC) -L$(GRBDIR)/lib \
 	-l$(GRBNAME) \
