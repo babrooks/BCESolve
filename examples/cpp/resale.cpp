@@ -1,65 +1,68 @@
+// Computes minimum revenue for the resale mechanism
+
 #include "bce.hpp"
 
-class MyMech : public BCEAbstractGame
+class ResaleMech : public BCEAbstractGame
 {
 private:
-  double a;
+  double r;
 public:
-  MyMech(int na):
-    BCEAbstractGame(2,na,1,3),
-    a(0.24)
-  {
-    
-  }
+  ResaleMech(int na,int ns,double _r):
+    BCEAbstractGame(ns,na,1,3),
+    r(_r)
+  {  }
 
   double prior(int state, const vector<int> & types) const
   { 
-    if (state==1)
-      return 0.83; 
-    return 0.17;
+    return 1.0/static_cast<double>(numStates);
   }
 
   double objective(int state, const vector<int> & actions,
 		   int obj) const
   {
-    vector<double> s(2);
+    vector<double> s(2), t(2);
+    double maxs = 0;
     for (int p=0; p<2; p++)
-      s[p] = (1.0-a)*actions[p]/(numActions[p]-1.0);
+      {
+	s[p] = actions[p]/(numActions[p]-1.0);
+	maxs=max(maxs,s[p]);
+      }
 
-    double v = 0; // This is just the reported v of course
-    if ((1.0-s[0])*(1.0-s[1])<=a || s[0] == numActions[0]-1 || s[1] == numActions[1]-1)
-      v = 1.0;
-    else
-      v = a/((1.0-s[0])*(1.0-s[1]));
-
-    double x = 0;
-    double alpha = (1.0-log(a))/(1.0-log(a)+0.5*(log(a)*log(a)));
+    double v = static_cast<double>(state)/(numStates-1.0);
+    double T = r*(1.0-r);
+    double g = (1-r/maxs);
     
+    if (maxs<r)
+      return 0;
+
     if (obj<2)
       {
-	double q = alpha*(1-(1-s[1-obj])*(1-s[1-obj]))
-	  + alpha*(log(v)-log(a/((1-s[1-obj])*(1-s[1-obj]) ) ) );
-	assert(q>=0);
-
+	if (actions[obj]==0)
+	  return 0;
 	if (actions[obj] > actions[1-obj])
-	  return q*static_cast<double>(state)-alpha*(v-a);
-	else if (actions[obj]==actions[1-obj])
-	  return (q*static_cast<double>(state)-alpha*(v-a))/2;
+	  return (v*g-T);
+	else if (actions[obj] == actions[1-obj])
+	  return (0.5*v-T);
+	else
+	  return (v*(1-g)-T);
       }
     else if (obj==2)
       {
-	return alpha*(v-a);
+	return 2*T;
       }
 
     return 0.0;
   }
   
-};
+}; // resalemech
 
 int main()
 {
-  int numA = 75;
-  MyMech mech(numA);
+  int numA = 50;
+  int numS = 2;
+  double r=0.25;
+
+  ResaleMech mech(numA,numS,r);
 
   BCESolver solver(mech);
 
@@ -76,7 +79,7 @@ int main()
 		+ solver.getObjectiveFunction(2).getValue() ) << endl;
       
       stringstream ss;
-      ss << "maxminconj_" << numA << ".bce";
+      ss << "maxminconj2_" << numA << ".bce";
       BCESolution soln;
       solver.getSolution(soln);
       BCESolution::save(soln,ss.str().c_str());

@@ -632,7 +632,7 @@ void BCESolver::mapBoundary(const char * fname,
 	      // Find unit clockwise normal from the reduced
 	      // cost. This is the shallowest direction such that we
 	      // would want to introduce this variable into the basis.
-	      double d = sqrt(rc0[vc]*rc0[vc] + rc1[vc]*rc1[vc]);
+ 	      double d = sqrt(rc0[vc]*rc0[vc] + rc1[vc]*rc1[vc]);
 	      if (d<1e-12)
 		continue;
 	      double t0 = rc1[vc]/d,
