@@ -75,7 +75,7 @@ public:
 
 int main()
 {
-  int numA = 200;
+  int numA = 150;
   MyMech mech(numA);
 
   BCESolver solver(mech);
