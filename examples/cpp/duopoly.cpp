@@ -31,16 +31,16 @@ int main(int argc, char ** argv)
   double entryCost=0.00;
   double margCost = 0.00;
   double minAngleIncrement = 0.025;
-  int numBids = 25, numVals = 4;
+  int numPrices = 15, numVals = numPrices;
 
   int t, a, ahat;
 
   char filename[100];
-  sprintf(filename,"duopoly_nb=%d_entrycost_%1.2f.bce",numBids,entryCost);
+  sprintf(filename,"duopoly_np=%d_nv=%d_entrycost_%1.2f.bce",numPrices,numVals,entryCost);
 
   cout << "Starting main" << endl;
 
-  Duopoly duop(numBids,numVals,4,entryCost,margCost);
+  Duopoly duop(numPrices,numVals,4,entryCost,margCost);
 
   BCESolver solver(duop);
 
@@ -60,7 +60,11 @@ int main(int argc, char ** argv)
       objWeights[0]=0; objWeights[1]=1;
       solver.solve(objWeights);
 
-      solver.mapBoundary();
+      vector< vector<double> > bndryWeights(2,vector<double>(4,0));
+      bndryWeights[1][0]=1; 
+      bndryWeights[1][1]=1; 
+      bndryWeights[0][2]=1; 
+      solver.mapBoundary(bndryWeights);
       cout << "Mapped boundary" << endl;
 
       BCESolution data;
@@ -73,6 +77,7 @@ int main(int argc, char ** argv)
       cerr << "BCEException caught: " << endl;
       if (bcee.errorType == BCEException::NotProbDistr)
 	cerr << "Not a probability distribution" << endl;
+      cerr << bcee.what() << endl;
     }
   catch (...)
     {

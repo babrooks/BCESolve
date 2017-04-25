@@ -45,7 +45,7 @@ public:
 
   int getNumValues(){return numValues;}
 
-  void stateToPrivateValues(int state, vector<int> &values) const
+  void stateToValues(int state, vector<int> &values) const
   {
     values.resize(2);
 
@@ -56,21 +56,23 @@ public:
 
   double prior (int state, const vector<int> &types) const
   {
-    vector<int> values;
-    stateToPrivateValues(state,values);
-    double v0 = static_cast<double>(values[0]+1)/numValues;
-    double v1 = static_cast<double>(values[1]+1)/numValues;
-    double incr = 1.0/numValues;
+    // vector<int> values;
+    // stateToValues(state,values);
+    // double v0 = static_cast<double>(values[0]+1)/numValues;
+    // double v1 = static_cast<double>(values[1]+1)/numValues;
+    // double incr = 1.0/numValues;
 
-    // return PDF(distribution,v0,v1,incr);
-    return distribution.PDF(v0,v1,incr);
+    // // return PDF(distribution,v0,v1,incr);
+    // return distribution.PDF(v0,v1,incr);
+
+    return 1.0/(1.0*numValues*numValues);
   }
 
   double objective(int state, const vector<int> &actions, int objectiveIndex) const
   {
     // Convert the state into a pair of valuations
     vector<int> values(2,0);
-    stateToPrivateValues(state,values);
+    stateToValues(state,values);
     
     double valuations[2], prices[2], surpluses[2], entryCosts[2];
     valuations[0] = 1.0*values[0]/(numValues-1.0);
