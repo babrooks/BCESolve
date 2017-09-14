@@ -42,16 +42,19 @@ ifneq "$(wildcard /Users/benjaminbrooks/Applications/IBM/ILOG/CPLEX_Studio1262/c
 
  RMCMD=rm -rf 
 endif
-ifneq "$(wildcard /opt/ibm/ILOG/CPLEX_Studio1251/cplex/bin/x86-64_sles10_4.1/cplex )" "" 
+ifneq "$(wildcard /opt/gurobi751/linux64/bin/grbgetkey )" "" 
  $(info Compiling on Bens desktop)
 
- GRBDIR=/opt/gurobi563/linux64
+ GRBDIR=/opt/gurobi751/linux64
  GRBINCLDIR=$(GRBDIR)/include
  GRBLIBDIR=$(GRBDIR)/lib
- GRBNAME=gurobi56
+ GRBNAME=gurobi75
 
  STATIC=-Wl,-Bstatic
  DYNAMIC=-Wl,-Bdynamic
+
+ BOOSTINCLDIR=/usr/include/boost
+ BOOSTDIR=/usr/lib64/
 
  CXX=g++
  RMCMD=rm -rf 
