@@ -25,8 +25,8 @@
 
 int main() {
 
-  int numVals = 100;
-  double price = .05;
+  int numVals = 300;
+  double price = 0.24999;
   double prPlayer0Wins = .50;
 
   PostedPrice pp(numVals,price,prPlayer0Wins);
@@ -52,6 +52,18 @@ int main() {
   const char * fNameC = fNameStr.c_str();
   BCESolution::save(soln,fNameC);
 
+  // Weights are set, by default, to 0.
+  vector<vector<double> > mapBoundaryWeights(2,vector<double>(3,0));
+  // Sets objective 0 weights for the x-axis
+  mapBoundaryWeights[0][0]=1;
+  // Sets objective 1 weights for the x-axis
+  mapBoundaryWeights[0][1]=1;
+  // Sets objective 2 weights on the y-axis
+  mapBoundaryWeights[1][2]=1;      
+
+  // solver.setMinAngleIncr(1e-2);
+  solver.mapBoundary("postedpricebndry.dat",mapBoundaryWeights);
+  
   return 0;
 
 }
