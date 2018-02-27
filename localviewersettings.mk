@@ -20,11 +20,11 @@
 # ben@benjaminbrooks.net
 # Chicago, IL
 
-exists(/opt/ibm/ILOG/CPLEX_Studio1251/cplex/bin/x86-64_sles10_4.1/cplex) {
+exists(/opt/gurobi751/linux64/bin/grbgetkey) {
 message("QMAKE run on Ben's desktop...")
 
-GRBDIR=/opt/gurobi563/linux64
-GRBNAME=gurobi56
+GRBDIR=/opt/gurobi751/linux64
+GRBNAME=gurobi75
 }
 
 # Robbie's computer
