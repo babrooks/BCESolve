@@ -33,8 +33,8 @@ int main(int argc, char ** argv)
 {
   double entryCost=0.0;
   double reservePrice=0.0;
-  int nvals=2;
-  int nbids=15;
+  int nvals=40;
+  int nbids=40;
   double lowbid = 0.0;
 
   solveFPA(nvals,nbids,entryCost,reservePrice,false);
@@ -87,6 +87,11 @@ void solveFPA(int nvals, int nbids,
       // Minimize Revenue
       solverWeights[2]=-1;
 
+      // Minimize social surplus
+      solverWeights[0]=-1;
+      solverWeights[1]=-1;
+      solverWeights[2]=-1;
+
       if (verbose)
       	cout << "Objective function set" << endl;
 
@@ -94,16 +99,16 @@ void solveFPA(int nvals, int nbids,
       solver.solve(solverWeights);
 
 
-      // Weights are set, by default, to 0.
-      vector<vector<double> > mapBoundaryWeights(2,vector<double>(numObjs,0));
-      // Sets objective 0 weights for the x-axis
-      mapBoundaryWeights[0][0]=1;
-      // Sets objective 1 weights for the x-axis
-      mapBoundaryWeights[0][1]=0;
-      // Sets objective 2 weights on the y-axis
-      mapBoundaryWeights[1][2]=1;      
+      // // Weights are set, by default, to 0.
+      // vector<vector<double> > mapBoundaryWeights(2,vector<double>(numObjs,0));
+      // // Sets objective 0 weights for the x-axis
+      // mapBoundaryWeights[0][0]=1;
+      // // Sets objective 1 weights for the x-axis
+      // mapBoundaryWeights[0][1]=0;
+      // // Sets objective 2 weights on the y-axis
+      // mapBoundaryWeights[1][2]=1;      
 
-      solver.mapBoundary("fpaknown.dat",mapBoundaryWeights);
+      // solver.mapBoundary("fpaknown.dat",mapBoundaryWeights);
 
       BCESolution soln;
       solver.getSolution(soln);
