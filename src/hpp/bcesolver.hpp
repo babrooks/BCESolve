@@ -1,21 +1,21 @@
 // This file is part of the BCESolve library for games of incomplete
 // information
 // Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton
-// 
+//
 // BCESolve free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // BCESolve is distributed in the hope that it will be useful, but
 // WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see
 // <http://www.gnu.org/licenses/>.
-// 
+//
 // Benjamin A. Brooks
 // ben@benjaminbrooks.net
 // Chicago, IL
@@ -43,14 +43,14 @@
 
   \ingroup src
 */
-class BCESolver 
+class BCESolver
 {
 public:
 
   //! Double parameters
   /*! An enumeration type for parameters of type double. Pass to
     BCESolver::setParam and BCESolver::getParam to set or retrieve a
-    double parameter value. */ 
+    double parameter value. */
   enum DoubleParameter
     {
       /*! When running the map boundary method,
@@ -61,28 +61,28 @@ public:
   //! Integer parameters
   /*! An enumeration type for parameters of type int. Pass to
     BCESolver::setParam and BCESolver::getParam to set or retrieve a
-    double parameter value. */ 
+    double parameter value. */
   enum IntParameter
     {
-      //! The index of the current objective. Not currently used? 
+      //! The index of the current objective. Not currently used?
       CurrentObjective,
       //! Control algorithm output
       /*! Controls the frequency and detail with which progress of the
 	algorithm is reported. 0 corresponds to no output, 1 is some
 	output. Is also passed to the BCESolver::model solver, so it
 	controls the level of output of Gurobi. */
-      DisplayLevel, 
-      //! The first objective used when mapping the boundary. 
-      BoundaryObjective1, 
-      //! The second objective used when mapping the boundary. 
-      BoundaryObjective2 
+      DisplayLevel,
+      //! The first objective used when mapping the boundary.
+      BoundaryObjective1,
+      //! The second objective used when mapping the boundary.
+      BoundaryObjective2
     };
-  
+
   //! Bool parameters
   /*! An enumeration type for parameters of type bool. Pass to
     BCESolver::setParam and BCESolver::getParam to set or retrieve a
     double parameter value. Will be replaced by new BCEAbstractGame
-    architecture with a constraint checker. */ 
+    architecture with a constraint checker. */
   enum BoolParameter
     {
     };
@@ -93,67 +93,71 @@ public:
   }
 
 protected:
-  //! Pointer to the BCEAbstractGame object that is being solved. 
-  BCEAbstractGame * game; 
+  //! Pointer to the BCEAbstractGame object that is being solved.
+  BCEAbstractGame * game;
 
-  //! Number of columns in the constraint matrix. 
-  long int numColumns; 
-  //! Number of rows in the constraint matrix. 
-  long int numRows; 
-  //! Number of non-basic variables? 
-  long int numNonBasicVariables; 
+  //! Number of columns in the constraint matrix.
+  long int numColumns;
+  //! Number of rows in the constraint matrix.
+  long int numRows;
+  //! Number of non-basic variables?
+  long int numNonBasicVariables;
 
-  //! Total number of action profiles for the players. 
-  long int numActions_total; 
-  //! Total number of types for the players. 
-  long int numTypes_total; 
+  //! Total number of action profiles for the players.
+  long int numActions_total;
+  //! Total number of types for the players.
+  long int numTypes_total;
   //! Total number of of actions and types for each player. Used?
-  long int numActionsTypesPerPlayer_total; 
-  //! Total number of actions and types. 
-  long int numActionsTypes_total; 
+  long int numActionsTypesPerPlayer_total;
+  //! Total number of actions and types.
+  long int numActionsTypes_total;
 
   // Stores the # of IC constraints for each player.
-  //! The number of IC constraints for each player. 
-  vector<int> numICConstraints; 
-  //! The total number of IC constraints. 
+  //! The number of IC constraints for each player.
+  vector<int> numICConstraints;
+  //! The total number of IC constraints.
   long int numICConstraints_total;
   //! The number of probability variables.
-  long int numProbabilityVariables; 
+  long int numProbabilityVariables;
   //! The total number of constraints on probabilities
-  long int numProbabilityConstraints; 
+  long int numProbabilityConstraints;
 
   // Gurobi components
 
-  GRBEnv env;  
+  GRBEnv env;
   //! The objective for BCESolver::model.
-  GRBLinExpr gurobiObjective; 
+  GRBLinExpr gurobiObjective;
 
   //! The variables for BCESolver::model.
-  GRBVar* variables; 
-  //! The constraints for BCESolver::model. 
-  vector<GRBLinExpr> constraints; 
+  GRBVar* variables;
+  //! The constraints for BCESolver::model.
+  vector<GRBLinExpr> constraints;
 
   // We allow the user to define any number of objective functions.
   // These are all stored in an array obfun. The index of the current
-  // objective is currentobfun. 
+  // objective is currentobfun.
   //! Objectives
   /*! An array of objective functions, corresponding to the objectives
     in the BCEAbstractGame object. */
-  vector<GRBLinExpr> objectiveFunctions; 
+  vector<GRBLinExpr> objectiveFunctions;
 
   //! Indicates if solver has been populated yet
   bool isPopulated;
-  
+
   //! List of indices of non-zero variables
   /*! The solver only creates variables for events that could occur
     with positive probability under the prior in the BCEAbstractGame
     object. This property stores the locations of the non-zero
     probability outcomes. */
   list<int> nonZeroVariableLocations;
+  //! List of indices of non-zero IC Constraints
+  /*! Stores locations of the non-zero IC constraints in the
+    constraints array. */
+  list<int> nonZeroICConstraintLocations;
   //! Locations of probability constraints
   /*! Stores locations of the probability constraints in the
     constraints array. */
-  vector<int> probabilityConstraintLocations; 
+  vector<int> probabilityConstraintLocations;
   //! Map from variable indices to non-zero variable locations
   /*! A map from standard indices to the corresponding non-zero
     variable location. (See BCECounter.) */
@@ -163,12 +167,12 @@ protected:
   /*! The minimum increment of the angle for
     BCESolver::mapBoundary. */
   double minAngleIncrement;
-  //! Index of the current objective. Not currently being used. 
+  //! Index of the current objective. Not currently being used.
   int currentObjective;
-  //! The display level. 
+  //! The display level.
   /*! 0 is no output, 1 is some output. Also passed to Gurobi, so 2+
     controls Gurobi output. */
-  int displayLevel; 
+  int displayLevel;
 
   // Lists for storing equilibria and boundary points.
   //! X coordinates of frontier.
@@ -179,9 +183,9 @@ protected:
   /*! List of y-coordinates of boundary
     points traced out by the
     BCESolver::mapBoundary routine. */
-  list<double> boundaryYs; 
+  list<double> boundaryYs;
   //! BCESolution object for serializing output of the algorithm.
-  BCESolution soln; 
+  BCESolution soln;
 
   /*! Initializes the properties that count the number of actions and
   types. */
@@ -195,26 +199,26 @@ protected:
 public:
   //! Default constructor.
   /*! Creates a  new BCESolver object. */
-  BCESolver(); 
+  BCESolver();
 
   //! Constructor
   /*! Creates a new BCESolver object and initializes it with the given
     game. */
   BCESolver(BCEAbstractGame & _game);
 
-  //! The GUROBI model. 
+  //! The GUROBI model.
   GRBModel model;
 
   //! Destructor
   ~BCESolver()
-  { delete[] variables; } 
+  { delete[] variables; }
 
   // Main routines
 
   //! Main populate routine
   /*! Populates the Gurobi model with constraints and initializes the
     objectives. */
-  void populate(); 
+  void populate();
 
   //! Solve method
   /*! Sets Gurobi solver parameters and calls Gurobi::optimize(). */
@@ -252,12 +256,12 @@ public:
   /*! This method copies the BCE, which is a vector of doubles, to a
     map from standard indices to probabilities. Mainly for saving
     space in data files. */
-  void bceToMap(map<int,double> & distribution);
-  
+  void bceToMap(map<int,double> & distribution, map<int,double> & multipliers) const;
+
   // Get methods
   //! Returns the BCESolver::model object.
   GRBModel& getModel() { return model; }
-  //! Returns the \f$n\f$th objective function. 
+  //! Returns the \f$n\f$th objective function.
   const GRBLinExpr& getObjectiveFunction (int n) const { return objectiveFunctions[n]; }
   //! Returns the objective for BCESolver::model.
   GRBLinExpr& getObjective() { return gurobiObjective; }

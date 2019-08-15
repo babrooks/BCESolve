@@ -1,21 +1,21 @@
 // This file is part of the BCESolve library for games of incomplete
 // information
 // Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton
-// 
+//
 // BCESolve free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // BCESolve is distributed in the hope that it will be useful, but
 // WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see
 // <http://www.gnu.org/licenses/>.
-// 
+//
 // Benjamin A. Brooks
 // ben@benjaminbrooks.net
 // Chicago, IL
@@ -43,12 +43,12 @@
     well as the objective functions for the players and possible
     auxiliary objective functions. The user can also reimplement the
     BCEAbstractGame::dominated method to indicate if there are dominated
-    actions that a given type should never play. 
+    actions that a given type should never play.
 
     \ingroup src
 
 */
-class BCEAbstractGame 
+class BCEAbstractGame
 {
 
   /**
@@ -58,15 +58,15 @@ class BCEAbstractGame
 
 protected:
   //! The number of players, always 2.
-  int numPlayers; 
-  //! The number of action profiles for each player. 
-  vector<int> numActions; 
+  int numPlayers;
+  //! The number of action profiles for each player.
+  vector<int> numActions;
   //!  The number of payoff relevant states.
-  int numStates; 
+  int numStates;
   //! The number of private types for each player.
-  vector<int> numTypes; 
+  vector<int> numTypes;
   //! The number of objective functions. Must be >= 2.
-  int numObjectives; 
+  int numObjectives;
 
   //! Indicates if the state has a product structure.
   /*! If true, the state has a product structure, and each player's
@@ -88,25 +88,25 @@ public:
   //! Constructor
   /*! This constructor assumes that all of the players have the same
     numbers of types and actions. */
-  BCEAbstractGame(int numStatesArg, 
-		  int numActionsArg, 
-		  int numTypesArg, 
+  BCEAbstractGame(int numStatesArg,
+		  int numActionsArg,
+		  int numTypesArg,
 		  int numObjectivesArg);
   //! Constructor
   /*! This constructor allows different players to have different
     numbers of types and actions. */
-  BCEAbstractGame(int numStatesArg, 
-		  const vector<int> & numActionsArg, 
-		  const vector<int> & numTypesArg, 
+  BCEAbstractGame(int numStatesArg,
+		  const vector<int> & numActionsArg,
+		  const vector<int> & numTypesArg,
 		  int numObjectivesArg);
 
   //! Destructor
   ~BCEAbstractGame()
-  {} 
+  {}
 
   //! Allows user to specify if the game has a product structure
   void setHasProductStructureData(bool hasProductStructure) {
-    hasProductStructureData = hasProductStructure; 
+    hasProductStructureData = hasProductStructure;
   }
 
   //! Prior over state and types
@@ -127,8 +127,8 @@ public:
 
   //! Marginal prior distribution
   /*! Calculates the marginal joint distribution of a given player's
-      type and the state. 
-      
+      type and the state.
+
       TODO: Have behavior depend on whether or not the state has a
       product structure.
   */
@@ -140,11 +140,11 @@ public:
     inclusive.  objective=0 through numPlayers-1 are the payoffs of
     players 1 through numPlayers, respectively. This is a pure virtual
     function that must be implemented by the derived class. */
-  virtual double objective(int state, const vector<int> &actions, 
-			   int obj) const = 0; 
+  virtual double objective(int state, const vector<int> &actions,
+			   int obj) const = 0;
 
   //! Overloaded objective if the game has a product structure
-  double objective(const vector<int> &states, 
+  double objective(const vector<int> &states,
 		   const vector<int> &actions,
 		   int obj) const
   {
@@ -168,14 +168,14 @@ public:
   /*! Utility function that iteratively calls
       BCESolver::dominated(int,int,int) for each player, and returns
       false if all of the calls returned false. */
-  bool dominated(const vector<int> &actions, const vector<int> &types) const; 
+  bool dominated(const vector<int> &actions, const vector<int> &types) const;
 
   //! Check if deviation is feasible
   /*! Indicates whether or not it is feasible to deviate from the
     action to the alternative dev, when the player's type is
     type. This is a virtual method that can be reimplemented. By
     default, all deviations are feasible. */
-  virtual bool feasibleDeviation(int action, int dev, 
+  virtual bool feasibleDeviation(int action, int dev,
 				 int type, int player) const
   {return true;};
 
@@ -202,7 +202,7 @@ public:
       product*=_numPrivateStates[player];
     if (product!=numStates)
       return false;
-  
+
     numPrivateStates = _numPrivateStates;
     hasProductStructureData = true;
 
@@ -225,7 +225,7 @@ public:
   }
 
   //! Finds if a specific label matches any existing labels.
-  /*! If a label matches and existing label, appends an * and 
+  /*! If a label matches and existing label, appends an * and
     checks recursively if the new label is unique. */
   void findLabelRedundancies(int obj);
 
@@ -251,7 +251,7 @@ public:
   const vector<int> & getNumTypes() const { return numTypes; }
   //! Returns the number of players (always 2)
   int getNumPlayers() const { return numPlayers; }
-  
+
 };
 
 #endif

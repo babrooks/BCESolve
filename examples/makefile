@@ -26,9 +26,9 @@
 # Directories
 include ../localsettings.mk
 
-MAINS=allpayauction commonvalueauction duopoly \
-	fangmorris fpaknown fpaunknown \
-	hybridentryreserve postedprice spaunknown \
+MAINS=allpayauction commonvalueauction fpaperfectcor duopoly \
+	fangmorris fpaknown AsymetricDoubleAuction ObservedIdiosyncratic fpaunknown \
+	Duo hybridentryreserve postedprice spaunknown \
 	smoothauction maxminconj maxminconj2 maxminconj3 maxminmech resale songzi
 
 all: $(MAINS)
@@ -40,9 +40,8 @@ $(MAINS): % : $(EXAMPLEDIR)/%.cpp
 	-lgurobi_c++ \
 	$(DYNAMIC) -L$(GRBDIR)/lib \
 	-l$(GRBNAME) \
-	 $(LDFLAGS) -L./cpp -L../lib -o $@ 
+	 $(LDFLAGS) -L./cpp -L../lib -o $@
 
 clean:
 	$(RMCMD) *.o $(MAINS)
 	make -C ../lib clean
-

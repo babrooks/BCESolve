@@ -1,21 +1,21 @@
 // This file is part of the BCESolve library for games of incomplete
 // information
 // Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton
-// 
+//
 // BCESolve free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // BCESolve is distributed in the hope that it will be useful, but
 // WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see
 // <http://www.gnu.org/licenses/>.
-// 
+//
 // Benjamin A. Brooks
 // ben@benjaminbrooks.net
 // Chicago, IL
@@ -41,7 +41,7 @@
 //! Class for storing data produced by BCESolver
 /*! This class stores Bayes correlated equilibria as output by the
   BCESolver class. It also contains statistical routines for analyzing
-  the list of equilibria. 
+  the list of equilibria.
 
   The class contains data structures for storing BCE in the
   BCESolution::equilibria member. It also stores various information about
@@ -113,11 +113,12 @@ public:
 
   /* Managing the equilibria. */
   //! Appends distr to the end of the list newEquilibria
-  void addEquilibrium(const map<int,double> & distr);
+  void addEquilibrium(const map<int,double> & distr, map<int,double> & multipliers);
+  //void addEquilibrium(const map<int,double> & distr);
   //! Clears all equilibria
   void clearEquilibria();
-  //! Sets boundaryMapped status. 
-  void setBoundaryMapped(const bool isMapped) 
+  //! Sets boundaryMapped status.
+  void setBoundaryMapped(const bool isMapped)
   { boundaryMapped = isMapped; }
   //! Sets mapBoundaryWeights.
   void setMapBoundaryWeights(const vector<vector<double> >& weights)
@@ -147,14 +148,14 @@ public:
   /* Statistical routines */
   //! Gets the expected objectives under the current BCE
   /*!  This method will calculate the expected objectives for the
-       current equilibrium, as specified by BCESolution::currentIndex. */  
+       current equilibrium, as specified by BCESolution::currentIndex. */
   void getExpectedObjectives(vector<double> &objectiveValues) const;
   //! Gets the expected objectives under all BCE
   /*!  This method will calculate the expected objectives for each of
     the equilibrium distributions in "equilibria". Optionally can be
     called with a particular given distribution, which is useful,
     e.g., for calculating objectives with a conditional
-    distribution. */  
+    distribution. */
   void getExpectedObjectives(vector< vector<double> > &objectiveValues) const;
   //! Calculates expected objectives for the given distribution.
   void getExpectedObjectives(vector<double> &objectiveValues,
@@ -167,6 +168,12 @@ public:
   double getDeviationObjectives(int player, int action, int type,
 				vector< vector<double> > & objectiveValues) const;
 
+  //! Calculates constraint multipliers
+  /*! Calculates the multiplier associated with each action for
+    the given player, type, and recommended action. */
+  double getConstraintMultipliers(int player, int action, int type,
+  					   vector< vector<double> > &values) const;
+
   //! Computes the marginal conditional distribution of a BCE
   /*! A general method for calculating conditional marginal
     distributions of the current BCE. The state must be equal to an
@@ -176,7 +183,7 @@ public:
     variables with a logical true in Marginal. Returns the probability
     of the event we are conditioning on. See BCECounter for a
     description of the conditioning and marginal arguments. */
-  double getConditionalMarginal(const vector<int> &stateConditions, 
+  double getConditionalMarginal(const vector<int> &stateConditions,
 			      const vector< vector<int> > &actionConditions,
 			      const vector< vector<int> > &typeConditions,
 			      bool stateMarginal,
@@ -184,7 +191,7 @@ public:
 			      const vector<bool> &typeMarginal,
 			      vector<double> &distribution) const;
 
-  //! Returns the mapBoundary weights 
+  //! Returns the mapBoundary weights
   const vector<vector<double> >& getMapBoundaryWeights() const {
     return mapBoundaryWeights;
   }

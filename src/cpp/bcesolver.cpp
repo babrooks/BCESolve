@@ -1,21 +1,21 @@
 // This file is part of the BCESolve library for games of incomplete
 // information
 // Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton
-// 
+//
 // BCESolve free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // BCESolve is distributed in the hope that it will be useful, but
 // WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see
 // <http://www.gnu.org/licenses/>.
-// 
+//
 // Benjamin A. Brooks
 // ben@benjaminbrooks.net
 // Chicago, IL
@@ -52,7 +52,7 @@ BCESolver::BCESolver (BCEAbstractGame & _game):
 {
   // Set the total type/action variables
   countActionsTypes();
-} // Constructor that takes arguments for 
+} // Constructor that takes arguments for
 
 void BCESolver::countActionsTypes()
 {
@@ -64,7 +64,7 @@ void BCESolver::countActionsTypes()
   const int numObjectives = game->getNumObjectives();
   const vector<int> & numTypes = game->getNumTypes();
   const vector<int> & numActions = game->getNumActions();
-  
+
   for (playerCounter=0; playerCounter<numPlayers; playerCounter++)
     {
       numActions_total *= numActions[playerCounter];
@@ -105,7 +105,7 @@ void BCESolver::setParameter(BCESolver::IntParameter param, int arg)
 
       currentObjective = arg;
       break;
-      
+
     case DisplayLevel:
       displayLevel = arg;
       break;
@@ -165,7 +165,7 @@ void BCESolver::populate ()
   if (isPopulated)
     throw(BCEException(BCEException::AlreadyPopulated));
   isPopulated = true;
-  
+
   const int numPlayers = 2;
   const int numStates = game->getNumStates();
   const int numObjectives = game->getNumObjectives();
@@ -173,11 +173,11 @@ void BCESolver::populate ()
   const vector<int> & numActions = game->getNumActions();
 
   int state, type, action, deviation;
-  vector<int> types(numPlayers,0), 
-    actions(numPlayers,0), 
+  vector<int> types(numPlayers,0),
+    actions(numPlayers,0),
     deviations(numPlayers,0);
-  volatile int variableCounter, 
-    ICCounter, 
+  volatile int variableCounter,
+    ICCounter,
     probabilityConstraintCounter,
     player,
     objectiveCounter,
@@ -195,7 +195,7 @@ void BCESolver::populate ()
     cout << printStr << endl;
   }
 
-  // Probability variables are conditional on the state and type. 
+  // Probability variables are conditional on the state and type.
 
   // We will only create variables variables for probabilities of
   // events that can occur, i.e. the prior is non-zero and the
@@ -215,7 +215,7 @@ void BCESolver::populate ()
   variableLocationsMap.clear();
   do
     {
-      // Only create variables if neither action is dominated and 
+      // Only create variables if neither action is dominated and
       // if the combination of values and types could arise.
       if ((!game->dominated(counter.getActions(),counter.getTypes()))
 	  && game->prior(counter.getState(),counter.getTypes())>0.0)
@@ -228,23 +228,26 @@ void BCESolver::populate ()
 
   // IC constraints
   numICConstraints = vector<int>(2,0);
+  int globalICCounter=-1;
+  nonZeroICConstraintLocations.clear();
   for (player=0; player<numPlayers; player++)
     {
-      for (ICCounter=0; 
-	   ICCounter<numTypes[player]*numActions[player]*numActions[player]; 
+      for (ICCounter=0;
+	   ICCounter<numTypes[player]*numActions[player]*numActions[player];
 	   ICCounter++)
 	{
 	  indexToTypeActionDeviation(ICCounter,player,type,action,deviation);
-
+      globalICCounter++;
 	  if (deviation==action)
 	    continue;
 
 	  // Create an IC constraint if both the action and the deviation
 	  // are not dominated, and if the deviating action is distinct.
-	  if (!(game->dominated(action,type,player) 
+	  if (!(game->dominated(action,type,player)
 	  	|| game->dominated(deviation,type,player) )
 	      && game->feasibleDeviation(action,deviation,type,player) )
 	    {
+          nonZeroICConstraintLocations.push_back(globalICCounter);
 	      numICConstraints[player]++;
 	    } // ! dominated
 	} // ICCounter
@@ -253,8 +256,8 @@ void BCESolver::populate ()
 
   // Sum the IC constraints.
   numICConstraints_total=0;
-  for (numICConstraintsIterator=numICConstraints.begin(); 
-       numICConstraintsIterator!=numICConstraints.end(); 
+  for (numICConstraintsIterator=numICConstraints.begin();
+       numICConstraintsIterator!=numICConstraints.end();
        numICConstraintsIterator++)
     numICConstraints_total += *numICConstraintsIterator;
 
@@ -270,6 +273,7 @@ void BCESolver::populate ()
 	{
 	  probabilityConstraintLocations[counter.getMarginal()]=numProbabilityConstraints;
 	  numProbabilityConstraints++;
+     // nonZeroICConstraintLocations.push_back(counter.getMarginal());
 	}
     } while (++counter);
   numNonBasicVariables=numProbabilityVariables-numProbabilityConstraints-1;
@@ -278,7 +282,7 @@ void BCESolver::populate ()
   if (displayLevel)
     {
       cout << "Done counting variables." << endl
-	   << "numProbabilityVariables=" << numProbabilityVariables << endl 
+	   << "numProbabilityVariables=" << numProbabilityVariables << endl
 	   << "numProbabilityConstraints=" << numProbabilityConstraints << endl;
       for (player=0; player<numPlayers; player++)
 	cout << "numICConstraints for player " << player << "=" << numICConstraints[player] << endl;
@@ -305,10 +309,10 @@ void BCESolver::populate ()
   objectiveFunctions.resize(numObjectives);
   for (objectiveCounter=0; objectiveCounter<numObjectives; objectiveCounter++)
     objectiveFunctions[objectiveCounter] = 0;
-  
+
   if (displayLevel)
     cout << "Done adding variables" << endl;
-  
+
   vector<int> stateConditions(0);
   vector< vector<int> > actionConditions(2);
   vector< vector<int> > typeConditions(2);
@@ -327,8 +331,8 @@ void BCESolver::populate ()
   // IC constraints
   for (player=0; player<numPlayers; player++)
     {
-      for (ICCounter=0; 
-	   ICCounter<numTypes[player]*numActions[player]*numActions[player]; 
+      for (ICCounter=0;
+	   ICCounter<numTypes[player]*numActions[player]*numActions[player];
 	   ICCounter++)
 	{
 	  indexToTypeActionDeviation(ICCounter,player,type,action,deviation);
@@ -341,7 +345,7 @@ void BCESolver::populate ()
 	  actionConditions[1-player] = vector<int>(0);
 	  deviations[player] = deviation;
 
-	  if (!(game->dominated(action,type,player) 
+	  if (!(game->dominated(action,type,player)
 		|| game->dominated(deviations[player],type,player))
 	      && game->feasibleDeviation(action,deviation,type,player) )
 	    {
@@ -350,7 +354,7 @@ void BCESolver::populate ()
 	      counter = BCECounter(numStates,numActions,numTypes,
 				   stateConditions,actionConditions,typeConditions,
 				   stateMarginal,actionMarginal,typeMarginal);
-		    
+
 	      if (counter.getActions()[player] != action ||
 		  counter.getTypes()[player] != type)
 		throw(BCEException(BCEException::ConditionFailed));
@@ -373,7 +377,7 @@ void BCESolver::populate ()
 		} while (++counter);
 
 	      lhs += variables[numProbabilityVariables + row];
-	      
+
 	      constraints[row] += lhs;
 
 	      row++;
@@ -383,7 +387,7 @@ void BCESolver::populate ()
 		  time(&nowIC);
 		  double secElapsed = difftime(startIC,nowIC);
 		  double remaining = secElapsed * (1-numICConstraints_total/(1.0*row));
-		  int minRemaining = remaining/60, 
+		  int minRemaining = remaining/60,
 		    secRemaining = remaining - minRemaining*60;
 		  cout << "player = " << player << ", row=" << row << ", ";
 		  if (minRemaining>0)
@@ -414,9 +418,9 @@ void BCESolver::populate ()
 		  if (variableLocationsMap.count(col))
 		    lhs += variables[variableLocationsMap[col]];
 		}
-	      
+
 	      constraints[row] += lhs;
-	      
+
 	      row++;
 	    } // if
 	} // state
@@ -429,21 +433,21 @@ void BCESolver::populate ()
 		       vector<int>(0),vector<vector<int> >(2),
 		       vector< vector<int> > (2),
 		       true,vector<bool>(2,true),vector<bool>(2,false));
-  col=0; 
+  col=0;
   do
     {
-      if ((!game->dominated(counter.getActions(),counter.getTypes())) 
+      if ((!game->dominated(counter.getActions(),counter.getTypes()))
 	  && game->prior(counter.getState(),counter.getTypes())>0.0)
 	{
 	  // New column.
 
 	  // Objective functions
 	  for (objectiveCounter=0; objectiveCounter<numObjectives; objectiveCounter++)
-	    objectiveFunctions[objectiveCounter] 
+	    objectiveFunctions[objectiveCounter]
 	      += (game->objective(counter.getState(),counter.getActions(),objectiveCounter)
 		  *game->prior(counter.getState(),counter.getTypes())
 		  *variables[variableLocationsMap[counter.getVariable()]]);
-	  
+
 	  // Every once in a while, print progress.
 	  if (!(col%(5000)) && displayLevel)
 	    cout << "col=" << col << endl;
@@ -461,7 +465,7 @@ void BCESolver::populate ()
   std::cout << "IC Constraints Added" << std::endl;
   std::cout << "Size Constraints vec:" << constraints.size() << std::endl;
   std::cout << "No Constraints:" << numICConstraints_total+numProbabilityVariables << std::endl;
-  for (int constraintCounter = 0; 
+  for (int constraintCounter = 0;
        constraintCounter < numProbabilityConstraints;
        constraintCounter++) {
     model.addConstr(constraints[numICConstraints_total
@@ -477,6 +481,7 @@ void BCESolver::populate ()
 void BCESolver::solve(vector<double>& objectiveWeights)
 {
   map<int,double> solutionEquilibrium;
+  map<int,double> solutionMultipliers;
 
   model.getEnv().set(GRB_IntParam_Crossover,0);
   model.getEnv().set(GRB_IntParam_Method,2);
@@ -500,13 +505,14 @@ void BCESolver::solve(vector<double>& objectiveWeights)
   model.optimize();
   if (displayLevel) {
     for (int obj = 0; obj < objectiveFunctions.size(); obj++)
-      cout << "Objective " << obj << " = " << setprecision(16) 
+      cout << "Objective " << obj << " = " << setprecision(16)
 	   << objectiveFunctions[obj].getValue() << endl;
   }
 
   soln.clearEquilibria();
-  bceToMap(solutionEquilibrium);
-  soln.addEquilibrium(solutionEquilibrium);
+  bceToMap(solutionEquilibrium, solutionMultipliers);
+  soln.addEquilibrium(solutionEquilibrium, solutionMultipliers);
+  // soln.addEquilibrium(solutionEquilibrium);
   soln.consolidateEquilibria();
   // If the solve routine is used after mapping the boundary,
   // this will be overridden
@@ -561,15 +567,15 @@ void BCESolver::mapBoundary(const char * fname,
     obj0 += weights[0][obj]*getObjectiveFunction(obj);
     obj1 += weights[1][obj]*getObjectiveFunction(obj);
   }
-  
-  // First solve 
+
+  // First solve
   // gurobiObjective = objectiveFunctions[boundaryObjectiveIndex1];
   // Primal Simplex, Indexed at 0
   int oldMethod = model.getEnv().get(GRB_IntParam_Method);
   int oldOutput = model.getEnv().get(GRB_IntParam_OutputFlag);
   model.getEnv().set(GRB_IntParam_Method,0);
   model.getEnv().set(GRB_IntParam_OutputFlag,0);
-  
+
   int ItLimDefault = 2100000000;
 
   double w0 = 1.0,
@@ -582,6 +588,7 @@ void BCESolver::mapBoundary(const char * fname,
   bool passedWest = false;
 
   map<int,double> currentEquilibrium;
+  map<int,double> currentMultipliers;
   vector<double> rc0(numVars), rc1(numVars);
 
   int iter = 0;
@@ -593,16 +600,17 @@ void BCESolver::mapBoundary(const char * fname,
       model.optimize();
 
       model.getEnv().set(GRB_DoubleParam_TimeLimit,2);
-      
+
       if (model.get(GRB_IntAttr_Status) != GRB_OPTIMAL)
 	throw(BCEException(BCEException::MapFrontierNotOptimal));
 
       model.getEnv().set(GRB_IntParam_Method,0);
       model.getEnv().set(GRB_DoubleParam_IterationLimit, 0);
-      
+
       // Print current equilibrium
-      bceToMap(currentEquilibrium);
-      soln.addEquilibrium(currentEquilibrium);
+      bceToMap(currentEquilibrium, currentMultipliers);
+      soln.addEquilibrium(currentEquilibrium, currentMultipliers);
+      //soln.addEquilibrium(currentEquilibrium)
 
       // Find the reduced costs
       model.setObjective(obj0,GRB_MAXIMIZE);
@@ -637,7 +645,7 @@ void BCESolver::mapBoundary(const char * fname,
 		continue;
 	      double t0 = rc1[vc]/d,
 		t1 = -rc0[vc]/d;
-	      
+
 	      // If this direction is shallower than the current new
 	      // direction, make it the new direction.
 	      if (t0*nw1 - t1*nw0>0)
@@ -653,12 +661,12 @@ void BCESolver::mapBoundary(const char * fname,
 	  md1 = w0* sin(minAngleIncrement) + w1 * cos(minAngleIncrement);
       if (nw0*md1 - nw1*md0>0)
 	{
-	  w0 = md0; 
+	  w0 = md0;
 	  w1 = md1;
 	}
       else
 	{
-	  w0 = nw0; 
+	  w0 = nw0;
 	  w1 = nw1;
 	}
 
@@ -670,7 +678,7 @@ void BCESolver::mapBoundary(const char * fname,
 
       // Print progress.
       if (!(iter%10))
-	cout << setprecision(3) 
+	cout << setprecision(3)
 	     << "(w0,w1) = (" <<  w0 << "," << w1
 	     << "), passedWest = " << passedWest
 	     << ", iter = " << iter << endl;
@@ -679,18 +687,18 @@ void BCESolver::mapBoundary(const char * fname,
     } // while
 
   model.getEnv().set(GRB_DoubleParam_IterationLimit,ItLimDefault);
-  
+
   // Print the bndry points.
   ofstream vertexData;
   list<double>::iterator XIterator;
   list<double>::iterator YIterator;
   vertexData.open(fname);
-  for (XIterator=boundaryXs.begin(), YIterator=boundaryYs.begin(); 
-       XIterator!=boundaryXs.end() && YIterator!=boundaryYs.end(); 
+  for (XIterator=boundaryXs.begin(), YIterator=boundaryYs.begin();
+       XIterator!=boundaryXs.end() && YIterator!=boundaryYs.end();
        XIterator++, YIterator++)
     vertexData << *XIterator << " " << *YIterator << endl;
   vertexData.close();
-  
+
   // Configure solution
   soln.consolidateEquilibria();
   soln.setBoundaryMapped(true);
@@ -705,26 +713,39 @@ void BCESolver::getSolution(BCESolution & output)
   output=soln;
 }
 
-void BCESolver::bceToMap(map<int,double> & distribution)
+void BCESolver::bceToMap(map<int,double> & distribution,
+     map<int,double> & multipliers) const
 {
-  int variable;
+  int var;
+  int mlt;
+  GRBConstr* con = model.getConstrs();
   list<int>::const_iterator it;
-  vector<double> gurobiValues(numProbabilityVariables,0.0);
-  for(int var = 0; var<numProbabilityVariables; var++)
-    gurobiValues[var] = variables[var].get(GRB_DoubleAttr_X);
+  list<int>::const_iterator er;
 
   distribution = map<int,double>();
+  multipliers = map<int,double>();
 
   // Populate the distribution vector.
-  for (variable=0, it = nonZeroVariableLocations.begin(); 
-       variable<numProbabilityVariables; 
-       variable++, ++it)
+  for (var=0, it = nonZeroVariableLocations.begin();
+       var<numProbabilityVariables;
+       var++, ++it)
     {
-      if (abs(gurobiValues[variable])>1e-12)
+      if (abs(variables[var].get(GRB_DoubleAttr_X))>1e-12)
   	distribution.insert(pair<int,double>(*it,
-  					     gurobiValues[variable]));
+  					     variables[var].get(GRB_DoubleAttr_X)));
     }
-  
+  // Populate the multipliers vector.
+  for (mlt=0, er = nonZeroICConstraintLocations.begin();
+       mlt<numICConstraints_total;
+       //mlt<numICConstraints_total+numProbabilityConstraints;
+       mlt++, ++er)
+    {
+        if (abs(con[mlt].get(GRB_DoubleAttr_Pi))>1e-12)
+        multipliers.insert(pair<int,double>(*er,
+        					 con[mlt].get(GRB_DoubleAttr_Pi)));
+
+    }
+
 
 }
 
@@ -757,4 +778,3 @@ void BCESolver::indexToTypeActionDeviation(int index, int player, int &type, int
   // assert(deviation<game->getNumActions()[player]);
 
 }
-
