@@ -1,0 +1,46 @@
+# This file is part of the BCESolve library for games of incomplete
+# information
+# Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton
+#
+# BCESolve free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# BCESolve is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see
+# <http://www.gnu.org/licenses/>.
+#
+# Benjamin A. Brooks
+# ben@benjaminbrooks.net
+# Chicago, IL
+
+PROJECT_NAME		= BCESolve
+OUTPUT_DIRECTORY 	= doc
+INPUT			= src viewer
+EXCLUDE_PATTERNS	= *qcustomplot*
+SHOW_DIRECTORIES	= YES
+FULL_PATH_NAMES		= YES
+DIRECTORY_GRAPH		= YES
+FILE_PATTERNS		= bce*.cpp bce*.hpp
+RECURSIVE		= YES
+GENERATE_TREEVIEW	= YES
+EXTRACT_PRIVATE		= YES
+EXTRA_PACKAGES		= amsmath amsfonts amssymb
+EXAMPLE_PATH		= examples
+EXAMPLE_RECURSIVE	= yes
+EXAMPLE_PATTERNS	= *.cpp *.hpp
+HIDE_UNDOC_RELATIONS	= YES
+HAVE_DOT		= YES
+GROUP_GRAPHS		= YES
+# EXCLUDE_SYMBOLS		= list int double
+DOT_GRAPH_MAX_NODES	= 15
+MAX_DOT_GRAPH_DEPTH	= 1
+BUILTIN_STL_SUPPORT	= NO
+HTML_EXTRA_STYLESHEET	= bcedoxystyle.css
+GENERATE_HTML		= YES
