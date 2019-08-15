@@ -1,21 +1,21 @@
 // This file is part of the BCESolve library for games of incomplete
 // information
 // Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton
-// 
+//
 // BCESolve free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // BCESolve is distributed in the hope that it will be useful, but
 // WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see
 // <http://www.gnu.org/licenses/>.
-// 
+//
 // Benjamin A. Brooks
 // ben@benjaminbrooks.net
 // Chicago, IL
@@ -23,7 +23,7 @@
 #include "bceplothandler.hpp"
 
 BCEPlotHandler::BCEPlotHandler(QWidget *parent):
-  deviationBarGraphs(2),devPlotTitles(2)
+  deviationBarGraphs(4),devPlotTitles(4)
 {
   isSolnDataLoaded=false;
   guiData = new BCEDataState();
@@ -45,7 +45,7 @@ void BCEPlotHandler::setupLayout() {
 	  this,SLOT(setGUITitle()));
   connect(guiData,SIGNAL(newDataLoaded()),
 	  this,SLOT(indicateDataLoaded()));
-  
+
   // End Data Connections
   /////////////////////////////////////////
   // Plot Initializations and Organization
@@ -75,7 +75,7 @@ void BCEPlotHandler::setupLayout() {
   connect(guiData,SIGNAL(eqmCoordSignal(double,double)),
 	  setOfBCEPlotTitle,SLOT(changeDisplayedCoords(double,double)));
 
-  // Bar Plot Initialization 
+  // Bar Plot Initialization
   deviationBarGraphs[0] = new BCEValueSetPlot();
   deviationBarGraphs[0]->setSizePolicy(sp);
   deviationBarGraphs[0]->xAxis->setLabel("Player 0's Actions");
@@ -93,15 +93,44 @@ void BCEPlotHandler::setupLayout() {
     deviationBarGraphs[player]->
       plotLayout()->
       addElement(0,0,devPlotTitles[player]);
-    
+
     connect(guiData,
-	    SIGNAL(devPlotTitleChange(int,int,int,double)),
+	    SIGNAL(devPlotTitleChange(int,int,int,double,double)),
 	    devPlotTitles[player],
-	    SLOT(changeText(int,int,int,double)));
+	    SLOT(changeText(int,int,int,double,double)));
     connect(guiData,
 	    SIGNAL(devPlotPrChange(int,double)),
 	    devPlotTitles[player],
 	    SLOT(changeProbability(int,double)));
+    }
+
+
+    deviationBarGraphs[2] = new BCEValueSetPlot();
+    deviationBarGraphs[2]->setSizePolicy(sp);
+    deviationBarGraphs[2]->xAxis->setLabel("Player 0's Actions");
+    deviationBarGraphs[3] = new BCEValueSetPlot();
+    deviationBarGraphs[3]->setSizePolicy(sp);
+    deviationBarGraphs[3]->xAxis->setLabel("Player 1's Actions");
+    for (int player = 2; player < 4; player++) {
+      deviationBarGraphs[player]->yAxis->setLabel("Multiplier");
+      devPlotTitles[player] = new BCEPlotTitle(DeviationPlot,
+                         player, //flip
+                         deviationBarGraphs[player]);
+      devPlotTitles[player]->setFont(font);
+
+      deviationBarGraphs[player]->plotLayout()->insertRow(0);
+      deviationBarGraphs[player]->
+        plotLayout()->
+        addElement(0,0,devPlotTitles[player]);
+
+      connect(guiData,
+        SIGNAL(devPlotTitleChange(int,int,int,double,double)),
+        devPlotTitles[player],
+        SLOT(changeText(int,int,int,double,double)));
+      connect(guiData,
+        SIGNAL(devPlotPrChange(int,double)),
+        devPlotTitles[player],
+        SLOT(changeProbability(int,double)));
   }
 
   QSizePolicy sp2(QSizePolicy::Expanding,QSizePolicy::Expanding);
@@ -121,9 +150,24 @@ void BCEPlotHandler::setupLayout() {
 
   // Left Viewer Panel, Bar Plots and Slider Box
   QVBoxLayout *leftSectorDivide = new QVBoxLayout();
+
+  QTabWidget *TabWidget;
+  TabWidget = new QTabWidget(this);
+
+  QWidget *ObjectiveTabWidget = new QWidget(this);
+  QVBoxLayout *ObjectiveTabDivide = new QVBoxLayout();
+  QWidget *MultiplierTabWidget = new QWidget(this);
+  QVBoxLayout *MultiplierTabDivide = new QVBoxLayout();
   for (int player = 0; player < 2; player++) {
-    leftSectorDivide->addWidget(deviationBarGraphs[player]);
+    ObjectiveTabDivide->addWidget(deviationBarGraphs[player]);
+    MultiplierTabDivide->addWidget(deviationBarGraphs[player+2]);
   }
+  ObjectiveTabWidget->setLayout(ObjectiveTabDivide);
+  MultiplierTabWidget->setLayout(MultiplierTabDivide);
+
+  TabWidget->addTab(ObjectiveTabWidget,"Deviation Payoffs");
+  TabWidget->addTab(MultiplierTabWidget,"I.C. Multipliers");
+  leftSectorDivide->addWidget(TabWidget);//
 
   // Right Viewer Panel, Conditional-Marginal Distribution
   conditionalMarginalPlot = new BCEValueSetPlot();
@@ -141,9 +185,9 @@ void BCEPlotHandler::setupLayout() {
   // Color Plottable Set-Up and Interaction Settings
   colorScale = new QCPColorScale(conditionalMarginalPlot);
 
-  conditionalMarginalPlot->plotLayout()->addElement(0, 1, colorScale); 
-  colorMap->setColorScale(colorScale); 
-  colorScale->setType(QCPAxis::atRight); 
+  conditionalMarginalPlot->plotLayout()->addElement(0, 1, colorScale);
+  colorMap->setColorScale(colorScale);
+  colorScale->setType(QCPAxis::atRight);
   colorScale->axis()->setLabel("Action Probability");
   colorScale->setRangeDrag(true);
 
@@ -199,7 +243,7 @@ void BCEPlotHandler::setupLayout() {
   mainTab->addWidget(mainSplitter);
 
   // End Plot Initializations and Organization
-  /////////////////////////////////////////////// 
+  ///////////////////////////////////////////////
 }
 
 /////////////////////////////////////////////
@@ -212,8 +256,8 @@ void BCEPlotHandler::plotEqm() {
   colorMap->clearData();
   int nx = eqmMatrix.size();
   int ny = eqmMatrix[0].size();
-  colorMap->data()->setSize(nx, ny); 
-  colorMap->data()->setRange(QCPRange(0,nx), QCPRange(0,ny)); 
+  colorMap->data()->setSize(nx, ny);
+  colorMap->data()->setRange(QCPRange(0,nx), QCPRange(0,ny));
   double x, y;
   double maxEntry = 0;
   for (int xIndex=0; xIndex<nx; ++xIndex)
@@ -262,7 +306,7 @@ void BCEPlotHandler::plotBCEValueSet() {
   // Graphing Curve
 
   QCPCurve * boundaryCurve = new QCPCurve(setOfBCEPlot->xAxis,setOfBCEPlot->yAxis);
-  
+
   boundaryCurve->setData(objective0Payoffs,objective1Payoffs);
 
   boundaryCurve->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc,
@@ -311,6 +355,9 @@ void BCEPlotHandler::plotDeviationObjectives(int player) {
   deviationBarGraphs[player]->clearGraphs();
   deviationBarGraphs[player]->clearPlottables();
 
+  deviationBarGraphs[player+2]->clearGraphs();
+  deviationBarGraphs[player+2]->clearPlottables();
+
   // Setup Main Bar Graph
 
   QCPBars *barGraph = new QCPBars(deviationBarGraphs[player]->xAxis,
@@ -335,6 +382,30 @@ void BCEPlotHandler::plotDeviationObjectives(int player) {
   barGraph->setPen(QColor(255, 131, 0));
   barGraph->setBrush(QColor(255, 131, 0, 50));
 
+
+
+  QCPBars *barGraphm = new QCPBars(deviationBarGraphs[player+2]->xAxis,
+				  deviationBarGraphs[player+2]->yAxis);
+  deviationBarGraphs[player+2]->addPlottable(barGraphm);
+  barGraphm->setName("Multiplier from Obedience Constraint");
+
+  const vector< vector<double> > multiplierValues(guiData->getMultiplierValues());
+
+  QVector<double> yDatam;
+
+  yDatam = QVector<double>::fromStdVector(multiplierValues[player]);
+
+  int sizeYDatam = yDatam.size();
+  QVector<double> xDatam(sizeYDatam,0);
+
+  for(int i = 0; i < sizeYDatam; i++) {
+    xDatam[i]=(double)i;
+  }
+
+  barGraphm->setData(xDatam,yDatam);
+  barGraphm->setPen(QColor(255, 131, 0));
+  barGraphm->setBrush(QColor(255, 131, 0, 50));
+
   // Highlight Recommended Action
 
   QCPBars *recAction = new QCPBars(deviationBarGraphs[player]->xAxis,
@@ -348,6 +419,20 @@ void BCEPlotHandler::plotDeviationObjectives(int player) {
 
   recAction->setPen(QPen(Qt::green));
   recAction->setBrush(QBrush(Qt::green));
+
+
+
+  QCPBars *recActionm = new QCPBars(deviationBarGraphs[player+2]->xAxis,
+				   deviationBarGraphs[player+2]->yAxis);
+  deviationBarGraphs[player+2]->addPlottable(recActionm);
+
+  int actionm = guiData->getCurrentSliderVal(Action,player);
+
+  recActionm->setData(QVector<double>(1,actionm),
+		     QVector<double>(1,yDatam[actionm]));
+
+  recActionm->setPen(QPen(Qt::green));
+  recActionm->setBrush(QBrush(Qt::green));
 
   // Highlight Indifferent Deviations
 
@@ -372,10 +457,35 @@ void BCEPlotHandler::plotDeviationObjectives(int player) {
   indiffAction->setPen(QColor(1, 92, 191));
   indiffAction->setBrush(QColor(1, 92, 191, 50));
 
+
+
+  double recValuem = yDatam[actionm];
+
+  QVector<double> xCoordIndiffm;
+  QVector<double> yCoordIndiffm;
+
+  for (int i = 0; i < sizeYDatam; i++) {
+    if (abs((yDatam[i]-recValuem)/recValuem) < maxDifference) {
+      xCoordIndiffm.push_back(i);
+      yCoordIndiffm.push_back(yDatam[i]);
+    }
+  }
+
+  QCPBars *indiffActionm = new QCPBars(deviationBarGraphs[player+2]->xAxis,
+				      deviationBarGraphs[player+2]->yAxis);
+  deviationBarGraphs[player+2]->addPlottable(indiffActionm);
+
+  indiffActionm->setData(xCoordIndiffm,yCoordIndiffm);
+  indiffActionm->setPen(QColor(1, 92, 191));
+  indiffActionm->setBrush(QColor(1, 92, 191, 50));
+
   // Replot
 
   deviationBarGraphs[player]->rescaleAxes();
   deviationBarGraphs[player]->replot();
+
+  deviationBarGraphs[player+2]->rescaleAxes();
+  deviationBarGraphs[player+2]->replot();
 
 } // Plot Deviation Objectives
 
@@ -389,7 +499,7 @@ void BCEPlotHandler::toggleLinearScale(bool checked) {
 
   if (checked)
     colorScale->setDataScaleType(QCPAxis::stLinear);
-  else 
+  else
     colorScale->setDataScaleType(QCPAxis::stLogarithmic);
   plotEqm();
 } // Slot to set a linear color scale for the distribution's heat map
@@ -416,7 +526,7 @@ void BCEPlotHandler::setGUITitle() {
 
   dynamicTitle << "BCE Solution Viewer, Current File = "
 	       << guiTitle;
-    
+
   string newTitleStr = dynamicTitle.str();
   QString newTitle = QString::fromStdString(newTitleStr);
 

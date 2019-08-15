@@ -1,21 +1,21 @@
 // This file is part of the BCESolve library for games of incomplete
 // information
 // Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton
-// 
+//
 // BCESolve free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // BCESolve is distributed in the hope that it will be useful, but
 // WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see
 // <http://www.gnu.org/licenses/>.
-// 
+//
 // Benjamin A. Brooks
 // ben@benjaminbrooks.net
 // Chicago, IL
@@ -38,8 +38,8 @@
 
 //! Class for storing and manipulating solution data used by the plot handler.
 /*! Continuously manipulated as user interacts with solution tab controls.
-  Holds all data for plotting. Also holds parameters the 
-  user supplies through solutions tab controls, such as the currently selected equilibrium. 
+  Holds all data for plotting. Also holds parameters the
+  user supplies through solutions tab controls, such as the currently selected equilibrium.
   Contains private "set" methods for changing private data.
   Contains public "get" methods that make minor integer or string copies
   or supply a const reference to the memory location
@@ -60,23 +60,23 @@ signals:
   */
   void selectedEqmChanged();
   //! Signal that new data has been loaded.
-  /*! Connected to changing the title of the graphical 
+  /*! Connected to changing the title of the graphical
     user interface. The GUI gets the file name from the
     path and displays it in the GUI's title bar.
 
     Also connected to a slot notifying the program that data has
     been loaded. Certain functions in the program will become
-    activated and functional. If these functions were used 
-    before data was loaded, the program would crash. 
+    activated and functional. If these functions were used
+    before data was loaded, the program would crash.
 
     These functions include toggleLinearScale(_) and
     toggleColorfulTheme(_) in the BCEPlothandler.
    */
   void newDataLoaded();
   //! Signal for a changed slider value.
-  /*! Connected to BCESlider and BCELineEdit. Slots serve 
+  /*! Connected to BCESlider and BCELineEdit. Slots serve
     to change read-only line edits when a slider has been
-    moved. Also, for common value/state games, moves both 
+    moved. Also, for common value/state games, moves both
     state sliders simultaneously upon user interaction
     with one.
   */
@@ -87,23 +87,24 @@ signals:
     types in the GUI's deviation plot titles.
   */
   void devPlotTitleChange(int player,
-			  int aciton,
+			  int action,
 			  int type,
-			  double payoff);
+			  double payoff,
+              double multiplier);
   //! Signals data for changing deviation bar plots' titles.
   /*! Connected to BCELabel. Slot changes QLabel info
     displayed about the probability of a player's action.
   */
   void devPlotPrChange(int player,double probability);
   //! Signals coordinates of the current equilibrium.
-  /*! Connected to BCELabel. Slot changes 
+  /*! Connected to BCELabel. Slot changes
     coordinates of equilibrium displayed in the GUI's
     Set of BCE plot title (top left plot in the solution tab).
   */
   void eqmCoordSignal(double xCoord,double yCoord);
   //! Signals changed state information and type of state (common or private).
-  /*! Connected to BCELabel. Slot changes 
-    information displayed about each player's state (in 
+  /*! Connected to BCELabel. Slot changes
+    information displayed about each player's state (in
     the private-states case) or the state of the
     game (in the common values case) in the GUI's
     heat map plot title (right plot in the solution tab).
@@ -139,7 +140,7 @@ signals:
 
 private: // Private Properties. Private Functions near EOF.
   //! Notes if data is currently loaded into the GUI.
-  /*! Prevents program from crashing if user clicks on 
+  /*! Prevents program from crashing if user clicks on
     GUI controls before any data is loaded.
    */
   bool isDataLoaded;
@@ -164,7 +165,7 @@ private: // Private Properties. Private Functions near EOF.
   //! If true, GUI displays marginal distribution for player's state.
   bool margS0, margS1;
   //! If true, GUI displays marginal distribution for player's action/type.
-  /*! 2 element vectors holding whether marginal distributions for 
+  /*! 2 element vectors holding whether marginal distributions for
     actions or type are displayed. Not currently in use.
   */
   vector<bool> margA, margT;
@@ -172,8 +173,10 @@ private: // Private Properties. Private Functions near EOF.
   int currentEqmIndex;
   //! Data displayed in the GUI's heatmap.
   vector< vector<double> > equilibriumMatrix;
-  //! Data displayed in the GUI's bar plots.
+  //! Data displayed in the GUI's objective bar plots.
   vector< vector<double> > objectiveValues;
+  //! Data displayed in the GUI's multiplier bar plots.
+  vector< vector<double> > multiplierValues;
   //! Data displayed in the GUI's BCE Value Set Plot.
   /*! Holds information about all the equilibria in a saved
     example file. If allEqm contains more than one
@@ -205,13 +208,13 @@ public:
   /*! Provides initial conditions for several private
      properties: actions, types, values, state, margS0,
      margS1, margA, margT, currentEqmIndex, isPrivateVals.
-     Further connects signals and slots when both are 
+     Further connects signals and slots when both are
      contained within this class.
   */
   BCEDataState();
 
   //! Loads new data into the GUI.
-  /*! Receives emitted signal that there is a new data 
+  /*! Receives emitted signal that there is a new data
     path from BCEWindow. This is called when the user
     interacts with the loadAction within the GUI's file menu.
     This function extracts the filename from the path for use
@@ -219,13 +222,13 @@ public:
     the class's privately stored "data" member. It then
     determines if the game has private values and sets initial
     conditions for a new load (i.e. actions, types, values, and
-    state are reset to 0). Emits that 
+    state are reset to 0). Emits that
   */
   void setSolutionData(const BCESolution &solution, const bool isBoundaryMapped);
 
   //! Layout Holding Sliders and Other Data Controls
   QWidget *controlsLayout;
-  
+
   //! Sends map boundary weights to the plot handler.
   const vector<vector<double> >& getMapBWeights() const {
     return solutionData.getMapBoundaryWeights();
@@ -240,7 +243,7 @@ public:
   /*! Returns basic properties of currently stored BCEData
     for setting slider ranges. Given Action, Type, or State,
     returns number of actions, types, or states for the
-    given player. This is always an integer value. 
+    given player. This is always an integer value.
   */
   int shareDataProperties(BCESliderType st,int player);
 
@@ -267,7 +270,7 @@ public:
 
   //! Shares memory location of equilibriumMatrix with BCEPlotHandler.
   /*! BCEPlotHandler cannot edit BCEDataState's private member
-    equilibriumMatrix but needs read access to plot the 
+    equilibriumMatrix but needs read access to plot the
     GUI's heatmap.
   */
   const vector< vector<double> >& getEqmMatrix() const {
@@ -283,6 +286,15 @@ public:
     return objectiveValues;
   }
 
+  //! Shares memory location of multiplierValues with BCEPlotHandler.
+  /*! BCEPlotHandler cannot edit BCEDataState's private member
+    multiplierValues but needs read access to plot the GUI's
+    bar plots of player's deviation objectives.
+  */
+  const vector< vector<double> >& getMultiplierValues() const {
+    return multiplierValues;
+  }
+
   //! Shares memory location of allEqm with BCEPlotHandler.
   /*! BCEPlotHandler cannot edit BCEDataState's private member
     allEqm but needs read access to plot the set of equilibria.
@@ -292,7 +304,7 @@ public:
   }
 
   //! Shares the current BCESolution by reference.
-  /*! Used to save the current solution. saveGame() in 
+  /*! Used to save the current solution. saveGame() in
     BCEWindow calls this function to serialize and save
     a BCESolution.
   */
@@ -323,17 +335,17 @@ public slots:
 		      int player);
 
   //! Manipulates data after user interaction with controls or new load action.
-  /*! Sets new data for some plots in the solution tab. If given 
+  /*! Sets new data for some plots in the solution tab. If given
     BCESliderType::Action, sets new deviation
     objectives for the given player. If given BCESliderType::Type,
     sets new deviation objectives for the given player. If given
-    BCESliderType::State, sets new data for the heatmap. 
+    BCESliderType::State, sets new data for the heatmap.
   */
   void resetManipulatedData(BCESliderType st,int player);
-  
+
   //! Calls all "set" data functions.
   /*! Called after user interaction with
-    the plot of equilibria player payoffs, this helper function 
+    the plot of equilibria player payoffs, this helper function
     sets new data for every plot in the solution tab.
   */
   void resetManipulatedData();
@@ -341,7 +353,7 @@ public slots:
   //! Changes current equilibrium index for stored BCEData.
   /*! Switches equilibrium indices. Takes in coordinates of a
     click on the plot, minimizes Euclidian distance to find
-    the closest equilibrium, and sets the index of that 
+    the closest equilibrium, and sets the index of that
     equilibrium as the current equilibrium index.
   */
   void modifyEqmFocus(double x,double y);
@@ -361,9 +373,15 @@ private: //functions
     and contains relevant data for those changes.
   */
   void setObjectiveVals(int player);
+  //! Resets constraint bar plot data.
+  /*! Replaces data in "multiplierValues."
+    Also, emits that bar plot titles need to be changed
+    and contains relevant data for those changes.
+  */
+  void setMultiplierVals(int player);
 
   //! Resets BCE Value Set Plot data.
-  /*! Sets payoffs for BCE Value Set Plot. Called after 
+  /*! Sets payoffs for BCE Value Set Plot. Called after
     switching equilibrium indices or after a load action.
   */
   void setAllEqm();

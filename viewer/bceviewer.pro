@@ -32,8 +32,8 @@ CONFIG += WARN_OFF
 CONFIG += debug
 
 QMAKE_CXXFLAGS += -std=gnu++11
-QMAKE_CXXFLAGS += -lm -lpthread  -O0 -O -fPIC -fexceptions 
-QMAKE_LFLAGS += -lm -lpthread  -O -fPIC -fexceptions 
+QMAKE_CXXFLAGS += -lm -lpthread  -O0 -O -fPIC -fexceptions
+QMAKE_LFLAGS += -lm -lpthread  -O -fPIC -fexceptions
 
 INCLUDEPATH += /usr/local/include \
 /usr/local/lib \
@@ -100,10 +100,16 @@ LIBS += ../lib/libbce.a
 
 include(../localviewersettings.mk)
 
+linux-g++-64 {
+LIBS +=  -Bstatic -L../lib -Wl,-Bstatic  -L/usr/lib/x86_64-linux-gnu/ -lboost_serialization -lboost_system -Wl,-Bdynamic
+LIBS += -L/usr/lib/x86_64-linux-gnu/ -L/usr/local/lib -lboost_serialization -lboost_system
+}
+
 linux-g++ {
 LIBS +=  -Bstatic -L../lib -Wl,-Bstatic  -L/usr/lib/x86_64-linux-gnu/ -lboost_serialization -lboost_system -Wl,-Bdynamic
 LIBS += -L/usr/lib/x86_64-linux-gnu/ -L/usr/local/lib -lboost_serialization -lboost_system
 }
+
 macx {
 LIBS +=
 LIBS += -L/usr/lib/x86_64-linux-gnu/ -L/usr/local/lib -lboost_serialization -lboost_system
@@ -122,4 +128,3 @@ OBJECTS_DIR = ./tmp
 
 TEMPLATE = app
 TARGET = bceviewer
-

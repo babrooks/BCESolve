@@ -1,21 +1,21 @@
 // This file is part of the BCESolve library for games of incomplete
 // information
 // Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton
-// 
+//
 // BCESolve free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // BCESolve is distributed in the hope that it will be useful, but
 // WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see
 // <http://www.gnu.org/licenses/>.
-// 
+//
 // Benjamin A. Brooks
 // ben@benjaminbrooks.net
 // Chicago, IL
@@ -37,7 +37,7 @@ BCEDataState::BCEDataState():
   margT = vector<bool>(2,false);
   currentEqmIndex = 0;
   isPrivateVals=false;
-  setupControlsLayout();  
+  setupControlsLayout();
   conditionedOnState = true;
   isMapped = false;
 }
@@ -69,7 +69,7 @@ void BCEDataState::setSolutionData(const BCESolution &solution,
     values = vector<int>(2,0);
     state = 0;
 
-    for (int player = 0; player < 2; player++)
+    for (int player = 0; player < 2; player++) //flag
       emit(sliderLabelsChanged(isPrivateVals,player));
 
     resetManipulatedData();
@@ -79,7 +79,7 @@ void BCEDataState::setSolutionData(const BCESolution &solution,
     vector<int> numTypes = gameData.getNumTypes();
     int numStates = gameData.getNumStates();
 
-    // Set Slider Ranges 
+    // Set Slider Ranges
     for (int player = 0; player < 2; player++) {
       sliderGroup[3*player]->setRange(0,numActions[player]-1);
       sliderGroup[3*player+1]->setRange(0,numTypes[player]-1);
@@ -165,7 +165,7 @@ void BCEDataState::setupControlsLayout() {
     sliderLabels.push_back(new BCELabel(SliderLabel,Type,player));
     sliderLabels.back()->setSizePolicy(sp2);
     sliderLabels.push_back(new BCELabel(SliderLabel,State,player));
-    sliderLabels.back()->setSizePolicy(sp2);	 
+    sliderLabels.back()->setSizePolicy(sp2);
   }
 
 
@@ -189,7 +189,7 @@ void BCEDataState::setupControlsLayout() {
       subLayoutWithLabels[3*i+j]->addWidget(sliderLabels[3*i+j]);
       subLayoutWithLabels[3*i+j]->addLayout(gridSubLayouts[3*i+j]);
       controlsGrid->addLayout(subLayoutWithLabels[3*i+j],j,i); // Layout Matrix
-    } 
+    }
   }
 
   controlsLayout = new QWidget(this);
@@ -227,7 +227,7 @@ void BCEDataState::setSliderValue(int value,
     for (int playerIt=0; playerIt < gameData.getNumPlayers(); playerIt++)
       emit(valueChanged(value,st,playerIt));
   }
-  else 
+  else
     emit(valueChanged(value,st,player));
 
   // Changes data in the gui must be changed.
@@ -248,7 +248,7 @@ void BCEDataState::resetManipulatedData(BCESliderType st,int player) {
 void BCEDataState::resetManipulatedData() {
   setAllEqm();
   setEqmMatrix();
-  for (int player = 0; player < 2; player++)
+  for (int player = 0; player < 2; player++) //flip
     setObjectiveVals(player);
 }
 
@@ -274,14 +274,14 @@ void BCEDataState::modifyEqmFocus(double x,double y) {
   solutionData.setCurrentEquilibrium(currentEqmIndex);
 
   double xClosest = allEqm[0][currentEqmIndex];
-  double yClosest = allEqm[1][currentEqmIndex]; 
+  double yClosest = allEqm[1][currentEqmIndex];
 
   emit(eqmCoordSignal(xClosest,yClosest));
 
   // resetManipulatedData();
 
   setEqmMatrix();
-  for (int player = 0; player < 2; player++)
+  for (int player = 0; player < 2; player++)//flip
     setObjectiveVals(player);
 
   emit(selectedEqmChanged());
@@ -309,14 +309,14 @@ void BCEDataState::setEqmMatrix() {
 
   double prob
     = solutionData.getConditionalMarginal(stateConditions,
-					  actionConditions, 
+					  actionConditions,
 					  typeConditions,
 					  margS0,
 					  margA,
 					  margT,
 					  distribution);
-  
-  int numActions_total = solutionData.getGame().getNumActions()[0] 
+
+  int numActions_total = solutionData.getGame().getNumActions()[0]
     * solutionData.getGame().getNumActions()[1];
   if (numActions_total != distribution.size())
     throw(BCEException(BCEException::WrongDistnSize));
@@ -343,16 +343,37 @@ void BCEDataState::setEqmMatrix() {
 
 void BCEDataState::setObjectiveVals(int player) {
 
+    // int mvp = 0;
+    // if (player > 1)
+    // {
+    //     player = player - 2;
+    //     mvp = 2;
+    // }
+
   double prob = solutionData.getDeviationObjectives(player,
 						    actions[player],
 						    types[player],
 						    objectiveValues);
 
+  double i = solutionData.getConstraintMultipliers(player,
+                             actions[player],
+                             types[player],
+                             multiplierValues);
+
+  // if (mvp > 1)
+  // {
   emit(devPlotTitleChange(player,
 			  actions[player],
 			  types[player],
-			  objectiveValues[player][actions[player]]));
+			  objectiveValues[player][actions[player]],
+              multiplierValues[player][actions[player]]));
+  //second one determines payoff also which player #
 
+
+  // }
+  // else
+  // {
+  // }
   emit(devPlotPrChange(player,prob));
   emit(objectiveValuesChanged(player));
 
@@ -385,7 +406,7 @@ void BCEDataState::setAllEqm() {
     cout << allEqm[1][0] << endl;
   }
   else if (isMapped) {
-    
+
     vector<double> summedWeights(2,0);
     summedWeights[0] = 0;
     summedWeights[1] = 0;
@@ -423,7 +444,7 @@ void BCEDataState::setAllEqm() {
     for (int eqm=0; eqm<sizeEqmData; eqm++) {
       allEqm[0][eqm] = eqmAccumulator[0][eqm];
       allEqm[1][eqm] = eqmAccumulator[1][eqm];
-      
+
     }
   }
 
