@@ -1,21 +1,21 @@
 // This file is part of the BCESolve library for games of incomplete
 // information
 // Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton
-// 
+//
 // BCESolve free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // BCESolve is distributed in the hope that it will be useful, but
 // WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see
 // <http://www.gnu.org/licenses/>.
-// 
+//
 // Benjamin A. Brooks
 // ben@benjaminbrooks.net
 // Chicago, IL
@@ -43,11 +43,11 @@
 
   The class contains table models for editing the game, which
   interface with the respective data using the BCEGame class's
-  interface methods. 
+  interface methods.
 
   The class also contains a table model for editing weights
-  on several objectives. This data interfaces with 
-  BCESolverWorker, the class for solving custom games the user 
+  on several objectives. This data interfaces with
+  BCESolverWorker, the class for solving custom games the user
   creates in the game tab.
 
   \ingroup viewer
@@ -56,7 +56,7 @@ class BCEGameHandler : public QMainWindow
 {
   Q_OBJECT;
   friend class BCEPlotHandler;
-  
+
 private:
   //! The game object.
   /*! This is the game that is represented in the game tab. Note that
@@ -114,7 +114,7 @@ private:
   // Combo box
   //! Drop down menu for selecting a state.
   QComboBox * currentStateCombo;
-  
+
   // Tables
   //! Table for displaying stage payoffs
   BCETableView * payoffTableView;
@@ -150,35 +150,36 @@ public:
   //! Returns the layout
   QVBoxLayout * getLayout() const
   { return layout; }
-  
+
   //! Returns the solveButton
   QPushButton * getSolveButton() const
   { return solveButton; }
-  
+
   //! Returns the cancelButton
   QPushButton * getCancelButton() const
   { return cancelButton; }
-  
+
   //! Changes the current state
   /*! Switches all of the models over to new state and updates table
       views. */
   void setState(int state);
   //! Returns weights on objectives.
-  const vector<double> getWeightsOnObjectives();
+  const vector<double> getWeightsOnObjectives() const;
   //! Returns weights on map boundary objectives.
   /*! This is a matrix of doubles. The first row gives the weights
     on objective0 for the mapBoundary algorithm. The second row gives
     the weights on objective1 for the algorithm. */
-  const vector<vector<double> > getMapBWeights();
+  const vector<vector<double> > getMapBWeights() const;
   //! Returns mapBoundaryOption.
   const bool getMapBoundaryOption() const {
     return mapBoundaryOption;
   }
+  //! Returns the minimum angle increment
   const double getMinAngleIncr() const {
     return minAngleIncrement;
   }
 
-  
+
 private:
   //! Delete old data models and create new ones.
   /*! Called in constructor and whenever game changes. */
@@ -187,7 +188,7 @@ private:
   void changeNumberOfStates(int newS);
   //! Sets up the layout for the game handler.
   void setupLayout();
-				     
+
 private slots:
   //! Slot for changing the state. Calls setState.
   void currentStateChanged(int newS);
@@ -205,7 +206,7 @@ private slots:
   void objectiveRemoved();
   //! Removes the current state.
   void stateRemoved();
-  //! Removes action for the given player. 
+  //! Removes action for the given player.
   /*! Will remove the action that is currently selected in the payoff
       table, if one is selected. Otherwise, this function removes the
       last action for the player. */

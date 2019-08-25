@@ -48,9 +48,13 @@ public:
       linear index corresponding to a particular state/type/action
       tuple can be easily calculated using BCECounter. */
   map<int,double> distribution;
+  //! The multipliers associated with the incentive constraints of the BCE
+  /*! Multipliers are represented as maps from linear indices to doubles. The
+      linear index corresponding to a particular type/action/deviation. */
   map<int,double> multipliers;
   //! Unused key for sorting BCE
   double dist_key;
+  //! Unused key for sorting BCE multipliers
   double mult_key;
 
   public:

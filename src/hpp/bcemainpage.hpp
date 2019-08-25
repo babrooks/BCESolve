@@ -1,21 +1,21 @@
 // This file is part of the BCESolve library for games of incomplete
 // information
 // Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton
-// 
+//
 // BCESolve free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // BCESolve is distributed in the hope that it will be useful, but
 // WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see
 // <http://www.gnu.org/licenses/>.
-// 
+//
 // Benjamin A. Brooks
 // ben@benjaminbrooks.net
 // Chicago, IL
@@ -91,7 +91,7 @@
   within.
 
   For a more detailed description of the solver library and its usage,
-  see \ref sourcepage.
+  see \subpage sourcepage.
 
   \section viewersec Overview of the graphical interface
 
@@ -102,9 +102,9 @@
   outside the interface. The solution tab has various visualizations
   for understanding equilibria. The log tab outputs progress and
   numerical solutions for any games games solved within the interface.
-    
+
   For more details about the object model underlying BCEViewer, see
-  the \ref viewerpage.
+  the \subpage viewerpage.
 
   \section examplesec Examples
 
@@ -170,7 +170,7 @@
 */
 
 /*! \defgroup src BCESolve library
-  
+
   @brief The main solver library.
 
   For a detailed description of the BCESolve library, see \ref
@@ -215,11 +215,11 @@
   details in the respective class pages.
 
   \section srcgamesec Specifying a game
-  
+
   The first step in using the BCESolve library is translating the
   abstract formulation of a game into a format that can be
   understood by the library. This translation is facilitated by the
-  BCEAbstractGame and BCEGame classes. 
+  BCEAbstractGame and BCEGame classes.
 
   BCEAbstractGame has protected data members that store the number of
   actions, number of states, number of types, number of objectives,
@@ -269,13 +269,13 @@
   (BCESolution::save) and deserialization (BCESolution::load). See
   allpayauction.cpp for an example of how these are used. Serialized
   BCESolution objects can then be loaded by BCEViewer.
-  
+
  */
 
 /*! \page viewerpage The BCEViewer graphical interface
   @brief An detailed description of the BCEViewer graphical interface.
   \section vieweroverviewsec Introduction
-  
+
   The BCEViewer module is a graphical interface for specifying,
   solving, and exploring the solutions of games with incomplete
   information. The interface is written using Qt 5.5 and the
@@ -283,11 +283,11 @@
   describes the object model underlying the program. For a brief
   description of how to use the graphical interface, please see \ref
   viewersec.
-  
+
   The graphical interface is initialized by the BCEWindow class. This
   class constructs the rest of the interface and handles some high
   level functions such as loading and saving games and solutions,
-  solving games, and keyboard commands. 
+  solving games, and keyboard commands.
 
   The layout has three tabs: these are the "solution tab", the "game
   tab", and the "log tab". The solution tab is for exploring the
@@ -341,7 +341,7 @@
   states, and types. When these options are selected, BCEGameHandler
   simply invokves the corresponding method in the BCEGame class and
   signals that the models need to update their layouts.
-  
+
   Finally, the game tab has a "Solve" push button which triggers the
   solve routine, and a "Cancel" push button for interrupting the
   computation. More on this in the next subsection.
@@ -398,5 +398,5 @@
   slot in BCEDataState that updates the parameter value, manipulates
   relevant data for plotting, and then signals to BCEPlotHandler to
   replot.
-  
+
  */

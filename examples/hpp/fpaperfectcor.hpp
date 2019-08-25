@@ -20,11 +20,6 @@
 // ben@benjaminbrooks.net
 // Chicago, IL
 
-// Header file for common value auction example.
-// RJM 03-12-2016
-//! @example
-//fpa perfect correlation, send dates
-
 #ifndef FPAPERFCOR_HPP
 #define FPAPERFCOR_HPP
 

@@ -1,21 +1,21 @@
 // This file is part of the BCESolve library for games of incomplete
 // information
 // Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton
-// 
+//
 // BCESolve free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // BCESolve is distributed in the hope that it will be useful, but
 // WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see
 // <http://www.gnu.org/licenses/>.
-// 
+//
 // Benjamin A. Brooks
 // ben@benjaminbrooks.net
 // Chicago, IL
@@ -114,7 +114,7 @@ void BCEGameHandler::setupLayout() {
       removeTypeButtons[player]->setSizePolicy(QSizePolicy::Fixed,
 					       QSizePolicy::Preferred);
     }
-  
+
   numObjectivesEdit = new QLineEdit("2",this);
   numObjectivesEdit->setReadOnly(true);
   numObjectivesEdit->setSizePolicy(QSizePolicy::Preferred,
@@ -165,7 +165,7 @@ void BCEGameHandler::setupLayout() {
   QVBoxLayout * probabilityLayout = new QVBoxLayout();
   QVBoxLayout * conditionalLayout = new QVBoxLayout();
   QVBoxLayout * weightsLayout = new QVBoxLayout();
-  
+
   solveButton = new QPushButton(tr("Maximize Main Objective"),this);
   solveButton->setSizePolicy(QSizePolicy::Expanding,
 			     QSizePolicy::Preferred);
@@ -202,9 +202,9 @@ void BCEGameHandler::setupLayout() {
       else
 	numActionsLabel += QString(tr("column"));
       numActionsLabel += QString(tr("):"));
-      
+
       leftControlLayout->addRow(numActionsLabel,
-				numActionsLayout);      
+				numActionsLayout);
     }
 
   for (int player = 0; player < 2; player ++)
@@ -223,18 +223,18 @@ void BCEGameHandler::setupLayout() {
       else
 	numTypesLabel += QString(tr("column"));
       numTypesLabel += QString(tr("):"));
-      
+
       leftControlLayout->addRow(numTypesLabel,
-				  numTypesLayout);      
+				  numTypesLayout);
     }
-       
+
 
   QHBoxLayout * currentStateLayout = new QHBoxLayout();
   currentStateLayout->addWidget(currentStateCombo);
   currentStateLayout->addWidget(prevStateButton);
   currentStateLayout->addWidget(nextStateButton);
   currentStateLayout->setSpacing(5);
-  
+
   centerControlLayout->addRow(new QLabel(tr("Current state:"),this),
 			      currentStateLayout);
 
@@ -254,9 +254,9 @@ void BCEGameHandler::setupLayout() {
   numObjectivesLayout->setSpacing(5);
 
   QString numObjectivesLabel = QString(tr("Number of Objectives:"));
-      
+
   centerControlLayout->addRow(numObjectivesLabel,
-			     numObjectivesLayout); 
+			     numObjectivesLayout);
   centerControlLayout->addRow(clearButton);
 
   QHBoxLayout *minAngleLayout = new QHBoxLayout();
@@ -346,7 +346,7 @@ void BCEGameHandler::setupLayout() {
   weightsLayout->addWidget(weightsScrollArea);
   weightsLayout->addWidget(new QLabel(tr("Prior over States:"),this));
   weightsLayout->addWidget(probabilityScrollArea);
- 
+
   // END SCROLL AREA SETUP
   //////////////////////////////
   // ADDING WIDGETS TO QSPLITTER
@@ -408,7 +408,7 @@ void BCEGameHandler::setupLayout() {
 	  this,SLOT(nextState()));
   connect(prevStateButton,SIGNAL(clicked()),
 	  this,SLOT(prevState()));
- 
+
   connect(solveButton,SIGNAL(clicked()),
 	  this,
 	  SLOT(emitSolveSignal()));
@@ -468,7 +468,7 @@ void BCEGameHandler::setGame(const BCEGame & _game)
       ->setText(QString::number(game.getNumTypes()[player]));
   }
   numStatesEdit->setText(QString::number(game.getNumStates()));
-  numObjectivesEdit->setText(QString::number(game.getNumObjectives()));  
+  numObjectivesEdit->setText(QString::number(game.getNumObjectives()));
 
   initializeModels();
 
@@ -486,7 +486,7 @@ void BCEGameHandler::changeNumberOfStates(int newS)
     numTypesEdits[player]
       ->setText(QString::number(game.getNumTypes()[player]));
   }
-  
+
   int state = currentStateCombo->count();
   // Remove items larger than the new number of states
   while (state > newS)
@@ -499,7 +499,7 @@ void BCEGameHandler::changeNumberOfStates(int newS)
 
   connect(currentStateCombo,SIGNAL(currentIndexChanged(int)),
 	  this,SLOT(currentStateChanged(int)));
-  
+
 } // changeNumberOfStates
 
 void BCEGameHandler::initializeModels()
@@ -544,20 +544,20 @@ void BCEGameHandler::setState(int state)
     numTypesEdits[player]
       ->setText(QString::number(game.getNumTypes()[player]));
   }
-  
+
   payoffModel->setState(state);
   payoffModel->emitLayoutChanged();
   conditionalModel->setState(state);
   conditionalModel->emitLayoutChanged();
   payoffTableView->resizeColumnsToContents();
   conditionalTableView->resizeColumnsToContents();
-  
+
   disconnect(currentStateCombo,SIGNAL(currentIndexChanged(int)),
 	     this,SLOT(currentStateChanged(int)));
   currentStateCombo->setCurrentIndex(state);
   connect(currentStateCombo,SIGNAL(currentIndexChanged(int)),
 	  this,SLOT(currentStateChanged(int)));
-  
+
 } // setState
 
 void BCEGameHandler::currentStateChanged(int newS)
@@ -585,9 +585,9 @@ void BCEGameHandler::actionAdded(int player)
 {
   if (player < 0 || player > 1)
     return;
-  
+
   int newAction = game.getNumActions()[player];
-  
+
   if (payoffTableView->selectionModel()->hasSelection())
     {
       if (player==1)
@@ -597,7 +597,7 @@ void BCEGameHandler::actionAdded(int player)
 	newAction = (payoffTableView->selectionModel()
 		     ->selectedIndexes().front().row()+1);
     }
-    
+
   game.addAction(player,newAction);
   numActionsEdits[player]
     ->setText(QString::number(game.getNumActions()[player]));
@@ -611,9 +611,9 @@ void BCEGameHandler::typeAdded(int player)
 {
   if (player < 0 || player > 1)
     return;
-  
+
   int newType = game.getNumTypes()[player];
-  
+
   if (conditionalTableView->selectionModel()->hasSelection())
     {
       if (player==1)
@@ -623,7 +623,7 @@ void BCEGameHandler::typeAdded(int player)
 	newType = (conditionalTableView->selectionModel()
 		   ->selectedIndexes().front().row()+1);
     }
-    
+
   game.addType(player,newType);
   numTypesEdits[player]
     ->setText(QString::number(game.getNumTypes()[player]));
@@ -634,14 +634,14 @@ void BCEGameHandler::typeAdded(int player)
 }  // typeAdded
 
 void BCEGameHandler::objectiveAdded() {
-  
+
   int newObjective = game.getNumObjectives();
-  
+
   if (weightsTableView->selectionModel()->hasSelection())
     {
       newObjective = (weightsTableView->selectionModel()
 		      ->selectedIndexes().front().row()+1);
-    } 
+    }
 
   game.addObjective(newObjective,"k");
   weightsModel->addObjective(newObjective);
@@ -663,7 +663,7 @@ void BCEGameHandler::stateAdded()
   game.addState(newState);
   changeNumberOfStates(game.getNumStates());
   numStatesEdit->setText(QString::number(game.getNumStates()));
-  
+
   priorModel->emitLayoutChanged();
   priorTableView->resizeColumnToContents(game.getNumStates());
   setState(newState);
@@ -674,7 +674,7 @@ void BCEGameHandler::actionRemoved(int player)
   int state = currentStateCombo->currentIndex();
   if (game.getNumActions()[player] == 1)
     return;
-  
+
   int action = game.getNumActions()[player]-1;
   if (payoffTableView->selectionModel()->hasSelection())
     {
@@ -698,7 +698,7 @@ void BCEGameHandler::typeRemoved(int player)
 {
   if (game.getNumTypes()[player] == 1)
     return;
-  
+
   int type = game.getNumTypes()[player]-1;
   if (conditionalTableView->selectionModel()->hasSelection())
     {
@@ -722,7 +722,7 @@ void BCEGameHandler::objectiveRemoved()
 {
   if (game.getNumObjectives() == 1 || game.getNumObjectives() == 2)
     return;
-  
+
   int objective = game.getNumObjectives()-1;
   if (weightsTableView->selectionModel()->hasSelection())
     {
@@ -760,7 +760,7 @@ void BCEGameHandler::stateRemoved()
   currentStateCombo->removeItem(currentStateCombo->count()-1);
   connect(currentStateCombo,SIGNAL(currentIndexChanged(int)),
 	  this,SLOT(currentStateChanged(int)));
-  
+
   game.removeState(state);
 
   priorModel->emitLayoutChanged();
@@ -769,7 +769,7 @@ void BCEGameHandler::stateRemoved()
   numStatesEdit->setText(QString::number(game.getNumStates()));
 
   setState(newState);
-  
+
 } // stateRemoved
 
 void BCEGameHandler::clearCurrentGame() {
@@ -795,11 +795,11 @@ void BCEGameHandler::clearCurrentGame() {
   currentStateCombo->addItem("0");
 }
 
-const vector<double> BCEGameHandler::getWeightsOnObjectives() {
+const vector<double> BCEGameHandler::getWeightsOnObjectives() const {
   return weightsModel->getSolverData();
 }
 
-const vector<vector<double> > BCEGameHandler::getMapBWeights() {
+const vector<vector<double> > BCEGameHandler::getMapBWeights() const {
 
   return weightsModel->getMapBoundaryData();
 }

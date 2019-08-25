@@ -1,21 +1,21 @@
 // This file is part of the BCESolve library for games of incomplete
 // information
 // Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton
-// 
+//
 // BCESolve free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // BCESolve is distributed in the hope that it will be useful, but
 // WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see
 // <http://www.gnu.org/licenses/>.
-// 
+//
 // Benjamin A. Brooks
 // ben@benjaminbrooks.net
 // Chicago, IL
@@ -59,7 +59,7 @@ private:
   //! Data for the feasibleDeviation array
   /*! Access via feasibleDeviationData[player][type][action + dev*numActions[player]] */
   vector< vector< vector<bool> > > feasibleDeviationData;
-  
+
 public:
   //! Default constructor
   BCEGame();
@@ -67,10 +67,10 @@ public:
   //! Constructor
   /*! Copies a BCEAbstractGame into a BCEGame. */
   BCEGame(const BCEAbstractGame & game);
-  
+
   //! Destructor
   ~BCEGame()
-  {} 
+  {}
 
   //! Prior over state and types
   /*! For each state and vector of types, returns the prior
@@ -97,8 +97,8 @@ public:
     types[player] = type;
     for (int state = 0; state < numStates; state++)
       {
-	for (types[1-player]=0; 
-	     types[1-player]<numTypes[1-player]; 
+	for (types[1-player]=0;
+	     types[1-player]<numTypes[1-player];
 	     types[1-player]++)
 	  probSum += prior(state,types);
       }
@@ -111,16 +111,17 @@ public:
   double conditional(int state, const vector<int> &types) const
   {
     return conditionalData[state][types[0] + types[1] * numTypes[0]];
-  } // prior
+  } // conditional
 
-  //! Sets the prior
+  //! Sets the conditional
   bool setConditional(int state, const vector<int> &types, double value)
   {
     conditionalData[state][types[0] + types[1] * numTypes[0]] = value;
 
     return true;
-  } // setPrior
+  } // setConditional
 
+  //! Sets the prior
   bool setPrior(int state, double value)
   {
     priorData[state] = value;
@@ -134,7 +135,7 @@ public:
     inclusive.  objective=0 through numPlayers-1 are the payoffs of
     players 1 through numPlayers, respectively. This is a pure virtual
     function that must be implemented by the derived class. */
-  double objective(int state, const vector<int> &actions, 
+  double objective(int state, const vector<int> &actions,
 		   int obj) const
   {
     return objectiveData[obj][state]
@@ -142,7 +143,7 @@ public:
   } // objective
 
   //! Sets the objective
-  bool setObjective(int state, const vector<int> &actions, 
+  bool setObjective(int state, const vector<int> &actions,
 		    int obj, double value)
   {
     objectiveData[obj][state]
@@ -171,14 +172,14 @@ public:
     action to the alternative dev, when the player's type is
     type. This is a virtual method that can be reimplemented. By
     default, all deviations are feasible. */
-  bool feasibleDeviation(int action, int dev, 
+  bool feasibleDeviation(int action, int dev,
 				 int type, int player) const
   {
     return feasibleDeviationData[player][type][action+dev*numActions[player]];
   } // feasibleDeviation
 
   //! Set feasible
-  bool setFeasibleDeviation(int action, int dev, 
+  bool setFeasibleDeviation(int action, int dev,
 			    int type, int player, bool value)
   {
     feasibleDeviationData[player][type][action+dev*numActions[player]] = value;
@@ -221,7 +222,7 @@ public:
     ar & hasProductStructureData;
     ar & numPrivateStates;
   } // serialize
-  
+
   //! Serialize a BCEGame object using Boost.
   static void save(const BCEGame & game, const char* filename)
   {
@@ -251,7 +252,7 @@ public:
     else
       throw(BCEException(BCEException::FailedOpen));
   }
-  
+
   friend class boost::serialization::access;
 }; // BCEGame
 

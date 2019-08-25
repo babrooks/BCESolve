@@ -200,7 +200,7 @@ public:
   const vector<double> getMainObjectiveWeights() const {
     return mainObjectiveWeights;
   }
-
+  //! Returns true if boundary was mapped in the solver.
   const bool getIsBoundaryMapped() const {
     return boundaryMapped;
   }

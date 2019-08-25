@@ -162,13 +162,20 @@ private: // Private Properties. Private Functions near EOF.
   BCEGame gameData;
   //! File name of example currently displayed in the GUI.
   string guiTitle;
-  //! If true, GUI displays marginal distribution for player's state.
-  bool margS0, margS1;
-  //! If true, GUI displays marginal distribution for player's action/type.
+  //! If true, GUI displays marginal distribution for player 0's state.
+  bool margS0;
+  //! If true, GUI displays marginal distribution for player 1's state.
+  bool margS1;
+  //! If true, GUI displays marginal distribution for player's action.
   /*! 2 element vectors holding whether marginal distributions for
-    actions or type are displayed. Not currently in use.
+    actions are displayed. Not currently in use.
   */
-  vector<bool> margA, margT;
+  vector<bool> margA;
+  //! If true, GUI displays marginal distribution for player's type.
+  /*! 2 element vectors holding whether marginal distributions for
+    types are displayed. Not currently in use.
+  */
+  vector<bool> margT;
   //! Index of equilibrium currently displayed in the GUI.
   int currentEqmIndex;
   //! Data displayed in the GUI's heatmap.

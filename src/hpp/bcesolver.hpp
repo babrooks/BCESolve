@@ -124,6 +124,7 @@ protected:
 
   // Gurobi components
 
+  //! Enviorment constructor
   GRBEnv env;
   //! The objective for BCESolver::model.
   GRBLinExpr gurobiObjective;
@@ -187,13 +188,10 @@ protected:
   //! BCESolution object for serializing output of the algorithm.
   BCESolution soln;
 
-  /*! Initializes the properties that count the number of actions and
-  types. */
+  //! Initializes the properties that count the number of actions and types.
   void countActionsTypes();
 
-  // Helper functions. These functions map between a linear index i
-  // and valuations, types, and states. Mostly deprecated because of
-  // use of BCECounter class.
+  //! Maps between a linear index i and valuations, types, and states. Mostly deprecated because of use of BCECounter class.
   void indexToTypeActionDeviation(int index, int player, int &type, int &action, int &deviation);
 
 public:

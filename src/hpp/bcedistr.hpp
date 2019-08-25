@@ -1,21 +1,21 @@
 // This file is part of the BCESolve library for games of incomplete
 // information
 // Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton
-// 
+//
 // BCESolve free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // BCESolve is distributed in the hope that it will be useful, but
 // WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see
 // <http://www.gnu.org/licenses/>.
-// 
+//
 // Benjamin A. Brooks
 // ben@benjaminbrooks.net
 // Chicago, IL
@@ -31,7 +31,7 @@ using namespace std;
 //! Utility class for probability distributions
 /*! This is a pure virtual base class for describing bivariate joint
     distributions. You can inherit from this class and reimplement the
-    CDF method. The CDF method should return the joint CDF. 
+    CDF method. The CDF method should return the joint CDF.
 
     \ingroup src
 */
@@ -78,7 +78,7 @@ public:
   //! Default constructor
   /*! Creates an empty BCEDistrArray. */
   BCEDistrArray() {}
-  
+
   //! Destructor
   /*! Deletes all of the member distributions. */
   ~BCEDistrArray()
@@ -119,7 +119,7 @@ public:
     // First check if this object is itself distr.
     if (this==distr)
       return true;
-    
+
     // Now check if any of the elements of distributions are distr. If
     // any of the elements of distributions are themselves arrays,
     // initiate a recursive check.
@@ -128,8 +128,8 @@ public:
 	 ++it)
       {
 	BCEDistrArray * distrArray = dynamic_cast<BCEDistrArray *>(distr);
-	
-	if (distr == *it 
+
+	if (distr == *it
 	    || (distrArray != NULL
 		&& distrArray->contains(distr) ) )
 	  return true;
@@ -217,12 +217,13 @@ public:
       return 0.0;
     else if (v1 < 1)
       p *= c1*( d1*v1 + pow(v1-m1,k1) + e1 );
-    
+
     return p;
   }
 
 }; // unimodal
 
+//! Additive correlated distribution
 class additiveCorrelated: public BCEDistr
 {
 public:
@@ -254,7 +255,7 @@ public:
       return 0.0;
     else if (v1 < 1)
       p *= v1;
-    
+
     return p;
   }
 
@@ -280,7 +281,7 @@ public:
       return 0.0;
     else if (v1 < 1)
       p *= lowProb;
-    
+
     return p;
   }
 
@@ -311,7 +312,7 @@ public:
       p *= alpha;
     else if (v1 < 1)
       p *= (1-alpha)*v1;
-    
+
     return p;
   }
 
@@ -321,7 +322,7 @@ public:
 class uniformNoTie: public BCEDistr
 {
   int k;
-  
+
 public:
   uniformNoTie() {}
   uniformNoTie(int _k): k(_k) {}
@@ -338,7 +339,7 @@ public:
       return 0.0;
     else if (v1 < 1)
       p *= v1;
-    
+
     if (abs(v0-v1)<(0.5/k))
       p -= 1.0/(k*k);
 
@@ -356,13 +357,13 @@ class vToTheAlpha: public BCEDistr
 public:
   vToTheAlpha() {}
 
-  vToTheAlpha(double a0, double a1): 
-    alpha0(a0), 
+  vToTheAlpha(double a0, double a1):
+    alpha0(a0),
     alpha1(a1)
   {}
 
-  vToTheAlpha(double a): 
-    alpha0(a), 
+  vToTheAlpha(double a):
+    alpha0(a),
     alpha1(a)
   {}
 
@@ -378,7 +379,7 @@ public:
       return 0.0;
     else if (v1 < 1)
       p *= pow(v1,alpha1);
-    
+
     return p;
   } // CDF
 
@@ -413,8 +414,8 @@ public:
   //! Constructor
   /*! Truncates the distribution at _dist to the range
       \f$[min,max]^2\f$. */
-  truncated(BCEDistr * _dist, 
-	    double _min, double _max): 
+  truncated(BCEDistr * _dist,
+	    double _min, double _max):
     dist(_dist),
     min0(_min),
     min1(_min),
@@ -422,12 +423,12 @@ public:
     max1(_max)
   {}
 
-  //! Constructor. 
+  //! Constructor.
   /*! Truncates the distribution at _dist to the range
       \f$[min_0,max_0]\times[min_1,max_1]\f$. */
-  truncated(BCEDistr * _dist, 
+  truncated(BCEDistr * _dist,
 	    double _min0, double _min1,
-	    double _max0, double _max1): 
+	    double _max0, double _max1):
     dist(_dist),
     min0(_min0),
     min1(_min1),
