@@ -28,7 +28,7 @@ int main() {
   double reservePrice = 0.125;
   int nv = 50;
   int nbids = 50;
-  double highBid = 1;
+  double highBid = 0.3;
   double alpha = 1;
 
   CommonValueAuction cva(nbids,nv,alpha,highBid,

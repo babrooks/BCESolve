@@ -24,13 +24,31 @@
 BOOSTINCLDIR=/usr/include/boost
 BOOSTDIR=/usr/include/boost
 
-ifneq "$(wildcard /Users/benjaminbrooks/Applications/IBM/ILOG/CPLEX_Studio1262/cplex/bin/x86-64_osx/cplex )" "" 
- $(info Compiling on Bens macbook pro)
+ifneq "$(wildcard /Users/benjaminbrooks/ )" "" 
+ $(info Compiling on Bens imac)
 
- GRBDIR=/Library/gurobi650/mac64
+ GRBDIR=/Library/gurobi903/mac64
  GRBINCLDIR=$(GRBDIR)/include
  GRBLIBDIR=$(GRBDIR)/lib
- GRBNAME=gurobi65
+ GRBNAME=gurobi90
+
+ BOOSTINCLDIR=/usr/local/include/
+ BOOSTDIR=/usr/local/lib/
+
+ STATIC=
+ DYNAMIC=
+
+ CXX=clang++ -O0
+
+ RMCMD=rm -rf 
+endif
+ifneq "$(wildcard /Users/benbrooks/ )" "" 
+ $(info Compiling on Bens macbook pro)
+
+ GRBDIR=/Library/gurobi811/mac64
+ GRBINCLDIR=$(GRBDIR)/include
+ GRBLIBDIR=$(GRBDIR)/lib
+ GRBNAME=gurobi81
 
  BOOSTINCLDIR=/usr/local/include/
  BOOSTDIR=/usr/local/lib/

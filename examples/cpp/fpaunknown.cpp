@@ -28,12 +28,12 @@
 int main(int argc, char ** argv)
 {
   double entryCost=0.0;
-  double reservePrice=0;
+  double reservePrice=0.00;
   double minAngleIncrement = 0.025;
-  int nb = 15;
-  int nv = 15;
+  int nb = 30;
+  int nv = nb;
 
-  double highbid = 1.0;
+  double highbid = 0.15;
 
   int t, a, ahat;
 
@@ -66,16 +66,14 @@ int main(int argc, char ** argv)
       	   << solver.getObjectiveFunction(1).getValue() << endl;
       cout << "Revenue: " 
       	   << solver.getObjectiveFunction(2).getValue() << endl;
-      cout << "Total surplus: " 
-      	   << solver.getObjectiveFunction(3).getValue() << endl;
 
-      vector< vector<double> > bndryWeights(2,vector<double>(3));
-      bndryWeights[0] = vector<double>(3,1);// total surplus
-      bndryWeights[1][2] = 1; // revenue
+      // vector< vector<double> > bndryWeights(2,vector<double>(3));
+      // bndryWeights[0] = vector<double>(3,1);// total surplus
+      // bndryWeights[1][2] = 1; // revenue
       
-      solver.mapBoundary("fpaunknownbndry_correlated.dat",
-			 bndryWeights);
-      cout << "Mapped boundary" << endl;
+      // solver.mapBoundary("fpaunknownbndry_correlated.dat",
+      // 			 bndryWeights);
+      // cout << "Mapped boundary" << endl;
 
       BCESolution soln;
       solver.getSolution(soln);

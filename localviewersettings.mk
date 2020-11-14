@@ -35,11 +35,11 @@ GRBDIR=/opt/gurobi650/linux64
 GRBNAME=gurobi65
 } # Robbie's computer
 
-exists( /Users/benjaminbrooks/Applications/IBM/ILOG/CPLEX_Studio1262/cplex/bin/x86-64_osx/cplex ) {
+exists( /Users/benbrooks ) {
 message("QMAKE run on Ben's macbook pro...")
 
-GRBNAME=gurobi65
-GRBDIR=/Library/gurobi650/mac64
+GRBNAME=gurobi81
+GRBDIR=/Library/gurobi811/mac64
 
 } # Ben's macbook pro
 

@@ -20,8 +20,8 @@
 # ben@benjaminbrooks.net
 # Chicago, IL
 
-QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.11
-QMAKE_MAC_SDK = macosx10.11
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.15
+QMAKE_MAC_SDK = macosx10.15
 
 QT += core gui printsupport
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport

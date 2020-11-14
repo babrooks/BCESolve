@@ -32,9 +32,9 @@ void solveFPA(int nvals, int nbids,
 int main(int argc, char ** argv)
 {
   double entryCost=0.0;
-  double reservePrice=0.0;
-  int nvals=40;
-  int nbids=40;
+  double reservePrice=0.125;
+  int nvals=20;
+  int nbids=20;
   double lowbid = 0.0;
 
   solveFPA(nvals,nbids,entryCost,reservePrice,false);
