@@ -50,21 +50,15 @@
 
   \section installsec Installation
 
-  To use this software, you can directly download the BCEViewer
-  binaries, which are precompiled for Linux, OS X, and MS Windows. The
-  source code is also available at
-  www.benjaminbrooks.net/research.shtml. The code has been compiled
-  on: CentOS 7 using gcc version 4.8.3 and Boost 1.53; and on OS X
-  using LLVM version 7.0.2 and Boost 1.57; and on MS Windows using
-  MinGW 4.92. In both cases, the BCEViewer was compiled using Qt
-  5.5. The class BCESolver uses Gurobi for linear programming, and the
-  code was compiled with Gurobi 5.63 on Linux and Gurobi 6.50 on OS
-  X. To compile the source and example code yourself, you need to
-  change the relevant variables in localsettings.mk and
-  locasettings2.mk to direct the compiler to Boost and
-  Gurobi. Importantly, just directing the compiler to Gurobi is not
-  sufficient; your Gurobi installation must be associated with a valid
-  license. A free academic license may be obtained here: <a
+  The source code is also available through the author's github
+  page. The code has been most recently compiled on Mac OS 12.1 using
+  Boost 1.76 and Gurobi 9.0.3. BCEViewer was compiled using Qt 6.2. To
+  compile the source and example code yourself, you need to change the
+  relevant variables in localsettings.mk and locasettings2.mk to
+  direct the compiler to Boost and Gurobi. Importantly, just directing
+  the compiler to Gurobi is not sufficient; your Gurobi installation
+  must be associated with a valid license. A free academic license may
+  be obtained here: <a
   href="http://www.gurobi.com/registration/academic-license-reg">Gurobi
   University License</a>. You can then build the desired examples by
   calling "make examplename" (the .cpp or .hpp ending is not included)
@@ -136,12 +130,13 @@
   contains tools for interfacing between MATLAB and BCESolve. In
   particular, bcemex.cpp is a mex program that can be used to create
   games and load solution files from within MATLAB. There is also a
-  matlab m-file bcemexbuild.m that was used to build bcemex on Linux
-  and with MATLAB R2014a. (Note that building bcemex is a bit tricky
-  since the mex file needs to be linked to position independent code,
-  and the default Boost libraries obtained through most package
-  managers were compiled without the -fPIC compiler flag. You may need
-  to build the Boost serialization library from the source code.)
+  matlab m-file bcemexbuild.m that was most recently used to build
+  bcemex on Linux and with MATLAB R2014a. (Note that building bcemex
+  is a bit tricky since the mex file needs to be linked to position
+  independent code, and the default Boost libraries obtained through
+  most package managers were compiled without the -fPIC compiler
+  flag. You may need to build the Boost serialization library from the
+  source code.)
 
   This program would not have been possible without the support of
   numerous groups and the contributions of others, and it is entirely
@@ -152,7 +147,9 @@
   Eichhammer's QCustomPlot (www.qcustomplot.com), the Boost libraries
   (www.boost.org), and the GNU project (www.gnu.org). We would also
   like to gratefully acknowledge support from the Becker Friedman
-  Institute and the University of Chicago.
+  Institute and the University of Chicago. Also, special thanks to
+  Robbie Minton, who made significant contributions to this project in
+  2016.
 
   Finally, it should go without saying that this program is a work in
   progress. Feedback, bug reports, and contributions are much
@@ -163,10 +160,6 @@
   Ben Brooks
   Chicago, IL
   ben@benjaminbrooks.net
-
-  Robbie Minton
-  Chicago, IL
-  rminton@uchicago.edu
 */
 
 /*! \defgroup src BCESolve library
