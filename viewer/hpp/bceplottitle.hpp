@@ -38,7 +38,7 @@
   \ingroup viewer
 
  */
-class BCEPlotTitle : public QCPPlotTitle {
+class BCEPlotTitle : public QCPTextElement {
   Q_OBJECT;
 
 private:

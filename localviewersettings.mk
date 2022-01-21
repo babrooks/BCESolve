@@ -20,11 +20,25 @@
 # ben@benjaminbrooks.net
 # Chicago, IL
 
+QMAKE=qmake
+MACDEPLOYQT=macdeployqt
+
 exists(/opt/gurobi751/linux64/bin/grbgetkey) {
 message("QMAKE run on Ben's desktop...")
 
 GRBDIR=/opt/gurobi751/linux64
 GRBNAME=gurobi75
+
+# QMAKEDIR=/usr/local/Cellar/qt@5/5.15.2_1/bin
+# QMAKE=$(QMAKEDIR)/qmake
+# MACDEPLOYQT=$(QMAKEDIR)/macdeployqt
+
+}
+exists(/Users/benjaminbrooks) {
+message("QMAKE run on Ben's work iMac...")
+
+GRBDIR=/Library/gurobi903/mac64
+GRBNAME=gurobi90
 }
 
 # Robbie's computer

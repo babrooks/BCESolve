@@ -25,7 +25,7 @@
 BCEPlotTitle::BCEPlotTitle(LabelType _labelType,
 			   int _player,
 			   QCustomPlot *parentPlot):
-  player(_player),labelType(_labelType),QCPPlotTitle(parentPlot)
+  player(_player),labelType(_labelType),QCPTextElement(parentPlot)
 {
   std::stringstream titleName;
   titleName << "Player " << player << "'s Deviation Objectives";
@@ -39,7 +39,7 @@ BCEPlotTitle::BCEPlotTitle(LabelType _labelType,
 
 BCEPlotTitle::BCEPlotTitle(LabelType _labelType,
 			   QCustomPlot *parentPlot):
-  labelType(_labelType),QCPPlotTitle(parentPlot)
+  labelType(_labelType),QCPTextElement(parentPlot)
 {
   switch(_labelType) {
   case ValueSetPlot: {

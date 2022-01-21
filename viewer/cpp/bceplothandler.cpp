@@ -132,7 +132,7 @@ void BCEPlotHandler::setupLayout() {
   // Plot Layout and Interaction Settings
   colorMap = new QCPColorMap(conditionalMarginalPlot->xAxis,
 			     conditionalMarginalPlot->yAxis);
-  conditionalMarginalPlot->addPlottable(colorMap);
+  // conditionalMarginalPlot->addPlottable(colorMap);
   conditionalMarginalPlot->setInteractions(QCP::iRangeDrag|QCP::iRangeZoom);
   conditionalMarginalPlot->axisRect()->setupFullAxesBox(true);
   conditionalMarginalPlot->xAxis->setLabel("Player 0");
@@ -209,7 +209,7 @@ void BCEPlotHandler::plotEqm() {
 
   const vector< vector<double> > eqmMatrix(guiData->getEqmMatrix());
 
-  colorMap->clearData();
+  // colorMap->clearData();
   int nx = eqmMatrix.size();
   int ny = eqmMatrix[0].size();
   colorMap->data()->setSize(nx, ny); 
@@ -269,7 +269,7 @@ void BCEPlotHandler::plotBCEValueSet() {
 							QPen(Qt::blue),
 							QBrush(Qt::blue),
 							5));
-  setOfBCEPlot->addPlottable(boundaryCurve);
+  // setOfBCEPlot->addPlottable(boundaryCurve);
 
   setOfBCEPlot->rescaleAxes();
   setOfBCEPlot->xAxis->scaleRange(1.1, setOfBCEPlot->xAxis->range().center());
@@ -294,7 +294,7 @@ void BCEPlotHandler::plotBCEValueSet() {
 					  pen,
 					  QBrush(Qt::green),
 					  13));
-  setOfBCEPlot->addPlottable(xCurve);
+  // setOfBCEPlot->addPlottable(xCurve);
   // Replot
 
   setOfBCEPlot->replot();
@@ -315,14 +315,14 @@ void BCEPlotHandler::plotDeviationObjectives(int player) {
 
   QCPBars *barGraph = new QCPBars(deviationBarGraphs[player]->xAxis,
 				  deviationBarGraphs[player]->yAxis);
-  deviationBarGraphs[player]->addPlottable(barGraph);
+  // deviationBarGraphs[player]->addPlottable(barGraph);
   barGraph->setName("Expected Payoffs from Deviation");
 
   const vector< vector<double> > objectiveValues(guiData->getObjectiveValues());
 
   QVector<double> yData;
 
-  yData = QVector<double>::fromStdVector(objectiveValues[player]);
+  yData = QList<double>(objectiveValues[player].begin(),objectiveValues[player].end());
 
   int sizeYData = yData.size();
   QVector<double> xData(sizeYData,0);
@@ -339,7 +339,7 @@ void BCEPlotHandler::plotDeviationObjectives(int player) {
 
   QCPBars *recAction = new QCPBars(deviationBarGraphs[player]->xAxis,
 				   deviationBarGraphs[player]->yAxis);
-  deviationBarGraphs[player]->addPlottable(recAction);
+  // deviationBarGraphs[player]->addPlottable(recAction);
 
   int action = guiData->getCurrentSliderVal(Action,player);
 
@@ -366,7 +366,7 @@ void BCEPlotHandler::plotDeviationObjectives(int player) {
 
   QCPBars *indiffAction = new QCPBars(deviationBarGraphs[player]->xAxis,
 				      deviationBarGraphs[player]->yAxis);
-  deviationBarGraphs[player]->addPlottable(indiffAction);
+  // deviationBarGraphs[player]->addPlottable(indiffAction);
 
   indiffAction->setData(xCoordIndiff,yCoordIndiff);
   indiffAction->setPen(QColor(1, 92, 191));

@@ -164,8 +164,8 @@ BCEWindow::BCEWindow(BCELogHandler &logHandler) {
     }
   catch (BCEException & e)
     {
-      qDebug() << "BCEException caught: " << endl
-	       << e.what() << endl;
+      qDebug() << "BCEException caught: " 
+	       << e.what();
     }
 } // Default Constructor
 
@@ -257,6 +257,7 @@ void BCEWindow::saveSolution() {
 			     "../examples/",
 			     tr("BCEViewer solution files (*.bce)"));
   saveSolnDialog.setDefaultSuffix("bce");
+  saveSolnDialog.setAcceptMode(QFileDialog::AcceptSave);
 
   if (saveSolnDialog.exec()
       && !saveSolnDialog.selectedFiles().isEmpty())
