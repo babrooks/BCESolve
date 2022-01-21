@@ -1,6 +1,6 @@
 // This file is part of the BCESolve library for games of incomplete
 // information
-// Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton
+// Copyright (C) 2022 Benjamin A. Brooks
 // 
 // BCESolve free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by
@@ -354,9 +354,6 @@ void BCESolver::populate ()
 	      if (counter.getActions()[player] != action ||
 		  counter.getTypes()[player] != type)
 		throw(BCEException(BCEException::ConditionFailed));
-
-	      // assert(counter.getActions()[player]==action);
-	      // assert(counter.getTypes()[player]==type);
 
 	      do
 		{
@@ -735,9 +732,6 @@ void BCESolver::indexToTypeActionDeviation(int index, int player, int &type, int
       index >= game->getNumTypes()[player]*
       game->getNumActions()[player]*game->getNumActions()[player])
     throw(BCEException(BCEException::BadArgument));
-  // assert(index>=0);
-  // assert(index<game->getNumTypes()[player]*
-  // 	 game->getNumActions()[player]*game->getNumActions()[player]);
 
   deviation=index%game->getNumActions()[player];
   index-=deviation; index/=game->getNumActions()[player];
@@ -749,12 +743,6 @@ void BCESolver::indexToTypeActionDeviation(int index, int player, int &type, int
       type >= game->getNumTypes()[player] || action >= game->getNumActions()[player] ||
       deviation >= game->getNumActions()[player])
     throw(BCEException(BCEException::BadArgument));
-  // assert(type>=0);
-  // assert(action>=0);
-  // assert(deviation>=0);
-  // assert(type<game->getNumTypes()[player]);
-  // assert(action<game->getNumActions()[player]);
-  // assert(deviation<game->getNumActions()[player]);
 
 }
 

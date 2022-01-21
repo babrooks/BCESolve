@@ -1,2 +1,2 @@
 # BCESolve
-BCE solver library
+BCE solver library. See the doxygen documentation for more detail on installation and usage.

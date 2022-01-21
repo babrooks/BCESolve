@@ -1,6 +1,6 @@
 // This file is part of the BCESolve library for games of incomplete
 // information
-// Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton
+// Copyright (C) 2022 Benjamin A. Brooks
 // 
 // BCESolve free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by
@@ -589,7 +589,7 @@ void BCEWindow::displayAbout() {
   aboutBox.setTextFormat(Qt::RichText); 
 
   aboutBox.setWindowTitle("About");
-  aboutBox.setText("BCEViewer is part of the BCESolve library for solving games with incomplete information.<br><br>Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton<br><br>BCESolve implements a Gurobi linear programming algorithm to solve for Bayes Correlated Equilibria. Use the tabs at the top left to navigate through the program. The game tab is used to specify and solve a game. The solution tab can be used to explore the solution object of a solved game. The log tab outputs progress of the algorithm while the solve routine is running. For more about the viewer, see the documentation. <br><br>For more information about Gurobi, see their <a href='http://www.gurobi.com/'>website</a>. To download Gurobi and acquire an academic license, see <a href='http://www.gurobi.com/registration/academic-license-reg'>this link</a>. <br><br>Inquiries can be directed to:<br><br>Ben Brooks<br>Chicago, IL\nben@benjaminbrooks.net<br>February 5, 2016");
+  aboutBox.setText("BCEViewer is part of the BCESolve library for solving games with incomplete information.<br><br>Copyright (C) 2022 Benjamin A. Brooks<br><br>BCESolve implements a Gurobi linear programming algorithm to solve for Bayes Correlated Equilibria. Use the tabs at the top left to navigate through the program. The game tab is used to specify and solve a game. The solution tab can be used to explore the solution object of a solved game. The log tab outputs progress of the algorithm while the solve routine is running. For more about the viewer, see the documentation. <br><br>For more information about Gurobi, see their <a href='http://www.gurobi.com/'>website</a>. To download Gurobi and acquire an academic license, see <a href='http://www.gurobi.com/registration/academic-license-reg'>this link</a>. <br><br>Inquiries can be directed to:<br><br>Ben Brooks<br>Chicago, IL\nben@benjaminbrooks.net<br>February 5, 2016");
   
   aboutBox.exec();
 }

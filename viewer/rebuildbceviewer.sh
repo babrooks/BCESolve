@@ -1,7 +1,5 @@
 #!/bin/bash
 
-
-
 rm -rf ./build/bceviewer.app
 qmake
 make

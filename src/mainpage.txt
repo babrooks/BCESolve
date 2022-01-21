@@ -1,7 +1,7 @@
 /*
 # This file is part of the BCESolve library for games of incomplete
 # information
-# Copyright (C) 2016 Benjamin A. Brooks and Robert J. Minton
+# Copyright (C) 2022 Benjamin A. Brooks
 #
 # BCESolve free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
@@ -36,15 +36,16 @@ payoffs of the players.
 
 \section installsec Installation
 
-To use the library, you must first install GUROBI and have the
-GUROBI libraries locatable on the path. The program also uses Boost
-libraries for serialization, which the user must install. The src
-and examples directories have makefiles for building the source
-code using GNU's make. The makefile may have to be edited to
-reflect the correct path to GUROBI and Boost. The program has most
-recently been compiled with gcc 4.8.2 and run using GUROBI 6.5.0
-and Boost 1.57 on Centos 7. To build the program, simply open a
-terminal, change to the examples directory, and run "make".
+To use the library, you must first install GUROBI and have the GUROBI
+libraries locatable on the path. The program also uses Boost libraries
+for serialization, which the user must install. The src and examples
+directories have makefiles for building the source code using GNU's
+make. The makefile may have to be edited to reflect the correct path
+to GUROBI and Boost. The program has most recently been compiled with
+clang++, Gurobi 9.0.3, Boost 1.76, and Qt6 on Mac OS 12.1. To build
+the program, simply change the library and include directories in
+localsettings.mk and localviewersettings.mk to your installation, and
+run the provided makefiles.
 
 \section overviewsolvesec Overview of the solver program
 
@@ -67,71 +68,83 @@ within.
 
 \section overviewviewersec Overview of the viewer program
 
-BCESolve also includes an accompanying viewer. It is capable of displaying
-data in a BCESolution object. This includes plotting player payoffs for
-all equilibria, plotting deviation objectives for each player,
-and plotting the probability distribution of player actions given the state.
-It also includes a tab for creating custom games, using the class BCEGame,
-which is derived from BCEAbstractGame. The user can control the conditional
-distribution of types, objective payoffs, the prior over the states, and
-weights on the objectives for maximization. The user can solve these
-custom games within the viewer. Output is displayed in a log tab, and the 
-solution is displayed in the solution tab. The custom BCEGame can also
-be serialized and de-serialized.
+BCESolve also includes an accompanying viewer. It is capable of
+displaying data in a BCESolution object. This includes plotting player
+payoffs for all equilibria, plotting deviation objectives for each
+player, and plotting the probability distribution of player actions
+given the state.  It also includes a tab for creating custom games,
+using the class BCEGame, which is derived from BCEAbstractGame. The
+user can control the conditional distribution of types, objective
+payoffs, the prior over the states, and weights on the objectives for
+maximization. The user can solve these custom games within the
+viewer. Output is displayed in a log tab, and the solution is
+displayed in the solution tab. The custom BCEGame can also be
+serialized and de-serialized.
 
-The interface contains three tabs: a solution tab, a game tab,
-and a log tab. The solution tab displays graphs depicting features of the currently
-loaded solution object. The game tab facilitates the both creation of custom games
-and editing of games written in c++. Custom and edited games can be also be solved from
-within the game tab. The log tab outputs progress and numerical solutions
-for any games games solved within the interface. 
+The interface contains three tabs: a solution tab, a game tab, and a
+log tab. The solution tab displays graphs depicting features of the
+currently loaded solution object. The game tab facilitates the both
+creation of custom games and editing of games written in c++. Custom
+and edited games can be also be solved from within the game tab. The
+log tab outputs progress and numerical solutions for any games games
+solved within the interface.
 
-The solution tab uses two main classes: BCEPlotHandler and BCEDataState. 
-BCEDataState contains solution data for the currently loaded solution and
-has methods for manipulating that data. It also contains the user controls
-in the solution tab. These controls make use of the BCELineEdit, BCECheckBox,
-and BCESlider classes. When users interact with these controls, data is 
-manipulated to reflect new parameters, and signals are sent to BCEPlotHandler
-that data has been updated. BCEPlotHandler receives signals from BCEDataState
-to plot data. Its methods are largely aimed at configuring the various plots
-displayed in the solution tab. It makes use of the custom plot class BCEValueSetPlot,
-which adds the abilities to retrieve mouse-over graph coordinates and interact
-by clicking on the plot. It also uses the custom label class BCELabel, which
-serves to label all plots in the solution tab (some of them dynamically, as titles
-change when data is manipulated).
+The solution tab uses two main classes: BCEPlotHandler and
+BCEDataState.  BCEDataState contains solution data for the currently
+loaded solution and has methods for manipulating that data. It also
+contains the user controls in the solution tab. These controls make
+use of the BCELineEdit, BCECheckBox, and BCESlider classes. When users
+interact with these controls, data is manipulated to reflect new
+parameters, and signals are sent to BCEPlotHandler that data has been
+updated. BCEPlotHandler receives signals from BCEDataState to plot
+data. Its methods are largely aimed at configuring the various plots
+displayed in the solution tab. It makes use of the custom plot class
+BCEValueSetPlot, which adds the abilities to retrieve mouse-over graph
+coordinates and interact by clicking on the plot. It also uses the
+custom label class BCELabel, which serves to label all plots in the
+solution tab (some of them dynamically, as titles change when data is
+manipulated).
 
-The game tab uses a number of large classes. The overarching class that 
-manages the many objects within the tab is the BCEGameHandler. BCEGameHandler uses
-the class BCEPushButton to implement user controls. The tables seen within the gametab
-are, from left to right, a BCEPayoffTableModel, a BCEConditionalTableModel,
-a BCEPriorTableModel, and a BCEObjWeightsTableModel. These all inherit from the 
-BCETableModel class, which sets general settings used by all the models. When data in these models is changed, the currently loaded BCEGame object is altered to reflect the changes, and the model retrieves that new data from the 
-game to display in the model. In other words, data entered into the model is not the
-data that the user sees; that entered data is entered into the game, and the model
-updates the data it displays with that new data from the game. Entering data into the model thus also reveals if the data was properly entered into
-the game object. BCETableView is also used by the BCEGameHandler. It sets general
-settings for displaying the models in the game tab. BCEGameHandler also uses BCESolverWorker
-for solving games. When the solve button is clicked by the user, a BCESolverWorker object
-is initialized and used to solve the game. Progress of the solve routine is sent to
+The game tab uses a number of large classes. The overarching class
+that manages the many objects within the tab is the
+BCEGameHandler. BCEGameHandler uses the class BCEPushButton to
+implement user controls. The tables seen within the gametab are, from
+left to right, a BCEPayoffTableModel, a BCEConditionalTableModel, a
+BCEPriorTableModel, and a BCEObjWeightsTableModel. These all inherit
+from the BCETableModel class, which sets general settings used by all
+the models. When data in these models is changed, the currently loaded
+BCEGame object is altered to reflect the changes, and the model
+retrieves that new data from the game to display in the model. In
+other words, data entered into the model is not the data that the user
+sees; that entered data is entered into the game, and the model
+updates the data it displays with that new data from the
+game. Entering data into the model thus also reveals if the data was
+properly entered into the game object. BCETableView is also used by
+the BCEGameHandler. It sets general settings for displaying the models
+in the game tab. BCEGameHandler also uses BCESolverWorker for solving
+games. When the solve button is clicked by the user, a BCESolverWorker
+object is initialized and used to solve the game. Progress of the
+solve routine is sent to the log tab.
+
+The log tab layout is created by BCELogHandler. BCELogStream, which is
+initilized in main.cpp, serves to redirect all cout in the program to
 the log tab.
 
-The log tab layout is created by BCELogHandler. BCELogStream, which is initilized in
-main.cpp, serves to redirect all cout in the program to the log tab. 
-
-Finally, BCEWindow is called to create the high level layout containing the three tabs:
-a BCEPlotHandler object, a BCEGameHandler object, and a BCELogHandler object. It also
-creates the menu bar and implements methods for loading and saving both games and solutions.
+Finally, BCEWindow is called to create the high level layout
+containing the three tabs: a BCEPlotHandler object, a BCEGameHandler
+object, and a BCELogHandler object. It also creates the menu bar and
+implements methods for loading and saving both games and solutions.
 
 
 \section examplesec Examples
 
-A number of examples have been provided to illustrate how to use
-the program. Please see fpaknown.cpp, which uses the class files
+A number of examples have been provided to illustrate how to use the
+program. Please see fpaknown.cpp, which uses the class files
 fpaknown.hpp and fpagame.hpp, for an example that solves a private
-first price auction. The file fpaunknown.cpp uses fpagame.hpp to
-solve an "unknown" private value auction. Also see fparandomrp.hpp
-for an example of a first price common value auction with a random
-reserve price.
+first price auction. The file fpaunknown.cpp uses fpagame.hpp to solve
+an "unknown" private value auction. Also see fparandomrp.hpp for an
+example of a first price common value auction with a random reserve
+price.
 
 These programs show how to derive from the BCEGame class to create a
 representation of your own game.
